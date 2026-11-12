@@ -6,7 +6,6 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <title>Natsune</title>
-    <!-- Ícono personalizado para la pantalla de inicio del iPhone -->
     <link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' fill='%23000000'/><g transform='translate(50,50)'><path d='M-28,6 C-38,16 -32,34 -8,32 C-24,30 -28,18 -20,12 Z' fill='%23ffffff'/><path d='M-22,12 C-30,20 -24,30 -4,28 C-16,26 -20,18 -14,14 Z' fill='%23ffffff'/><path d='M28,-6 C38,-16 32,-34 8,-32 C24,-30 28,-18 20,-12 Z' fill='%23ffffff'/><path d='M22,-12 C30,-20 24,-30 4,-28 C16,-26 20,-18 14,-14 Z' fill='%23ffffff'/><polygon points='-11,-24 11,-24 24,-11 24,11 11,24 -11,24 -24,11 -24,-11' fill='%23ffffff'/><circle cx='0' cy='0' r='13' fill='%23000000'/><circle cx='0' cy='0' r='9.5' fill='%23ffffff'/><circle cx='0' cy='0' r='6.5' fill='%23000000'/></g></svg>">
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Google+Sans:wght@400;500;600&display=swap" rel="stylesheet">
@@ -23,7 +22,6 @@
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
         }
-        /* Luz ambiental celeste inferior estilo Gemini */
         .gemini-ambient-glow {
             position: fixed;
             bottom: -50px;
@@ -49,7 +47,7 @@
             <div class="space-y-6">
                 <div class="flex items-center justify-between">
                     <span class="text-white font-medium text-base">Historial de Natsune</span>
-                    <button onclick="toggleDrawer()" class="text-[#8e918f] hover:text-white p-2">✕</button>
+                    <button onclick="toggleDrawer()" class="text-[#8e918f] hover:text-white p-2 text-lg">✕</button>
                 </div>
                 <button onclick="resetChat(); toggleDrawer();" class="w-full bg-[#1e1f20] hover:bg-[#282a2c] text-sky-400 border border-[#3c4043] rounded-full py-2.5 px-4 text-sm font-medium text-left flex items-center space-x-2 transition">
                     <span>+</span>
@@ -91,7 +89,7 @@
                 <svg class="w-3.5 h-3.5 text-sky-400 pointer-events-none -ml-3" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"></path></svg>
             </div>
 
-            <!-- Botón de Perfil Personalizado -->
+            <!-- Botón de Perfil con ID exacto -->
             <button onclick="toggleSettings()" id="profileAvatarBtn" class="w-8 h-8 rounded-full bg-gradient-to-tr from-blue-500 via-indigo-500 to-sky-400 flex items-center justify-center text-xs font-bold text-white shadow-sm transition active:scale-95">
                 N
             </button>
@@ -143,23 +141,23 @@
         </div>
     </footer>
 
-    <!-- Modal de Ajustes con Personalización de Perfil y APIs -->
+    <!-- Modal de Ajustes Completo -->
     <div id="settingsModal" class="fixed inset-0 bg-black/80 backdrop-blur-md hidden flex items-center justify-center p-4 z-50">
         <div class="bg-[#1e1f20] border border-[#3c4043] rounded-3xl p-6 max-w-sm w-full space-y-3.5 shadow-2xl max-h-[90vh] overflow-y-auto">
             <div class="flex justify-between items-center">
                 <h3 class="text-base font-medium text-white">Configuración de Natsune</h3>
-                <button onclick="toggleSettings()" class="text-[#8e918f] hover:text-white">✕</button>
+                <button onclick="toggleSettings()" class="text-[#8e918f] hover:text-white text-lg">✕</button>
             </div>
             <div>
                 <label class="text-xs text-[#c4c7c5]">Tu Nombre:</label>
                 <input type="text" id="userNameInput" placeholder="¿Cómo te llamas?" class="w-full bg-[#131314] border border-[#3c4043] rounded-xl px-3 py-2 text-sm text-white mt-1 focus:border-sky-400 focus:outline-none">
             </div>
             <div>
-                <label class="text-xs text-[#c4c7c5]">Ícono o Inicial del Perfil (ej: Tu inicial o un emoji 🚀):</label>
-                <input type="text" id="userAvatarInput" maxlength="3" placeholder="N o 🚀" class="w-full bg-[#131314] border border-[#3c4043] rounded-xl px-3 py-2 text-sm text-white mt-1 focus:border-sky-400 focus:outline-none text-center font-bold text-sky-400">
+                <label class="text-xs text-[#c4c7c5]">Inicial o Emoji del perfil (ej: N o 🚀):</label>
+                <input type="text" id="userAvatarInput" maxlength="3" placeholder="N" class="w-full bg-[#131314] border border-[#3c4043] rounded-xl px-3 py-2 text-sm text-white mt-1 focus:border-sky-400 focus:outline-none text-center font-bold text-sky-400">
             </div>
             <hr class="border-[#3c4043]">
-            <p class="text-[11px] text-[#8e918f]">Llaves API opcionales (se guardan solo en tu iPhone):</p>
+            <p class="text-[11px] text-[#8e918f]">Llaves API (para modelos externos en vivo):</p>
             <div>
                 <label class="text-xs text-[#c4c7c5]">Gemini API Key:</label>
                 <input type="password" id="keyGemini" placeholder="AIzaSy..." class="w-full bg-[#131314] border border-[#3c4043] rounded-xl px-3 py-2 text-xs text-white mt-1 focus:border-sky-400 focus:outline-none">
@@ -212,8 +210,15 @@
             document.getElementById('welcomeTitle').textContent = name ? `Hola, ${name}` : 'Hola';
         }
 
-        function toggleSettings() { document.getElementById('settingsModal').classList.toggle('hidden'); }
-        function toggleDrawer() { document.getElementById('sideDrawer').classList.toggle('hidden'); }
+        function toggleSettings() { 
+            const modal = document.getElementById('settingsModal');
+            modal.classList.toggle('hidden'); 
+        }
+
+        function toggleDrawer() { 
+            const drawer = document.getElementById('sideDrawer');
+            drawer.classList.toggle('hidden'); 
+        }
 
         function saveSettings() {
             const name = document.getElementById('userNameInput').value.trim();
@@ -221,7 +226,6 @@
             
             localStorage.setItem('natsune_username', name);
             localStorage.setItem('natsune_avatar', avatar);
-            
             document.getElementById('profileAvatarBtn').textContent = avatar;
 
             localStorage.setItem('key_gemini', document.getElementById('keyGemini').value.trim());
@@ -260,11 +264,11 @@
                 return;
             }
             list.innerHTML = '';
-            userMsgs.slice(-5).reverse().forEach(m => {
+            userMsgs.slice(-6).reverse().forEach(m => {
                 const item = document.createElement('div');
                 item.className = "truncate py-1.5 px-2 hover:bg-[#1e1f20] rounded-lg cursor-pointer text-xs text-[#e3e3e3]";
                 item.textContent = m.content;
-                item.onclick = () => toggleDrawer();
+                item.onclick = () => { toggleDrawer(); };
                 list.appendChild(item);
             });
         }
