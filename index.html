@@ -127,7 +127,7 @@
     <!-- Contenedor Principal -->
     <main id="chatContainer" class="flex-1 overflow-y-auto px-4 max-w-2xl w-full mx-auto flex flex-col no-scrollbar z-10 pt-2 pb-6 fade-quick">
         
-        <!-- Pantalla de Bienvenida -->
+        <!-- Pantalla de Bienvenida (Logo Ampliado) -->
         <div id="welcomeScreen" class="my-auto space-y-6 text-left py-8 fade-quick">
             <div class="space-y-2">
                 <div id="welcomeLogoContainer" class="w-16 h-16 sm:w-20 sm:h-20 mb-4 flex items-center justify-center"></div>
@@ -374,10 +374,9 @@
         function updateDynamicGreeting() {
             const name = localStorage.getItem('natsune_username') || '';
             const modelKey = getCurrentModelKey();
-            const modelName = getCurrentModelName();
 
             document.getElementById('welcomeTitle').textContent = name ? `Hola, ${name}` : 'Hola';
-            document.getElementById('welcomeSubtitle').textContent = `Usando ${modelName}. ¿Qué investigamos?`;
+            document.getElementById('welcomeSubtitle').textContent = `Usando Natsune. ¿Qué investigamos?`;
             
             document.getElementById('welcomeLogoContainer').innerHTML = getModelLogoSVG(modelKey, true);
             document.getElementById('headerModelTitle').textContent = "Natsune";
@@ -632,7 +631,7 @@
             saveStoredChats(chats);
         }
 
-        // Base de datos de conocimiento masiva local de respaldo
+        // Base de conocimiento masiva local
         const natsuneMassiveDatabase = [
             { keywords: ["hola", "hi", "hello", "hey", "buenos dias", "buenas tardes", "buenas noches"], reply: (nick) => `¡Hola, ${nick}! Qué gusto saludarte. ¿De qué tema te gustaría hablar o qué proyecto investigamos hoy? ✨` },
             { keywords: ["como estas", "que tal", "como te va"], reply: (nick) => `¡Todo excelente por aquí, lista y operando al 100% para ayudarte, ${nick}! 🌸` },
@@ -677,7 +676,7 @@
         }
 
         // =========================================================================
-        // MOTOR DE INTELIGENCIA UNIFICADO Y SILENCIOSO
+        // MOTOR DE INTELIGENCIA UNIFICADO
         // =========================================================================
         async function getChainedIntelligence(query, userName, chatHistory = []) {
             const nick = getAutoNickname(userName);
@@ -783,7 +782,7 @@
                 } catch (e) {}
             }
 
-            // 6. Respaldo definitivo y natural (Cero mensajes robóticos de error)
+            // 6. Respaldo definitivo y natural
             return `Comprendo tu planteamiento sobre "${query}", ${nick}. Es un tema fascinante que podemos analizar y desarrollar paso a paso. ¿Qué perspectiva o detalle te gustaría que profundicemos juntos? 🌸`;
         }
 
@@ -800,7 +799,7 @@
             let customName = resolveDisplayName(text);
             renderMessage('user', text || '[Archivo adjunto]', currentMedia, modelKey, customName, false);
 
-            const userName = localStorage.getItem('natsune_username'] || '';
+            const userName = localStorage.getItem('natsune_username') || '';
             const chats = getStoredChats();
             const currentChat = chats.find(c => c.id === currentChatId);
             const chatHistory = currentChat ? currentChat.messages : [];
