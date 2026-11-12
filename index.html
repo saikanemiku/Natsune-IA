@@ -666,7 +666,7 @@
         }
 
         // =========================================================================
-        // MOTOR DE INTELIGENCIA UNIFICADO CON MEMORIA COMPARTIDA Y AVISO DE N的话
+        // MOTOR DE INTELIGENCIA UNIFICADO CON MEMORIA COMPARTIDA Y RESPALDO DE NATSU
         // =========================================================================
         async function getChainedIntelligence(query, userName, chatHistory = []) {
             const nick = getAutoNickname(userName);
@@ -684,11 +684,11 @@
                 return `Comprendo tu planteamiento sobre "${query}", ${nick}. Es un tema fascinante que podemos analizar y desarrollar paso a paso. ¿Qué perspectiva o detalle te gustaría que profundizemos juntos? 🌸`;
             }
 
-            // 2. Si usa la API de Gemini (con memoria unificada del chat anterior)
+            // 2. Si usa la API de Gemini
             const geminiKey = localStorage.getItem('key_gemini');
             if (selectedModel === 'gemini') {
                 if (!geminiKey) {
-                    return `¡Uy, ${nick}! Parece que aún no has configurado tu llave API de Gemini en los ajustes. Toca tu avatar arriba a la derecha para ponerla y que podamos empezar. 🌸✨`;
+                    return { text: `¡Uy, ${nick}! Parece que aún no has configurado tu llave API de Gemini en los ajustes. Toca tu avatar arriba a la derecha para ponerla y que podamos empezar. 🌸✨`, isNatsune: true };
                 }
                 try {
                     const variant = document.getElementById('variantSelector').value;
@@ -707,15 +707,15 @@
                     });
                     const data = await res.json();
                     const aiText = data.candidates?.[0]?.content?.parts?.[0]?.text;
-                    if (aiText) return aiText;
+                    if (aiText) return { text: aiText, isNatsune: false };
                 } catch (e) {}
             }
 
-            // 3. Si usa la API de ChatGPT (con memoria unificada)
+            // 3. Si usa la API de ChatGPT
             const openAIKey = localStorage.getItem('key_openai');
             if (selectedModel === 'chatgpt') {
                 if (!openAIKey) {
-                    return `¡Uy, ${nick}! Falta configurar tu llave API de OpenAI (ChatGPT) en los ajustes para que podamos usar este modelo. 🌸`;
+                    return { text: `¡Uy, ${nick}! Falta configurar tu llave API de OpenAI (ChatGPT) en los ajustes para que podamos usar este modelo. 🌸`, isNatsune: true };
                 }
                 try {
                     let messagesPayload = chatHistory.map(msg => ({
@@ -737,15 +737,15 @@
                     });
                     const data = await res.json();
                     const aiText = data.choices?.[0]?.message?.content;
-                    if (aiText) return aiText;
+                    if (aiText) return { text: aiText, isNatsune: false };
                 } catch (e) {}
             }
 
-            // 4. Si usa la API de Claude (con memoria unificada)
+            // 4. Si usa la API de Claude
             const claudeKey = localStorage.getItem('key_claude');
             if (selectedModel === 'claude') {
                 if (!claudeKey) {
-                    return `¡Uy, ${nick}! Necesitas ingresar tu llave API de Claude (Anthropic) en la configuración para usarlo. 🌸`;
+                    return { text: `¡Uy, ${nick}! Necesitas ingresar tu llave API de Claude (Anthropic) en la configuración para usarlo. 🌸`, isNatsune: true };
                 }
                 try {
                     let messagesPayload = chatHistory.map(msg => ({
@@ -769,11 +769,11 @@
                     });
                     const data = await res.json();
                     const aiText = data.content?.[0]?.text;
-                    if (aiText) return aiText;
+                    if (aiText) return { text: aiText, isNatsune: false };
                 } catch (e) {}
             }
 
-            return `¡Vaya, ${nick}! Ocurrió un pequeño detalle al conectar con el servidor. Inténtalo de nuevo en un momento. 🌸`;
+            return { text: `¡Vaya, ${nick}! Ocurrió un pequeño detalle al conectar con el servidor. Inténtalo de nuevo en un momento. 🌸`, isNatsune: true };
         }
 
         async function sendMessage() {
@@ -788,17 +788,6 @@
             clearAttachment();
 
             let modelKey = getCurrentModelKey();
-            
-            // Si Natsune responde al avisar que falta la llave, usamos su identidad ("Natsune")
-            // Si responde la IA externa, usamos su nombre correspondiente (Gemini, ChatGPT, Claude)
-            const hasKey = (modelKey === 'natsune') || 
-                           (modelKey === 'gemini' && localStorage.getItem('key_gemini')) || 
-                           (modelKey === 'chatgpt' && localStorage.getItem('key_openai')) || 
-                           (modelKey === 'claude' && localStorage.getItem('key_claude'));
-
-            let respondingModelKey = hasKey ? modelKey : 'natsune';
-            let customName = hasKey ? getCurrentModelName() : 'Natsune';
-
             renderMessage('user', text || '[Archivo adjunto]', currentMedia, modelKey, 'Tú', false);
 
             const userName = localStorage.getItem('natsune_username') || '';
@@ -806,8 +795,14 @@
             const currentChat = chats.find(c => c.id === currentChatId);
             const chatHistory = currentChat ? currentChat.messages : [];
 
-            const reply = await getChainedIntelligence(text, userName, chatHistory);
-            renderMessage('natsune', reply, null, respondingModelKey, customName, true);
+            const result = await getChainedIntelligence(text, userName, chatHistory);
+            
+            // Si Natsune responde por falta de llave o error, se muestra con su logo y nombre "Natsune"
+            // Si responde la IA externa correctamente, usa su respectivo logo y nombre
+            let finalModelKey = result.isNatsune ? 'natsune' : modelKey;
+            let finalName = result.isNatsune ? 'Natsune' : getCurrentModelName();
+
+            renderMessage('natsune', result.text, null, finalModelKey, finalName, true);
         }
 
         if (userInput) {
@@ -821,4 +816,3 @@
     </script>
 </body>
 </html>
-ñ
