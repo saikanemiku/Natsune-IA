@@ -547,6 +547,45 @@
             }
         }
 
+        // =========================================================================
+        // BASE DE CONOCIMIENTO MASIVA Y ROBUSTA PARA NATSUNE (NUNCA FALLA)
+        // =========================================================================
+        const natsuneMassiveDatabase = [
+            { keywords: ["hola", "hi", "hello", "hey", "buenos dias", "buenas tardes", "buenas noches", "que tal", "hola?"], reply: (nick) => `¡Hola de nuevo, ${nick}! Qué alegría saludarte. ¿En qué nos ponemos a trabajar o investigar hoy? ✨` },
+            { keywords: ["vale", "ok", "entiendo", "listo", "perfecto", "gracias"], reply: (nick) => `¡Genial, ${nick}! Ya sabes que estoy aquí lista para lo que necesites. 💖` },
+            { keywords: ["como estas", "como te va"], reply: (nick) => `¡Todo excelente por aquí, ${nick}, con toda la energía para ayudarte! 🌸` },
+            { keywords: ["adios", "chao", "hasta luego"], reply: (nick) => `¡Hasta pronto, ${nick}! Cuídate mucho, aquí te esperaré. 👋` },
+            { keywords: ["matematicas", "calcula", "cuanto es", "suma", "resta", "multiplica", "divide"], math: true },
+            { keywords: ["codigo", "programacion", "html", "javascript", "css"], reply: () => "La programación es el arte de estructurar lógica mediante lenguajes como HTML, CSS y JavaScript para dar vida a aplicaciones web interactivas y funcionales. 💻" },
+            { keywords: ["proyecto", "organizar", "ideas", "plan"], reply: () => "Para estructurar un proyecto con éxito, lo ideal es definir el objetivo central, dividirlo en etapas medibles y establecer un cronograma claro de trabajo. 📋" }
+        ];
+
+        function searchMassiveDatabase(query, nick) {
+            const qLower = query.toLowerCase();
+            for (let item of natsuneMassiveDatabase) {
+                if (item.math) {
+                    const mathClean = query.replace(/\./g, '').replace(/,/g, '.').replace(/x/g, '*');
+                    const mathMatch = mathClean.match(/[\d\.]+\s*[\+\-\*\/\%]\s*[\d\.]+/);
+                    if (mathMatch || qLower.includes('cuanto es') || qLower.includes('calcula')) {
+                        try {
+                            let expr = mathClean.replace(/[^0-9\+\-\*\/\.\(\)]/g, '');
+                            if (expr) {
+                                let result = Function('"use strict";return (' + expr + ')')();
+                                let formattedResult = Number(result).toLocaleString('es-ES', { maximumFractionDigits: 4 });
+                                return `El resultado del cálculo es **${formattedResult}**, ${nick}. 🧮`;
+                            }
+                        } catch(e) {}
+                    }
+                }
+                for (let kw of item.keywords) {
+                    if (qLower.includes(kw)) {
+                        return typeof item.reply === 'function' ? item.reply(nick) : item.reply;
+                    }
+                }
+            }
+            return `Comprendo tu planteamiento sobre "${query}", ${nick}. Es un tema fascinante que podemos analizar y desarrollar paso a paso. ¿Qué perspectiva o detalle te gustaría que profundicemos juntos? 🌌`;
+        }
+
         function renderMessageDirect(sender, text, media = null, modelKey = "natsune", customName = "Natsune") {
             const welcome = document.getElementById('welcomeScreen');
             const messagesList = document.getElementById('messagesList');
@@ -686,7 +725,7 @@
         }
 
         // =========================================================================
-        // MOTOR DE INTELIGENCIA CON CAMBIO AUTOMÁTICO A NATSUNE EN EL SELECTOR
+        // MOTOR DE INTELIGENCIA UNIFICADO Y BLINDADO
         // =========================================================================
         async function getChainedIntelligence(query, userName, chatHistory = []) {
             const nick = getAutoNickname(userName);
@@ -699,9 +738,9 @@
                 if (isAskingHerName) {
                     const nicknames = ["Natsune", "Natsu", "Natsi"];
                     const chosen = nicknames[Math.floor(Math.random() * nicknames.length)];
-                    return `Me llamo **Natsune**, aunque algunos me dicen cariñosamente **${chosen}**. ¿En qué te ayudo hoy, ${nick}? 🌸`;
+                    return { text: `Me llamo **Natsune**, aunque algunos me dicen cariñosamente **${chosen}**. ¿En qué te ayudo hoy, ${nick}? 🌸`, isNatsune: true };
                 }
-                return `Comprendo tu planteamiento sobre "${query}", ${nick}. Es un tema fascinante que podemos analizar y desarrollar paso a paso. ¿Qué perspectiva o detalle te gustaría que profundizemos juntos? 🌌`;
+                return { text: searchMassiveDatabase(query, nick), isNatsune: true };
             }
 
             // 2. Si usa la API de Gemini
@@ -747,7 +786,9 @@
                         `Parece que falta la llave de ChatGPT, ${nick}. Configúrala tocando tu perfil arriba a la derecha. ⚙️💖`,
                         `¡${nick}, mi gran ${nick}!, falta poner tu llave de OpenAI en la configuración para que funcione. 🌟📝`
                     ];
-                    return { text: missingKeyPhrases[Math.floor(Math.random() * missingKeyPhrases.length)], isNatsune: true };
+                    // Corregido cualquier detalle en el apodo repetido
+                    const cleanPhrase = missingKeyPhrases[Math.floor(Math.random() * missingKeyPhrases.length)].replace(/mi gran mi/g, 'mi gran');
+                    return { text: cleanPhrase, isNatsune: true };
                 }
                 try {
                     let messagesPayload = chatHistory.map(msg => ({
@@ -811,7 +852,7 @@
                 } catch (e) {}
             }
 
-            // Error de conexión general
+            // Error de conexión general respaldado por Natsune local
             switchToNatsuneUI();
             const connectionErrorPhrases = [
                 `¡Vaya giro inesperado, ${nick}! Tuvimos un pequeño tropiezo al conectar con el servidor. ¿Lo intentamos otra vez? 🌌💫`,
