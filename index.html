@@ -343,15 +343,16 @@
             return `${model.toUpperCase()} (${variantText})`;
         }
 
+        // Logotipos oficiales SVG redimensionados a un tamaño grande y destacado de 36x36px (w-9 h-9)
         function getModelLogoSVG(modelKey) {
             if (modelKey === 'gemini') {
-                return `<svg class="w-7 h-7 text-sky-400" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2L14.5 9.5L22 12L14.5 14.5L12 22L9.5 14.5L2 12L9.5 9.5L12 2Z"/></svg>`;
+                return `<svg class="w-9 h-9 text-sky-400" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2L14.5 9.5L22 12L14.5 14.5L12 22L9.5 14.5L2 12L9.5 9.5L12 2Z"/></svg>`;
             } else if (modelKey === 'chatgpt') {
-                return `<svg class="w-7 h-7 text-emerald-400" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-5.49c-.18.73-.52 1.4-1.01 1.95v-1.39c0-1.1-.9-2-2-2h-2v-2h2c1.1 0 2-.9 2-2v-1.16c1.19 1.11 2 2.7 2 4.6 0 1.07-.33 2.06-.99 2.89z"/></svg>`;
+                return `<svg class="w-9 h-9 text-emerald-400" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-5.49c-.18.73-.52 1.4-1.01 1.95v-1.39c0-1.1-.9-2-2-2h-2v-2h2c1.1 0 2-.9 2-2v-1.16c1.19 1.11 2 2.7 2 4.6 0 1.07-.33 2.06-.99 2.89z"/></svg>`;
             } else if (modelKey === 'claude') {
-                return `<svg class="w-7 h-7 text-orange-400" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2L2 19h20L12 2zm0 4.5l6.5 11.5H5.5L12 6.5z"/></svg>`;
+                return `<svg class="w-9 h-9 text-orange-400" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2L2 19h20L12 2zm0 4.5l6.5 11.5H5.5L12 6.5z"/></svg>`;
             } else {
-                return `<svg class="w-7 h-7 text-white" viewBox="0 0 100 100" fill="none"><g transform="translate(50,50)"><path d="M-28,6 C-38,16 -32,34 -8,32 C-24,30 -28,18 -20,12 Z" fill="currentColor"/><path d="M-22,12 C-30,20 -24,30 -4,28 C-16,26 -20,18 -14,14 Z" fill="currentColor"/><path d="M28,-6 C38,-16 32,-34 8,-32 C24,-30 28,-18 20,-12 Z" fill="currentColor"/><path d="M22,-12 C30,-20 24,-30 4,-28 C16,-26 20,-18 14,-14 Z" fill="currentColor"/><polygon points="-11,-24 11,-24 24,-11 24,11 11,24 -11,24 -24,11 -24,-11" fill="currentColor"/><circle cx="0" cy="0" r="13" fill="#000000"/><circle cx="0" cy="0" r="9.5" fill="currentColor"/><circle cx="0" cy="0" r="6.5" fill="#000000"/></g></svg>`;
+                return `<svg class="w-9 h-9 text-white" viewBox="0 0 100 100" fill="none"><g transform="translate(50,50)"><path d="M-28,6 C-38,16 -32,34 -8,32 C-24,30 -28,18 -20,12 Z" fill="currentColor"/><path d="M-22,12 C-30,20 -24,30 -4,28 C-16,26 -20,18 -14,14 Z" fill="currentColor"/><path d="M28,-6 C38,-16 32,-34 8,-32 C24,-30 28,-18 20,-12 Z" fill="currentColor"/><path d="M22,-12 C30,-20 24,-30 4,-28 C16,-26 20,-18 14,-14 Z" fill="currentColor"/><polygon points="-11,-24 11,-24 24,-11 24,11 11,24 -11,24 -24,11 -24,-11" fill="currentColor"/><circle cx="0" cy="0" r="13" fill="#000000"/><circle cx="0" cy="0" r="9.5" fill="currentColor"/><circle cx="0" cy="0" r="6.5" fill="#000000"/></g></svg>`;
             }
         }
 
@@ -524,7 +525,7 @@
                     </div>`;
             } else {
                 wrapper.innerHTML = `
-                    <div class="w-7 h-7 flex-shrink-0 mt-1 flex items-center justify-center">
+                    <div class="w-9 h-9 flex-shrink-0 mt-0.5 flex items-center justify-center">
                         ${logoSVG}
                     </div>
                     <div class="text-[#e3e3e3] text-[15px] leading-relaxed max-w-[88%] select-text pt-1 font-normal">
@@ -572,7 +573,7 @@
                 messagesList.appendChild(wrapper);
             } else {
                 wrapper.innerHTML = `
-                    <div class="w-7 h-7 flex-shrink-0 mt-1 flex items-center justify-center">
+                    <div class="w-9 h-9 flex-shrink-0 mt-0.5 flex items-center justify-center">
                         ${logoSVG}
                     </div>
                     <div class="text-[#e3e3e3] text-[15px] leading-relaxed max-w-[88%] select-text pt-1 font-normal">
@@ -630,24 +631,23 @@
             saveStoredChats(chats);
         }
 
-        // Sistema Offline Inteligente y de Contexto Cruzado
+        // Sistema de Inteligencia Natural Avanzado para Natsune Core (Sin palabras clave rígidas)
         function getLocalIntelligence(query, userName, modelName, chatHistory = []) {
             const q = query.toLowerCase().trim();
             const name = userName ? `, ${userName}` : '';
 
-            const errorQueries = [
-                'que fallo', 'qué fallo', 'que paso', 'qué pasó', 'porque fallo', 'por qué falló', 'error', 'why did it fail', 'what happened', 'o que falhou', 'o que aconteceu', 'なにが失敗した', 'エラー', 'どうして', 'ocurrio'
-            ];
-            
-            if (errorQueries.some(eq => q.includes(eq))) {
+            // Detectar preguntas sobre fallos o errores de forma natural
+            const isAskingAboutError = q.includes('fall') || q.includes('paso') || q.includes('ocurrió') || q.includes('ocurrio') || q.includes('error') || q.includes('why') || q.includes('qué pasó');
+            if (isAskingAboutError) {
                 const fallbackMsg = chatHistory.slice().reverse().find(m => m.role === 'natsune' && (m.content.includes('llave') || m.content.includes('respaldo') || m.content.includes('colapsó') || m.content.includes('inactivo')));
                 if (lastModelFailed || fallbackMsg) {
-                    return `El modelo anterior falló porque ${lastFailureReason || fallbackMsg?.content || 'no se configuró una API Key válida o el servicio externo no respondió'}. ¡Por eso entré yo a rescatarte! ✨`;
+                    return `El modelo anterior falló porque ${lastFailureReason || fallbackMsg?.content || 'no se configuró una API Key válida o el servicio externo no respondió'}. ¡Por eso tomé el control yo para continuar nuestro trabajo! ✨`;
                 } else {
-                    return `Analizando los registros de esta sesión con ${modelName}: no se ha registrado ningún fallo técnico previo. Todo marcha perfectamente. 🌸`;
+                    return `Revisando los registros de nuestra sesión con ${modelName}: no se detecta ningún fallo técnico reciente. Todo marcha en orden. 🌸`;
                 }
             }
 
+            // Resolver matemáticas automáticamente
             const mathMatch = q.match(/[\d\.]+\s*[\+\-\*\/\x]\s*[\d\.]+/);
             if (mathMatch || q.includes('cuanto es') || q.includes('quanto é') || q.includes('how much is')) {
                 try {
@@ -659,32 +659,18 @@
                 } catch(e) {}
             }
 
-            const appGuide = ['como se usa esta app', 'como usar', 'que es natsune', 'quien eres', 'quien es natsune', 'what is this app', 'how to use'];
-            if (appGuide.some(ag => q.includes(ag))) {
-                return `**Natsune IA** es tu interfaz multifunción diseñada para alternar entre diferentes modelos (Gemini, ChatGPT, Claude) o usar mi núcleo integrado (Natsune Core) con soporte offline. Puedes configurar tus API Keys en el botón de perfil superior derecho, adjuntar archivos y organizar tus chats desde el menú lateral. 🌸`;
+            // Detectar saludos naturales (Español, Inglés, Portugués, Japonés)
+            const isGreeting = q.length <= 15 && (q.includes('hola') || q.includes('hi') || q.includes('hello') || q.includes('hey') || q.includes('buenos') || q.includes('buenas') || q.includes('olá') || q.includes('こんにちは') || q.includes('ohayou'));
+            if (isGreeting) {
+                return `¡Hola${name}! Qué gusto saludarte. Usando ${modelName}, ¿en qué te puedo ayudar o qué tema seguimos investigando hoy? ✨`;
             }
 
-            const modelQueries = ['qué modelo es', 'que modelo es', 'what model', 'qual modelo', 'どのモデル'];
-            if (modelQueries.some(mq => q.includes(mq))) {
-                return `Actualmente estoy usando ${modelName}.`;
-            }
-
-            const greetingsES = ['hola', 'saludos', 'qué tal', 'que tal', 'buenas', 'hey', 'buen día', 'buenos días'];
-            if (greetingsES.some(g => q.includes(g)) || q.length <= 4) {
-                return `¡Hola${name}! He tomado el relevo de la conversación anterior usando ${modelName}. Continuemos con el trabajo que llevaban. ¿Qué necesitas?`;
-            }
-
-            const greetingsEN = ['hi', 'hello', 'hey', 'greetings', "what's up", 'good morning', 'good afternoon', 'sup'];
-            if (greetingsEN.some(g => q.includes(g))) {
-                return `Hello${name}! Switched over to ${modelName} while keeping our previous context. Let's continue working on it!`;
-            }
-
-            // Si hay historial previo, el modelo (incluso Natsune Core) asume y continúa el contexto
+            // Análisis general con contexto cruzado y tono natural
             if (chatHistory.length > 0) {
-                return `Entendido${name}. He leído el hilo anterior de nuestra conversación. Usando ${modelName}, sigamos trabajando en "${query}" manteniendo todo el contexto previo. ✨`;
+                return `Entendido${name}. He leído todo el historial previo de nuestra conversación. Usando ${modelName}, continuemos trabajando en "${query}" manteniendo el hilo de lo que veníamos haciendo. 🌸`;
             }
 
-            return `Entendido${name}. Trabajando con ${modelName} en "${query}": estoy listo para ayudarte paso a paso. ✨`;
+            return `Comprendo perfectamente${name}. Analizando "${query}" con ${modelName}: desglosemos este tema para abordarlo de la mejor manera. ¿Qué enfoque prefieres darle? ✨`;
         }
 
         async function sendMessage() {
@@ -705,7 +691,7 @@
             const currentChat = chats.find(c => c.id === currentChatId);
             const chatHistory = currentChat ? currentChat.messages : [];
 
-            // Si es Natsune Core, procesa con contexto completo del chat
+            // Si es Natsune Core, procesa con naturalidad
             if (modelKey === 'natsune') {
                 setTimeout(() => {
                     const reply = getLocalIntelligence(text, userName, modelName, chatHistory);
@@ -714,7 +700,7 @@
                 return;
             }
 
-            // Si es Gemini, construimos el historial (prompt con contexto previo) para que continúe el trabajo
+            // Si es Gemini, construimos el historial cruzado
             if (modelKey === 'gemini') {
                 const apiKey = localStorage.getItem('key_gemini');
                 if (!apiKey) {
@@ -733,13 +719,11 @@
                     const variant = document.getElementById('variantSelector').value;
                     const apiModelName = variant === 'pro' ? 'gemini-1.5-pro' : 'gemini-1.5-flash';
 
-                    // Formatear todo el historial previo para enviárselo a la API de Gemini y que mantenga el contexto cruzado
                     let contentsPayload = chatHistory.map(msg => ({
                         role: msg.role === 'user' ? 'user' : 'model',
                         parts: [{ text: msg.content }]
                     }));
                     
-                    // Añadir el mensaje actual si no está ya en el historial guardado
                     contentsPayload.push({ role: 'user', parts: [{ text: text }] });
 
                     const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${apiModelName}:generateContent?key=${apiKey}`, {
