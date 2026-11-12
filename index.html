@@ -53,34 +53,34 @@
 
     <!-- Menú Lateral Estilo Gemini Oficial -->
     <div id="sideDrawer" class="fixed inset-0 z-40 bg-black/70 backdrop-blur-sm hidden fade-quick opacity-0">
-        <div class="absolute left-0 top-0 bottom-0 w-72 bg-[#131314] border-r border-[#282a2c] p-4 flex flex-col justify-between shadow-2xl transform -translate-x-full transition-transform duration-200 ease-out" id="drawerPanel">
+        <div class="absolute left-0 top-0 bottom-0 w-80 bg-[#131314] border-r border-[#282a2c] p-4 flex flex-col justify-between shadow-2xl transform -translate-x-full transition-transform duration-200 ease-out" id="drawerPanel">
             <div class="space-y-4">
-                <div class="flex items-center justify-between px-2 pt-1">
+                <div class="flex items-center justify-between px-2 pt-1 pb-2 border-b border-[#282a2c]">
                     <span class="text-[#e3e3e3] font-medium text-sm flex items-center space-x-2">
-                        <span>✦</span>
+                        <span class="text-sky-400">✦</span>
                         <span>Natsune IA</span>
                     </span>
                     <button onclick="toggleDrawer()" class="text-[#c4c7c5] hover:text-white p-2 rounded-full hover:bg-[#1e1f20] transition">✕</button>
                 </div>
-                <button onclick="resetChat(); toggleDrawer();" class="w-full bg-[#1e1f20] hover:bg-[#282a2c] text-[#e3e3e3] rounded-full py-3 px-4 text-sm font-medium text-left flex items-center space-x-3 transition active:scale-95">
-                    <svg class="w-5 h-5 text-sky-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"></path></svg>
+                <button onclick="resetChat(); toggleDrawer();" class="w-full bg-[#1e1f20] hover:bg-[#282a2c] text-[#e3e3e3] rounded-full py-3 px-4 text-sm font-medium text-left flex items-center space-x-3 transition active:scale-95 shadow-sm border border-[#3c4043]/50">
+                    <span class="text-sky-400 text-lg font-light">+</span>
                     <span>Nuevo chat</span>
                 </button>
-                <div class="space-y-1 pt-3">
-                    <p class="text-[11px] text-[#8e918f] font-medium px-3 uppercase tracking-wider">Recientes</p>
+                <div class="space-y-1 pt-2">
+                    <p class="text-[11px] text-[#8e918f] font-medium px-3 uppercase tracking-wider">Chats recientes</p>
                     <div id="historyList" class="space-y-0.5 text-sm text-[#c4c7c5] max-h-[55vh] overflow-y-auto no-scrollbar">
                         <p class="text-xs text-[#666] italic py-2 px-3">Sin actividad reciente</p>
                     </div>
                 </div>
             </div>
-            <div class="border-t border-[#282a2c] pt-3 px-2 flex items-center justify-between text-xs text-[#8e918f]">
-                <span>Memoria Local</span>
+            <div class="border-t border-[#282a2c] pt-3 px-3 flex items-center justify-between text-xs text-[#8e918f]">
+                <span>Memoria local activa</span>
                 <button onclick="clearMemory(); toggleDrawer();" class="text-red-400 hover:underline">Borrar todo</button>
             </div>
         </div>
     </div>
 
-    <!-- Cabecera Corregida (Limpia en una sola línea) -->
+    <!-- Cabecera Oficial Optimizada -->
     <header class="flex items-center justify-between px-3 py-3 bg-black z-20 space-x-2">
         <div class="flex items-center space-x-2 flex-shrink-0">
             <button onclick="toggleDrawer()" title="Menú" class="p-2 rounded-full hover:bg-[#1f2124] text-[#c4c7c5] transition active:scale-95">
@@ -91,7 +91,7 @@
 
         <div class="flex items-center space-x-1.5 overflow-x-auto no-scrollbar">
             <!-- Selector de Modelo Principal -->
-            <div class="relative flex items-center bg-[#1e1f20] hover:bg-[#282a2c] border border-[#3c4043] rounded-full px-2 py-1 flex-shrink-0">
+            <div class="relative flex items-center bg-[#1e1f20] hover:bg-[#282a2c] border border-[#3c4043] rounded-full px-2.5 py-1 flex-shrink-0">
                 <select id="modelSelector" onchange="handleModelChange()" class="bg-transparent text-xs font-medium text-[#e3e3e3] appearance-none pr-3 focus:outline-none cursor-pointer">
                     <option value="natsune" class="bg-[#1e1f20]">Core</option>
                     <option value="gemini" class="bg-[#1e1f20]">Gemini</option>
@@ -102,7 +102,7 @@
             </div>
 
             <!-- Selector de Variante -->
-            <div class="relative flex items-center bg-[#1e1f20] hover:bg-[#282a2c] border border-[#3c4043] rounded-full px-2 py-1 flex-shrink-0">
+            <div class="relative flex items-center bg-[#1e1f20] hover:bg-[#282a2c] border border-[#3c4043] rounded-full px-2.5 py-1 flex-shrink-0">
                 <select id="variantSelector" onchange="handleVariantChange()" class="bg-transparent text-xs font-medium text-sky-400 appearance-none pr-3 focus:outline-none cursor-pointer">
                     <option value="default" class="bg-[#1e1f20]">Standard</option>
                 </select>
@@ -474,7 +474,7 @@
             }
         }
 
-        // Saludos naturales y respuestas fluidas (sin formalismos exagerados)
+        // Saludos naturales, directos y cercanos
         function getLocalIntelligence(query, userName, modelName, isFallback = false) {
             const q = query.toLowerCase();
             const name = userName ? `, ${userName}` : '';
@@ -484,16 +484,16 @@
             }
 
             if (isFallback) {
-                return `¡Vaya! Parece que el modelo anterior tuvo un pequeño problema técnico y no pudo responder. Mil disculpas por el inconveniente. He activado **Natsune Core** para ayudarte de inmediato. Si prefieres otro modelo, puedes seleccionarlo arriba cuando gustes.`;
+                return `¡Vaya! Parece que el modelo anterior no respondió como esperábamos. Te pido una disculpa por el inconveniente. He activado **Natsune Core** como respaldo para continuar sin problemas. Si prefieres otro, puedes seleccionarlo arriba cuando gustes.`;
             }
 
             if (q.includes('imagen') || q.includes('genera') || q.includes('dibuja')) {
-                return `Aquí tienes tu imagen generada con ${modelName}. ¿Qué te parece el resultado?`;
+                return `Aquí tienes tu imagen generada con ${modelName}. ¿Qué te parece?`;
             }
             if (q.includes('hola') || q.includes('buenas') || q.includes('saludos')) {
-                return `¡Hola${name}! Todo listo usando ${modelName}. ¿Qué tal va tu día?`;
+                return `¡Hola${name}! Todo listo usando ${modelName}. ¿En qué te ayudo?`;
             }
-            return `Entendido${name}. Usando ${modelName}, sobre "${query}": dime qué necesitas exactamente y lo resolvemos.`;
+            return `Entendido${name}. Usando ${modelName}, sobre "${query}": cuéntame los detalles para empezar.`;
         }
 
         async function sendMessage() {
