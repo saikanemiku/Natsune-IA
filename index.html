@@ -484,25 +484,16 @@
         function resolveDisplayName(modelKey, query = "") {
             if (modelKey !== 'natsune') return modelKey.toUpperCase();
             const q = query.toLowerCase();
-            if (q.includes('cómo te llamas') || q.includes('como te llamas') || q.includes('tu nombre') || q.includes('te llamas') || q.includes('como te llaman') || q.includes('apodo')) {
+            if ((q.includes('cómo te llamas') || q.includes('como te llamas') || q.includes('tu nombre') || q.includes('te llamas') || q.includes('como te llaman') || q.includes('apodo')) && !q.includes('don quijote')) {
                 const nicknames = ["Natsune", "Natsu", "Natsi"];
                 return nicknames[Math.floor(Math.random() * nicknames.length)];
             }
             return "Natsune";
         }
 
-        // Genera un apodo automático basado en el nombre de usuario configurado
         function getAutoNickname(userName) {
             if (!userName) return "amigo(a)";
-            const clean = userName.trim();
-            const firstWord = clean.split(' ')[0];
-            const lower = firstWord.toLowerCase();
-            
-            // Si el nombre tiene sufijos o caracteres específicos, o personaliza según el nombre
-            if (lower.endsWith('a') || lower.endsWith('e') || lower.endsWith('i') || lower.endsWith('o') || lower.endsWith('u')) {
-                return firstWord;
-            }
-            return firstWord;
+            return userName.trim().split(' ')[0];
         }
 
         function renderMessageDirect(sender, text, media = null, modelKey = "natsune", customName = "Natsune") {
@@ -641,14 +632,15 @@
             saveStoredChats(chats);
         }
 
-        // Base de datos de conocimiento masiva
+        // Base de datos de conocimiento masiva corregida y depurada
         const natsuneMassiveDatabase = [
             { keywords: ["hola", "hi", "hello", "hey", "buenos dias", "buenas tardes", "buenas noches"], reply: (nick) => `¡Hola, ${nick}! Qué gusto saludarte. ¿De qué tema te gustaría hablar o qué proyecto investigamos hoy? ✨` },
             { keywords: ["como estas", "que tal", "como te va"], reply: (nick) => `¡Todo excelente por aquí, lista y operando al 100% para ayudarte, ${nick}! 🌸` },
             { keywords: ["gracias", "thank you", "te agradezco"], reply: (nick) => `¡De nada, ${nick}! Ya sabes que cuentas conmigo para lo que necesites. 💖` },
             { keywords: ["adios", "chao", "hasta luego", "nos vemos"], reply: (nick) => `¡Hasta pronto, ${nick}! Aquí estaré cuando me necesites de nuevo. 👋` },
             { keywords: ["matematicas", "calcula", "cuanto es", "suma", "resta", "multiplica", "divide"], math: true },
-            { keywords: ["nombre", "te llamas", "quien eres", "apodo"], identity: true },
+            { keywords: ["como te llamas", "tu nombre", "te llamas", "quien eres", "apodo"], identity: true },
+            { keywords: ["don quijote", "quijote", "miguel de cervantes"], reply: (nick) => `Don Quijote de la Mancha es el protagonista de la famosa novela de Miguel de Cervantes. Es un hidalgo ingenioso que, enloquecido por leer tantas novelas de caballería, decide convertirse en caballero andante para entablar batallas imaginarias y defender la justicia, acompañado de su fiel escudero Sancho Panza. 📚✨` },
             { keywords: ["libro diario", "contabilidad", "asiento contable"], reply: () => "El Libro Diario es un registro contable cronológico donde se anotan todas las transacciones comerciales de una empresa mediante asientos de débito y crédito. 📊" },
             { keywords: ["libro mayor", "cuentas t"], reply: () => "El Libro Mayor agrupa y resume los movimientos de cada cuenta contable específica provenientes del Libro Diario, permitiendo conocer el saldo actual de cada una. 📚" },
             { keywords: ["activo", "pasivo", "patrimonio"], reply: () => "En contabilidad, los Activos son los bienes y derechos de la empresa, los Pasivos son las obligaciones y deudas, y el Patrimonio representa los recursos netos de los dueños. 💼" },
@@ -676,7 +668,7 @@
                     }
                 }
                 if (item.identity) {
-                    const nicknames = ["Natsune", "Natsu", "Natsi"];
+                    const nicknames = ["Natsu", "Natsi", "Natsune"];
                     const chosen = nicknames[Math.floor(Math.random() * nicknames.length)];
                     return `Me llamo **Natsune**, aunque algunos me dicen cariñosamente **${chosen}**. ¿En qué te ayudo hoy, ${nick}? 🌸`;
                 }
