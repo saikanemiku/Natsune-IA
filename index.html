@@ -524,7 +524,19 @@
 
         function getAutoNickname(userName) {
             if (!userName) return "amigo(a)";
-            return userName.trim().split(' ')[0];
+            const cleanName = userName.trim();
+            const firstWord = cleanName.split(' ')[0].toLowerCase();
+
+            // Apodos dinámicos y variados según el nombre del usuario
+            if (firstWord === 'saikane') {
+                const variants = ["Saikane-chan", "chiquitín(a)", "mi estrellita", "dulzura"];
+                return variants[Math.floor(Math.random() * variants.length)];
+            } else if (firstWord.length > 5) {
+                return "tesoro";
+            } else {
+                const generalNicknames = ["dulzura", "estrellita", "peque", "corazón", "viajero(a)"];
+                return generalNicknames[Math.floor(Math.random() * generalNicknames.length)];
+            }
         }
 
         function renderMessageDirect(sender, text, media = null, modelKey = "natsune", customName = "Natsune") {
@@ -666,7 +678,7 @@
         }
 
         // =========================================================================
-        // MOTOR DE INTELIGENCIA UNIFICADO CON MEMORIA COMPARTIDA Y RESPALDO DE NATSU
+        // MOTOR DE INTELIGENCIA CON FRASES DE ERROR VARIADAS Y EMOJIS MÁGICOS
         // =========================================================================
         async function getChainedIntelligence(query, userName, chatHistory = []) {
             const nick = getAutoNickname(userName);
@@ -681,14 +693,19 @@
                     const chosen = nicknames[Math.floor(Math.random() * nicknames.length)];
                     return `Me llamo **Natsune**, aunque algunos me dicen cariñosamente **${chosen}**. ¿En qué te ayudo hoy, ${nick}? 🌸`;
                 }
-                return `Comprendo tu planteamiento sobre "${query}", ${nick}. Es un tema fascinante que podemos analizar y desarrollar paso a paso. ¿Qué perspectiva o detalle te gustaría que profundizemos juntos? 🌸`;
+                return `Comprendo tu planteamiento sobre "${query}", ${nick}. Es un tema fascinante que podemos analizar y desarrollar paso a paso. ¿Qué perspectiva o detalle te gustaría que profundizemos juntos? 🌌`;
             }
 
             // 2. Si usa la API de Gemini
             const geminiKey = localStorage.getItem('key_gemini');
             if (selectedModel === 'gemini') {
                 if (!geminiKey) {
-                    return { text: `¡Uy, ${nick}! Parece que aún no has configurado tu llave API de Gemini en los ajustes. Toca tu avatar arriba a la derecha para ponerla y que podamos empezar. 🌸✨`, isNatsune: true };
+                    const missingKeyPhrases = [
+                        `¡Vaya, ${nick}! Parece que olvidaste colocar tu llave API de Gemini en los ajustes. Toca tu foto de perfil arriba para configurarla. 🗝️✨`,
+                        `Uy ${nick}, no encuentro la llave API de Gemini configurada. Pásala por los ajustes para que desatemos todo el poder. ⚡💫`,
+                        `¡Casi lo logramos, ${nick}! Falta añadir tu credencial de Gemini en la configuración superior para continuar. 🌙🔮`
+                    ];
+                    return { text: missingKeyPhrases[Math.floor(Math.random() * missingKeyPhrases.length)], isNatsune: true };
                 }
                 try {
                     const variant = document.getElementById('variantSelector').value;
@@ -715,7 +732,12 @@
             const openAIKey = localStorage.getItem('key_openai');
             if (selectedModel === 'chatgpt') {
                 if (!openAIKey) {
-                    return { text: `¡Uy, ${nick}! Falta configurar tu llave API de OpenAI (ChatGPT) en los ajustes para que podamos usar este modelo. 🌸`, isNatsune: true };
+                    const missingKeyPhrases = [
+                        `¡Oye ${nick}, espera! Necesitamos tu llave API de OpenAI (ChatGPT) en los ajustes para hablar con este modelo. 🗝️✨`,
+                        `Parece que falta la llave de ChatGPT, ${nick}. Configúrala tocando tu perfil arriba a la derecha. ⚙️💖`,
+                        `¡ ${nick}, mi gran ${nick}!, falta poner tu llave de OpenAI en la configuración para que funcione. 🌟📝`
+                    ];
+                    return { text: missingKeyPhrases[Math.floor(Math.random() * missingKeyPhrases.length)], isNatsune: true };
                 }
                 try {
                     let messagesPayload = chatHistory.map(msg => ({
@@ -745,7 +767,12 @@
             const claudeKey = localStorage.getItem('key_claude');
             if (selectedModel === 'claude') {
                 if (!claudeKey) {
-                    return { text: `¡Uy, ${nick}! Necesitas ingresar tu llave API de Claude (Anthropic) en la configuración para usarlo. 🌸`, isNatsune: true };
+                    const missingKeyPhrases = [
+                        `¡Ey, ${nick}! No veo la llave API de Claude por aquí. Entra a los ajustes y agrégala para echar a andar el motor. 🗝️🌸`,
+                        `Falta tu llave de Claude (Anthropic), ${nick}. Configúrala en el menú superior para que podamos platicar. 📜✨`,
+                        `¡Ay, ${nick}!, necesitamos la credencial de Claude guardada en los ajustes para usar este modelo. 🧭💫`
+                    ];
+                    return { text: missingKeyPhrases[Math.floor(Math.random() * missingKeyPhrases.length)], isNatsune: true };
                 }
                 try {
                     let messagesPayload = chatHistory.map(msg => ({
@@ -773,7 +800,13 @@
                 } catch (e) {}
             }
 
-            return { text: `¡Vaya, ${nick}! Ocurrió un pequeño detalle al conectar con el servidor. Inténtalo de nuevo en un momento. 🌸`, isNatsune: true };
+            // Errores generales de conexión variados
+            const connectionErrorPhrases = [
+                `¡Vaya giro inesperado, ${nick}! Tuvimos un pequeño tropiezo al conectar con el servidor. ¿Lo intentamos otra vez? 🌌💫`,
+                `Ocurrió un mini contratiempo en la red, ${nick}. Dame un segundito y vuelve a enviarlo. 🔌✨`,
+                `¡Ups, ${nick}! El viento digital sopló fuerte y falló la conexión. Inténtalo de nuevo en un momento. 🌪️🌸`
+            ];
+            return { text: connectionErrorPhrases[Math.floor(Math.random() * connectionErrorPhrases.length)], isNatsune: true };
         }
 
         async function sendMessage() {
@@ -797,8 +830,6 @@
 
             const result = await getChainedIntelligence(text, userName, chatHistory);
             
-            // Si Natsune responde por falta de llave o error, se muestra con su logo y nombre "Natsune"
-            // Si responde la IA externa correctamente, usa su respectivo logo y nombre
             let finalModelKey = result.isNatsune ? 'natsune' : modelKey;
             let finalName = result.isNatsune ? 'Natsune' : getCurrentModelName();
 
