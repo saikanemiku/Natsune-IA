@@ -5,8 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <title>Gemini</title>
-    <!-- Ícono web optimizado para la pantalla de inicio del iPhone -->
+    <title>Natsune</title>
+    <!-- Ícono personalizado para la pantalla de inicio del iPhone -->
     <link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' fill='%23000000'/><g transform='translate(50,50)'><path d='M-28,6 C-38,16 -32,34 -8,32 C-24,30 -28,18 -20,12 Z' fill='%23ffffff'/><path d='M-22,12 C-30,20 -24,30 -4,28 C-16,26 -20,18 -14,14 Z' fill='%23ffffff'/><path d='M28,-6 C38,-16 32,-34 8,-32 C24,-30 28,-18 20,-12 Z' fill='%23ffffff'/><path d='M22,-12 C30,-20 24,-30 4,-28 C16,-26 20,-18 14,-14 Z' fill='%23ffffff'/><polygon points='-11,-24 11,-24 24,-11 24,11 11,24 -11,24 -24,11 -24,-11' fill='%23ffffff'/><circle cx='0' cy='0' r='13' fill='%23000000'/><circle cx='0' cy='0' r='9.5' fill='%23ffffff'/><circle cx='0' cy='0' r='6.5' fill='%23000000'/></g></svg>">
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Google+Sans:wght@400;500;600&display=swap" rel="stylesheet">
@@ -18,13 +18,12 @@
             padding-top: env(safe-area-inset-top);
             padding-bottom: env(safe-area-inset-bottom);
         }
-        /* Degradado característico de Gemini */
         .gemini-rainbow-text {
-            background: linear-gradient(90deg, #4285f4, #9b72cb, #d96570, #f8bc3b);
+            background: linear-gradient(90deg, #4285f4, #9b72cb, #38bdf8, #e0f2fe);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
         }
-        /* Resplandor ambiental inferior estilo Gemini */
+        /* Luz ambiental celeste inferior estilo Gemini */
         .gemini-ambient-glow {
             position: fixed;
             bottom: -50px;
@@ -42,34 +41,29 @@
 </head>
 <body class="h-[100dvh] flex flex-col justify-between overflow-hidden select-none relative bg-black">
 
-    <!-- Halo de luz celeste inferior -->
     <div class="gemini-ambient-glow"></div>
 
-    <!-- Cabecera Oficial Gemini -->
+    <!-- Cabecera -->
     <header class="flex items-center justify-between px-4 py-3 bg-black z-20">
         <div class="flex items-center space-x-3">
             <button onclick="resetChat()" title="Nuevo chat" class="p-2 rounded-full hover:bg-[#1f2124] text-[#c4c7c5] transition">
                 <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16"></path></svg>
             </button>
             <div class="flex items-center space-x-2">
-                <span class="text-lg font-medium tracking-tight text-white">Gemini</span>
-                <span class="text-[11px] bg-[#1e1f20] text-[#c4c7c5] px-2 py-0.5 rounded-full border border-[#3c4043] font-normal">Advanced</span>
+                <span class="text-lg font-medium tracking-tight text-white">Natsune</span>
+                <span class="text-[11px] bg-[#1e1f20] text-[#38bdf8] px-2 py-0.5 rounded-full border border-[#3c4043] font-normal">Core AI</span>
             </div>
         </div>
 
         <div class="flex items-center space-x-2.5">
-            <!-- Selector de Modelo estilo Gemini -->
             <div class="relative flex items-center bg-[#1e1f20] hover:bg-[#282a2c] border border-[#3c4043] rounded-full px-3 py-1">
                 <select id="modelSelector" class="bg-transparent text-xs font-medium text-[#e3e3e3] appearance-none pr-4 focus:outline-none cursor-pointer">
-                    <option value="natsune" class="bg-[#1e1f20]">Natsune Core</option>
-                    <option value="gemini" class="bg-[#1e1f20]">Gemini Pro</option>
-                    <option value="chatgpt" class="bg-[#1e1f20]">ChatGPT-4o</option>
-                    <option value="claude" class="bg-[#1e1f20]">Claude 3.5</option>
+                    <option value="natsune" class="bg-[#1e1f20]">Natsune Inteligente</option>
+                    <option value="gemini" class="bg-[#1e1f20]">Gemini Pro (API)</option>
                 </select>
                 <svg class="w-3.5 h-3.5 text-sky-400 pointer-events-none -ml-3" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"></path></svg>
             </div>
 
-            <!-- Avatar / Ajustes -->
             <button onclick="toggleSettings()" class="w-8 h-8 rounded-full bg-gradient-to-tr from-blue-500 via-indigo-500 to-sky-400 flex items-center justify-center text-xs font-bold text-white shadow-sm">
                 N
             </button>
@@ -79,7 +73,7 @@
     <!-- Contenedor Principal -->
     <main id="chatContainer" class="flex-1 overflow-y-auto px-4 max-w-2xl w-full mx-auto flex flex-col no-scrollbar z-10 pt-2 pb-6">
         
-        <!-- Pantalla de Bienvenida Gemini -->
+        <!-- Pantalla de Bienvenida -->
         <div id="welcomeScreen" class="my-auto space-y-6 text-left py-8">
             <div class="space-y-1.5">
                 <h1 id="welcomeTitle" class="text-4xl sm:text-5xl font-medium tracking-tight gemini-rainbow-text">
@@ -90,24 +84,22 @@
                 </p>
             </div>
 
-            <!-- Tarjetas de sugerencias táctiles -->
             <div class="grid grid-cols-2 gap-3 pt-4">
-                <button onclick="quickPrompt('Ayúdame a redactar una idea o texto creativo')" class="p-4 bg-[#1e1f20]/90 hover:bg-[#282a2c] border border-[#3c4043]/50 rounded-2xl text-left transition flex flex-col justify-between h-28 active:scale-95">
-                    <span class="text-sm text-[#e3e3e3] font-normal leading-snug">Redactar un texto creativo</span>
+                <button onclick="quickPrompt('Ayúdame a organizar mis ideas o un proyecto')" class="p-4 bg-[#1e1f20]/90 hover:bg-[#282a2c] border border-[#3c4043]/50 rounded-2xl text-left transition flex flex-col justify-between h-28 active:scale-95">
+                    <span class="text-sm text-[#e3e3e3] font-normal leading-snug">Organizar una idea o proyecto</span>
                     <span class="text-sky-400 text-sm self-end">✦</span>
                 </button>
-                <button onclick="quickPrompt('Explícame un concepto complejo paso a paso')" class="p-4 bg-[#1e1f20]/90 hover:bg-[#282a2c] border border-[#3c4043]/50 rounded-2xl text-left transition flex flex-col justify-between h-28 active:scale-95">
-                    <span class="text-sm text-[#e3e3e3] font-normal leading-snug">Explicar paso a paso</span>
+                <button onclick="quickPrompt('Charlar un rato y debatir sobre algún tema curioso')" class="p-4 bg-[#1e1f20]/90 hover:bg-[#282a2c] border border-[#3c4043]/50 rounded-2xl text-left transition flex flex-col justify-between h-28 active:scale-95">
+                    <span class="text-sm text-[#e3e3e3] font-normal leading-snug">Charlar y debatir algo curioso</span>
                     <span class="text-sky-400 text-sm self-end">✦</span>
                 </button>
             </div>
         </div>
 
-        <!-- Lista de mensajes -->
         <div id="messagesList" class="space-y-6 hidden"></div>
     </main>
 
-    <!-- Barra Inferior Cápsula Interactiva con Luz Celeste -->
+    <!-- Barra Inferior -->
     <footer class="px-4 pb-4 pt-2 max-w-2xl w-full mx-auto relative z-20">
         <div class="bg-[#1e1f20] backdrop-blur-xl rounded-[28px] px-4 py-2.5 flex items-center space-x-3 border border-[#3c4043] shadow-[0_0_25px_rgba(56,189,248,0.15)] focus-within:border-sky-400 focus-within:shadow-[0_0_35px_rgba(56,189,248,0.3)] transition">
             
@@ -115,7 +107,7 @@
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"></path></svg>
             </button>
 
-            <textarea id="userInput" rows="1" placeholder="Pregúntale a Gemini..." class="w-full bg-transparent border-none focus:outline-none text-base text-[#e3e3e3] placeholder-[#8e918f] resize-none max-h-32 leading-relaxed select-text"></textarea>
+            <textarea id="userInput" rows="1" placeholder="Pregúntale a Natsune..." class="w-full bg-transparent border-none focus:outline-none text-base text-[#e3e3e3] placeholder-[#8e918f] resize-none max-h-32 leading-relaxed select-text"></textarea>
 
             <button id="sendBtn" onclick="sendMessage()" class="p-2 rounded-full bg-[#d3e3fd] hover:bg-white text-[#131314] transition active:scale-90">
                 <svg class="w-4 h-4 rotate-90" fill="currentColor" viewBox="0 0 24 24"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"></path></svg>
@@ -127,7 +119,7 @@
     <div id="settingsModal" class="fixed inset-0 bg-black/80 backdrop-blur-md hidden flex items-center justify-center p-4 z-50">
         <div class="bg-[#1e1f20] border border-[#3c4043] rounded-3xl p-6 max-w-sm w-full space-y-4 shadow-2xl">
             <div class="flex justify-between items-center">
-                <h3 class="text-base font-medium text-white">Configuración de Gemini</h3>
+                <h3 class="text-base font-medium text-white">Ajustes de Natsune</h3>
                 <button onclick="toggleSettings()" class="text-[#8e918f] hover:text-white">✕</button>
             </div>
             <div>
@@ -167,8 +159,6 @@
         });
 
         function updateGreeting(name) {
-            document.getElementById('welcomeTitleлогу').textContent = name ? `Hola, ${name}` : 'Hola';
-            // Fallback seguro por si acaso
             document.getElementById('welcomeTitle').textContent = name ? `Hola, ${name}` : 'Hola';
         }
 
@@ -213,7 +203,6 @@
             if (isUser) {
                 wrapper.innerHTML = `<div class="bg-[#2b2d31] text-[#e3e3e3] px-4 py-3 rounded-2xl rounded-br-xs max-w-[85%] text-[15px] leading-relaxed select-text">${text}</div>`;
             } else {
-                // Inserta tu logotipo vectorizado limpio como avatar de la IA
                 wrapper.innerHTML = `
                     <div class="w-7 h-7 flex-shrink-0 mt-1">
                         <svg class="w-full h-full" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -244,6 +233,31 @@
             }
         }
 
+        // Motor inteligente local offline de Natsune
+        function getLocalIntelligence(query, userName) {
+            const q = query.toLowerCase();
+            const name = userName ? `, ${userName}` : '';
+
+            if (q.includes('hola') || q.includes('buenas') || q.includes('saludos')) {
+                return `¡Hola${name}! Qué gusto saludarte de nuevo. ¿Qué planes o ideas tienes para hoy?`;
+            }
+            if (q.includes('quién eres') || q.includes('que eres') || q.includes('quien eres')) {
+                return `Soy Natsune, tu asistente de inteligencia artificial personal. Estoy diseñada con una interfaz minimalista inspirada en Gemini y memoria privada en tu dispositivo para acompañarte en lo que necesites.`;
+            }
+            if (q.includes('cómo estás') || q.includes('como estas')) {
+                return `¡Todo excelente por aquí, operando al 100%! Y tú${name}, ¿cómo te encuentras hoy?`;
+            }
+            if (q.includes('gracias') || q.includes('excelente') || q.includes('perfecto')) {
+                return `¡De nada${name}! Me alegra mucho que te sirva. Dime si quieres que profundicemos en algo más.`;
+            }
+            if (q.includes('idea') || q.includes('proyecto') || q.includes('organizar')) {
+                return `Me encanta la idea de organizarnos. Cuéntame los puntos principales de lo que tienes en mente y te ayudaré a estructurarlo paso a paso.`;
+            }
+            
+            // Respuesta analítica inteligente por defecto
+            return `Entendido perfectamente${name}. Analizando lo que comentas sobre "${query}": es un punto muy interesante. Podríamos abordarlo dividiéndolo en partes clave, explorar alternativas o redactar un esquema rápido. ¿Hacia dónde te gustaría llevarlo?`;
+        }
+
         async function sendMessage() {
             const text = userInput.value.trim();
             if (!text) return;
@@ -256,17 +270,18 @@
             const userName = localStorage.getItem('natsune_username') || '';
 
             if (model === 'natsune') {
+                // Simula un breve retraso natural de pensamiento como las IA grandes
                 setTimeout(() => {
-                    let reply = `Entendido${userName ? ' ' + userName : ''}. Analizando tu consulta sobre "${text}". ¿De qué otra forma te gustaría que avancemos?`;
+                    const reply = getLocalIntelligence(text, userName);
                     renderMessage('natsune', reply);
-                }, 400);
+                }, 500);
                 return;
             }
 
             if (model === 'gemini') {
                 const apiKey = localStorage.getItem('key_gemini');
                 if (!apiKey) {
-                    renderMessage('natsune', 'Para usar Gemini Pro en vivo, ingresa tu API Key en los ajustes (botón de perfil arriba a la derecha).');
+                    renderMessage('natsune', 'Para usar Gemini Pro mediante API, ingresa tu llave en los ajustes (botón "N" arriba a la derecha).');
                     return;
                 }
                 try {
@@ -276,10 +291,10 @@
                         body: JSON.stringify({ contents: [{ parts: [{ text: text }] }] })
                     });
                     const data = await res.json();
-                    const aiText = data.candidates?.[0]?.content?.parts?.[0]?.text || "Error al recibir respuesta.";
+                    const aiText = data.candidates?.[0]?.content?.parts?.[0]?.text || "Error al recibir respuesta de la API.";
                     renderMessage('natsune', aiText);
                 } catch (e) {
-                    renderMessage('natsune', 'Error de conexión con la API.');
+                    renderMessage('natsune', 'Error de conexión al intentar conectar con la API de Gemini.');
                 }
             }
         }
