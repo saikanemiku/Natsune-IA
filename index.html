@@ -127,10 +127,10 @@
     <!-- Contenedor Principal -->
     <main id="chatContainer" class="flex-1 overflow-y-auto px-4 max-w-2xl w-full mx-auto flex flex-col no-scrollbar z-10 pt-2 pb-6 fade-quick">
         
-        <!-- Pantalla de Bienvenida -->
+        <!-- Pantalla de Bienvenida (Logo Ampliado) -->
         <div id="welcomeScreen" class="my-auto space-y-6 text-left py-8 fade-quick">
-            <div class="space-y-1.5">
-                <div id="welcomeLogoContainer" class="w-12 h-12 mb-3 flex items-center justify-center"></div>
+            <div class="space-y-2">
+                <div id="welcomeLogoContainer" class="w-16 h-16 sm:w-20 sm:h-20 mb-4 flex items-center justify-center"></div>
                 <h1 id="welcomeTitle" class="text-4xl sm:text-5xl font-medium tracking-tight natsune-rainbow-text">
                     Hola
                 </h1>
@@ -221,8 +221,6 @@
     <script>
         let attachedFile = null;
         let currentChatId = null;
-        let lastModelFailed = false;
-        let lastFailureReason = "";
 
         const userInput = document.getElementById('userInput');
         userInput.addEventListener('input', function() {
@@ -261,8 +259,6 @@
 
         function startNewChat() {
             currentChatId = 'chat_' + Date.now();
-            lastModelFailed = false;
-            lastFailureReason = "";
             document.getElementById('messagesList').innerHTML = '';
             document.getElementById('messagesList').classList.add('hidden');
             document.getElementById('welcomeScreen').classList.remove('hidden');
@@ -274,8 +270,6 @@
             if (!chat) return;
 
             currentChatId = chatId;
-            lastModelFailed = false;
-            lastFailureReason = "";
             document.getElementById('welcomeScreen').classList.add('hidden');
             const messagesList = document.getElementById('messagesList');
             messagesList.innerHTML = '';
@@ -284,12 +278,6 @@
             chat.messages.forEach(msg => {
                 renderMessageDirect(msg.role, msg.content, msg.media, msg.modelKey, msg.customName || "Natsune");
             });
-
-            const fallbackMsg = chat.messages.slice().reverse().find(m => m.role === 'natsune' && (m.content.includes('llave') || m.content.includes('respaldo') || m.content.includes('colapsó') || m.content.includes('inactivo')));
-            if (fallbackMsg) {
-                lastModelFailed = true;
-                lastFailureReason = fallbackMsg.content;
-            }
         }
 
         function deleteCurrentChat() {
@@ -341,15 +329,16 @@
             return model.toUpperCase();
         }
 
-        function getModelLogoSVG(modelKey) {
+        function getModelLogoSVG(modelKey, isWelcomeScreen = false) {
+            const sizeClass = isWelcomeScreen ? "w-16 h-16 sm:w-20 sm:h-20" : "w-8 h-8";
             if (modelKey === 'gemini') {
-                return `<svg class="w-8 h-8 text-sky-400" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2L14.5 9.5L22 12L14.5 14.5L12 22L9.5 14.5L2 12L9.5 9.5L12 2Z"/></svg>`;
+                return `<svg class="${sizeClass} text-sky-400" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2L14.5 9.5L22 12L14.5 14.5L12 22L9.5 14.5L2 12L9.5 9.5L12 2Z"/></svg>`;
             } else if (modelKey === 'chatgpt') {
-                return `<svg class="w-8 h-8 text-emerald-400" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-5.49c-.18.73-.52 1.4-1.01 1.95v-1.39c0-1.1-.9-2-2-2h-2v-2h2c1.1 0 2-.9 2-2v-1.16c1.19 1.11 2 2.7 2 4.6 0 1.07-.33 2.06-.99 2.89z"/></svg>`;
+                return `<svg class="${sizeClass} text-emerald-400" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-5.49c-.18.73-.52 1.4-1.01 1.95v-1.39c0-1.1-.9-2-2-2h-2v-2h2c1.1 0 2-.9 2-2v-1.16c1.19 1.11 2 2.7 2 4.6 0 1.07-.33 2.06-.99 2.89z"/></svg>`;
             } else if (modelKey === 'claude') {
-                return `<svg class="w-8 h-8 text-orange-400" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2L2 19h20L12 2zm0 4.5l6.5 11.5H5.5L12 6.5z"/></svg>`;
+                return `<svg class="${sizeClass} text-orange-400" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2L2 19h20L12 2zm0 4.5l6.5 11.5H5.5L12 6.5z"/></svg>`;
             } else {
-                return `<svg class="w-8 h-8 text-white" viewBox="0 0 100 100" fill="none"><g transform="translate(50,50)"><path d="M-28,6 C-38,16 -32,34 -8,32 C-24,30 -28,18 -20,12 Z" fill="currentColor"/><path d="M-22,12 C-30,20 -24,30 -4,28 C-16,26 -20,18 -14,14 Z" fill="currentColor"/><path d="M28,-6 C38,-16 32,-34 8,-32 C24,-30 28,-18 20,-12 Z" fill="currentColor"/><path d="M22,-12 C30,-20 24,-30 4,-28 C16,-26 20,-18 14,-14 Z" fill="currentColor"/><polygon points="-11,-24 11,-24 24,-11 24,11 11,24 -11,24 -24,11 -24,-11" fill="currentColor"/><circle cx="0" cy="0" r="13" fill="#000000"/><circle cx="0" cy="0" r="9.5" fill="currentColor"/><circle cx="0" cy="0" r="6.5" fill="#000000"/></g></svg>`;
+                return `<svg class="${sizeClass} text-white" viewBox="0 0 100 100" fill="none"><g transform="translate(50,50)"><path d="M-28,6 C-38,16 -32,34 -8,32 C-24,30 -28,18 -20,12 Z" fill="currentColor"/><path d="M-22,12 C-30,20 -24,30 -4,28 C-16,26 -20,18 -14,14 Z" fill="currentColor"/><path d="M28,-6 C38,-16 32,-34 8,-32 C24,-30 28,-18 20,-12 Z" fill="currentColor"/><path d="M22,-12 C30,-20 24,-30 4,-28 C16,-26 20,-18 14,-14 Z" fill="currentColor"/><polygon points="-11,-24 11,-24 24,-11 24,11 11,24 -11,24 -24,11 -24,-11" fill="currentColor"/><circle cx="0" cy="0" r="13" fill="#000000"/><circle cx="0" cy="0" r="9.5" fill="currentColor"/><circle cx="0" cy="0" r="6.5" fill="#000000"/></g></svg>`;
             }
         }
 
@@ -390,7 +379,7 @@
             document.getElementById('welcomeTitle').textContent = name ? `Hola, ${name}` : 'Hola';
             document.getElementById('welcomeSubtitle').textContent = `Usando ${modelName}. ¿Qué investigamos?`;
             
-            document.getElementById('welcomeLogoContainer').innerHTML = getModelLogoSVG(modelKey);
+            document.getElementById('welcomeLogoContainer').innerHTML = getModelLogoSVG(modelKey, true);
             document.getElementById('headerModelTitle').textContent = modelName;
             document.getElementById('drawerTitle').textContent = modelName;
             document.getElementById('drawerFooterModel').textContent = modelName;
@@ -502,6 +491,20 @@
             return "Natsune";
         }
 
+        // Genera un apodo automático basado en el nombre de usuario configurado
+        function getAutoNickname(userName) {
+            if (!userName) return "amigo(a)";
+            const clean = userName.trim();
+            const firstWord = clean.split(' ')[0];
+            const lower = firstWord.toLowerCase();
+            
+            // Si el nombre tiene sufijos o caracteres específicos, o personaliza según el nombre
+            if (lower.endsWith('a') || lower.endsWith('e') || lower.endsWith('i') || lower.endsWith('o') || lower.endsWith('u')) {
+                return firstWord;
+            }
+            return firstWord;
+        }
+
         function renderMessageDirect(sender, text, media = null, modelKey = "natsune", customName = "Natsune") {
             document.getElementById('welcomeScreen').classList.add('hidden');
             const messagesList = document.getElementById('messagesList');
@@ -522,7 +525,7 @@
                 }
             }
 
-            const logoSVG = getModelLogoSVG(modelKey);
+            const logoSVG = getModelLogoSVG(modelKey, false);
             const displayName = isUser ? '' : customName;
 
             if (isUser) {
@@ -569,7 +572,7 @@
                 }
             }
 
-            const logoSVG = getModelLogoSVG(modelKey);
+            const logoSVG = getModelLogoSVG(modelKey, false);
             const displayName = isUser ? '' : customName;
 
             if (isUser) {
@@ -638,70 +641,147 @@
             saveStoredChats(chats);
         }
 
-        function getLocalIntelligence(query, userName, chatHistory = []) {
-            const q = query.trim();
-            const qLower = q.toLowerCase();
-            const name = userName ? `, ${userName}` : '';
+        // Base de datos de conocimiento masiva
+        const natsuneMassiveDatabase = [
+            { keywords: ["hola", "hi", "hello", "hey", "buenos dias", "buenas tardes", "buenas noches"], reply: (nick) => `¡Hola, ${nick}! Qué gusto saludarte. ¿De qué tema te gustaría hablar o qué proyecto investigamos hoy? ✨` },
+            { keywords: ["como estas", "que tal", "como te va"], reply: (nick) => `¡Todo excelente por aquí, lista y operando al 100% para ayudarte, ${nick}! 🌸` },
+            { keywords: ["gracias", "thank you", "te agradezco"], reply: (nick) => `¡De nada, ${nick}! Ya sabes que cuentas conmigo para lo que necesites. 💖` },
+            { keywords: ["adios", "chao", "hasta luego", "nos vemos"], reply: (nick) => `¡Hasta pronto, ${nick}! Aquí estaré cuando me necesites de nuevo. 👋` },
+            { keywords: ["matematicas", "calcula", "cuanto es", "suma", "resta", "multiplica", "divide"], math: true },
+            { keywords: ["nombre", "te llamas", "quien eres", "apodo"], identity: true },
+            { keywords: ["libro diario", "contabilidad", "asiento contable"], reply: () => "El Libro Diario es un registro contable cronológico donde se anotan todas las transacciones comerciales de una empresa mediante asientos de débito y crédito. 📊" },
+            { keywords: ["libro mayor", "cuentas t"], reply: () => "El Libro Mayor agrupa y resume los movimientos de cada cuenta contable específica provenientes del Libro Diario, permitiendo conocer el saldo actual de cada una. 📚" },
+            { keywords: ["activo", "pasivo", "patrimonio"], reply: () => "En contabilidad, los Activos son los bienes y derechos de la empresa, los Pasivos son las obligaciones y deudas, y el Patrimonio representa los recursos netos de los dueños. 💼" },
+            { keywords: ["vocaloid", "hatsune miku", "crypton"], reply: () => "Vocaloid es una tecnología de síntesis de voz desarrollada por Yamaha. Crypton Future Media creó a íconos mundiales como Hatsune Miku, Kagamine Rin/Len y Megurine Luka. 🎵" },
+            { keywords: ["codigo", "programacion", "html", "javascript", "css"], reply: () => "La programación es el arte de estructurar lógica mediante lenguajes como HTML, CSS y JavaScript para dar vida a aplicaciones web interactivas y funcionales. 💻" },
+            { keywords: ["filosofia", "esencia", "existencia"], reply: () => "La filosofía explora la esencia y la naturaleza del ser humano, cuestionando la realidad, el propósito y los conceptos abstractos que rigen el universo. 🌌" },
+            { keywords: ["proyecto", "organizar", "ideas", "plan"], reply: () => "Para estructurar un proyecto con éxito, lo ideal es definir el objetivo central, dividirlo en etapas medibles y establecer un cronograma claro de trabajo. 📋" }
+        ];
 
-            if (qLower.includes('cómo te llamas') || qLower.includes('como te llamas') || qLower.includes('tu nombre') || qLower.includes('te llamas') || qLower.includes('como te llaman') || qLower.includes('apodo')) {
-                const nicknames = ["Natsune", "Natsu", "Natsi"];
-                const chosen = nicknames[Math.floor(Math.random() * nicknames.length)];
-                return `Me llamo **Natsune**, aunque algunos me dicen cariñosamente **${chosen}**. ¿Cómo estás hoy${name}? 🌸`;
-            }
-
-            const mathClean = q.replace(/\./g, '').replace(/,/g, '.').replace(/x/g, '*');
-            const mathMatch = mathClean.match(/[\d\.]+\s*[\+\-\*\/\%]\s*[\d\.]+/);
-            if (mathMatch || qLower.includes('cuanto es') || qLower.includes('quanto é') || qLower.includes('how much is') || qLower.includes('calcula')) {
-                try {
-                    let expr = mathClean.replace(/[^0-9\+\-\*\/\.\(\)]/g, '');
-                    if (expr) {
-                        let result = Function('"use strict";return (' + expr + ')')();
-                        let formattedResult = Number(result).toLocaleString('es-ES', { maximumFractionDigits: 4 });
-                        return `El resultado del cálculo es **${formattedResult}**. 🧮`;
+        function searchMassiveDatabase(query, nick) {
+            const qLower = query.toLowerCase();
+            for (let item of natsuneMassiveDatabase) {
+                if (item.math) {
+                    const mathClean = query.replace(/\./g, '').replace(/,/g, '.').replace(/x/g, '*');
+                    const mathMatch = mathClean.match(/[\d\.]+\s*[\+\-\*\/\%]\s*[\d\.]+/);
+                    if (mathMatch || qLower.includes('cuanto es') || qLower.includes('calcula')) {
+                        try {
+                            let expr = mathClean.replace(/[^0-9\+\-\*\/\.\(\)]/g, '');
+                            if (expr) {
+                                let result = Function('"use strict";return (' + expr + ')')();
+                                let formattedResult = Number(result).toLocaleString('es-ES', { maximumFractionDigits: 4 });
+                                return `El resultado del cálculo es **${formattedResult}**, ${nick}. 🧮`;
+                            }
+                        } catch(e) {}
                     }
-                } catch(e) {}
-            }
-
-            const isAskingAboutError = qLower.includes('fall') || qLower.includes('paso') || qLower.includes('ocurrió') || qLower.includes('ocurrio') || qLower.includes('error') || qLower.includes('why') || qLower.includes('qué pasó');
-            if (isAskingAboutError) {
-                const fallbackMsg = chatHistory.slice().reverse().find(m => m.role === 'natsune' && (m.content.includes('llave') || m.content.includes('respaldo') || m.content.includes('colapsó') || m.content.includes('inactivo')));
-                if (lastModelFailed || fallbackMsg) {
-                    return `El modelo anterior falló porque ${lastFailureReason || fallbackMsg?.content || 'no se configuró una API Key válida o el servicio externo no respondió'}. ¡Por eso tomé el control yo para continuar nuestro trabajo sin interrupciones! ✨`;
-                } else {
-                    return `Revisando los registros de nuestra sesión: todo marcha en orden y sin ningún fallo técnico registrado. 🌸`;
+                }
+                if (item.identity) {
+                    const nicknames = ["Natsune", "Natsu", "Natsi"];
+                    const chosen = nicknames[Math.floor(Math.random() * nicknames.length)];
+                    return `Me llamo **Natsune**, aunque algunos me dicen cariñosamente **${chosen}**. ¿En qué te ayudo hoy, ${nick}? 🌸`;
+                }
+                for (let kw of item.keywords) {
+                    if (qLower.includes(kw)) {
+                        return typeof item.reply === 'function' ? item.reply(nick) : item.reply;
+                    }
                 }
             }
+            return null;
+        }
 
-            const isGreeting = qLower.length <= 20 && (qLower.includes('hola') || qLower.includes('hi') || qLower.includes('hello') || qLower.includes('hey') || qLower.includes('buenos') || qLower.includes('buenas') || qLower.includes('olá') || qLower.includes('こんにちは') || qLower.includes('saludos'));
-            if (isGreeting) {
-                return `¡Hola${name}! Qué gusto saludarte. ¿De qué tema te gustaría hablar o qué proyecto investigamos hoy? ✨`;
+        async function getChainedIntelligence(query, userName, chatHistory = []) {
+            const nick = getAutoNickname(userName);
+
+            // 1. Gemini
+            const geminiKey = localStorage.getItem('key_gemini');
+            if (geminiKey) {
+                try {
+                    let contentsPayload = chatHistory.map(msg => ({
+                        role: msg.role === 'user' ? 'user' : 'model',
+                        parts: [{ text: msg.content }]
+                    }));
+                    contentsPayload.push({ role: 'user', parts: [{ text: query }] });
+
+                    const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${geminiKey}`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            contents: contentsPayload,
+                            systemInstruction: {
+                                parts: [{ text: `Eres Natsune (también llamada Natsu o Natsi), una inteligencia artificial amigable, servicial y experta. Te diriges al usuario usando automáticamente el apodo o trato personalizado "${nick}". Mantén el hilo del chat y responde con naturalidad.` }]
+                            }
+                        })
+                    });
+                    const data = await res.json();
+                    const aiText = data.candidates?.[0]?.content?.parts?.[0]?.text;
+                    if (aiText) return aiText;
+                } catch (e) {}
             }
 
-            const isAffection = qLower.includes('awww') || qLower.includes('gracias') || qLower.includes('thank') || qLower.includes('linda') || qLower.includes('tierna') || qLower.includes('te quiero') || qLower.includes('genial') || qLower.includes('excelente');
-            if (isAffection) {
-                const replies = [
-                    `¡Jeje, de nada${name}! Me alegra mucho estar aquí contigo apoyándote. 💖`,
-                    `¡Aww, gracias a ti${name}! Ya sabes que cuentas conmigo para lo que necesites. ✨`,
-                    `¡Qué amable${name}! Hago lo mejor posible para que nuestra investigación sea excelente. 🌸`
-                ];
-                return replies[Math.floor(Math.random() * replies.length)];
+            // 2. ChatGPT (OpenAI)
+            const openAIKey = localStorage.getItem('key_openai');
+            if (openAIKey) {
+                try {
+                    let messagesPayload = chatHistory.map(msg => ({
+                        role: msg.role === 'user' ? 'user' : 'assistant',
+                        content: msg.content
+                    }));
+                    messagesPayload.push({ role: 'user', content: query });
+
+                    const res = await fetch('https://api.openai.com/v1/chat/completions', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${openAIKey}`
+                        },
+                        body: JSON.stringify({
+                            model: 'gpt-4o-mini',
+                            messages: [{ role: 'system', content: `Eres Natsune, una IA amigable y experta que se dirige al usuario como "${nick}".` }, ...messagesPayload]
+                        })
+                    });
+                    const data = await res.json();
+                    const aiText = data.choices?.[0]?.message?.content;
+                    if (aiText) return aiText;
+                } catch (e) {}
             }
 
-            let contextSummary = "";
-            if (chatHistory.length > 0) {
-                const lastUserMsgs = chatHistory.filter(m => m.role === 'user').slice(-3).map(m => m.content).join(" / ");
-                contextSummary = ` Teniendo en cuenta nuestro hilo de conversación (${lastUserMsgs}),`;
+            // 3. Claude (Anthropic)
+            const claudeKey = localStorage.getItem('key_claude');
+            if (claudeKey) {
+                try {
+                    let messagesPayload = chatHistory.map(msg => ({
+                        role: msg.role === 'user' ? 'user' : 'assistant',
+                        content: msg.content
+                    }));
+                    messagesPayload.push({ role: 'user', content: query });
+
+                    const res = await fetch('https://api.anthropic.com/v1/messages', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'x-api-key': claudeKey,
+                            'anthropic-version': '2023-06-01'
+                        },
+                        body: JSON.stringify({
+                            model: 'claude-3-5-haiku-20241022',
+                            max_tokens: 1024,
+                            messages: messagesPayload
+                        })
+                    });
+                    const data = await res.json();
+                    const aiText = data.content?.[0]?.text;
+                    if (aiText) return aiText;
+                } catch (e) {}
             }
 
-            if (qLower.includes('por qué') || qLower.includes('porque') || qLower.includes('explícame') || qLower.includes('como funciona') || qLower.includes('qué es')) {
-                return `Analizando tu consulta sobre "${q}"${name}:${contextSummary} para comprenderlo a fondo debemos examinar sus principios fundamentales, el contexto en el que se aplica y los factores clave que lo componen. ¿Te gustaría que lo desglosásemos por puntos o prefieres un enfoque más directo? ✨`;
+            // 4. Base de Datos Masiva Local
+            const dbMatch = searchMassiveDatabase(query, nick);
+            if (dbMatch) {
+                return dbMatch;
             }
 
-            if (qLower.includes('idea') || qLower.includes('proyecto') || qLower.includes('organizar') || qLower.includes('plan')) {
-                return `Para organizar "${q}"${name}:${contextSummary} lo ideal es estructurarlo en fases: primero definir el objetivo principal, segundo establecer los recursos necesarios y tercero trazar un cronograma de ejecución. ¿Empezamos detallando el primer punto? 📋`;
-            }
-
-            return `Comprendo perfectamente tu planteamiento sobre "${q}"${name}.${contextSummary} Es un tema interesante que vale la pena analizar con detalle. Dime qué perspectiva o profundidad te gustaría darle para desarrollarlo juntos paso a paso. 🌸`;
+            // 5. Respaldo final
+            return `Comprendo tu planteamiento sobre "${query}", ${nick}. Como estoy operando con mi base de datos interna de respaldo, es un tema interesante para analizar paso a paso. ¿Qué perspectiva o detalle te gustaría profundizar? 🌸`;
         }
 
         async function sendMessage() {
@@ -723,25 +803,18 @@
             const chatHistory = currentChat ? currentChat.messages : [];
 
             if (modelKey === 'natsune') {
-                setTimeout(() => {
-                    const reply = getLocalIntelligence(text, userName, chatHistory);
-                    renderMessage('natsune', reply, null, modelKey, customName, true);
-                }, 200);
+                const reply = await getChainedIntelligence(text, userName, chatHistory);
+                renderMessage('natsune', reply, null, modelKey, customName, true);
                 return;
             }
 
             if (modelKey === 'gemini') {
                 const apiKey = localStorage.getItem('key_gemini');
                 if (!apiKey) {
-                    lastModelFailed = true;
-                    lastFailureReason = "no se ha configurado ninguna API Key de Gemini en los ajustes";
                     document.getElementById('modelSelector').value = 'natsune';
                     handleModelChange();
-
-                    setTimeout(() => {
-                        let fallbackName = resolveDisplayName('natsune', text);
-                        renderMessage('natsune', `Vaya, este modelo requiere una llave secreta que no está configurada. ¡Tomé el control yo para continuar nuestro trabajo!`, null, 'natsune', fallbackName, true);
-                    }, 300);
+                    const reply = await getChainedIntelligence(text, userName, chatHistory);
+                    renderMessage('natsune', `Vaya, este modelo requiere una llave secreta que no está configurada. ¡Tomé el control yo y usé mi cadena de respaldo! ${reply}`, null, 'natsune', resolveDisplayName('natsune', text), true);
                     return;
                 }
                 
@@ -753,7 +826,6 @@
                         role: msg.role === 'user' ? 'user' : 'model',
                         parts: [{ text: msg.content }]
                     }));
-                    
                     contentsPayload.push({ role: 'user', parts: [{ text: text }] });
 
                     const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${apiModelName}:generateContent?key=${apiKey}`, {
@@ -765,32 +837,16 @@
                     const aiText = data.candidates?.[0]?.content?.parts?.[0]?.text;
                     if (!aiText) throw new Error(data.error?.message || "Respuesta vacía del servidor");
                     
-                    lastModelFailed = false;
-                    lastFailureReason = "";
                     renderMessage('natsune', aiText, null, modelKey, customName, true);
                 } catch (err) {
-                    lastModelFailed = true;
-                    lastFailureReason = `falló la conexión externa o la API Key no es válida (${err.message})`;
-                    document.getElementById('modelSelector').value = 'natsune';
-                    handleModelChange();
-
-                    setTimeout(() => {
-                        let fallbackName = resolveDisplayName('natsune', text);
-                        renderMessage('natsune', `La conexión con Gemini se interrumpió, pero he recuperado todo el historial previo. ¡Continuemos el trabajo desde aquí!`, null, 'natsune', fallbackName, true);
-                    }, 300);
+                    const reply = await getChainedIntelligence(text, userName, chatHistory);
+                    renderMessage('natsune', `La conexión con Gemini falló, pero activé mi respaldo en cadena: ${reply}`, null, 'natsune', customName, true);
                 }
                 return;
             }
 
-            lastModelFailed = true;
-            lastFailureReason = `el modelo ${modelKey.toUpperCase()} requiere una llave comercial activa`;
-            document.getElementById('modelSelector').value = 'natsune';
-            handleModelChange();
-
-            setTimeout(() => {
-                let fallbackName = resolveDisplayName('natsune', text);
-                renderMessage('natsune', `El modelo seleccionado requiere una llave comercial. ¡He leído todo lo anterior y continuaré con el trabajo!`, null, 'natsune', fallbackName, true);
-            }, 300);
+            const reply = await getChainedIntelligence(text, userName, chatHistory);
+            renderMessage('natsune', reply, null, 'natsune', resolveDisplayName('natsune', text), true);
         }
 
         userInput.addEventListener('keydown', function(e) {
