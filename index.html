@@ -221,6 +221,7 @@
     <script>
         let attachedFile = null;
         let currentChatId = null;
+        let lastModelFailed = false;
 
         const userInput = document.getElementById('userInput');
         userInput.addEventListener('input', function() {
@@ -259,6 +260,7 @@
 
         function startNewChat() {
             currentChatId = 'chat_' + Date.now();
+            lastModelFailed = false;
             document.getElementById('messagesList').innerHTML = '';
             document.getElementById('messagesList').classList.add('hidden');
             document.getElementById('welcomeScreen').classList.remove('hidden');
@@ -270,6 +272,7 @@
             if (!chat) return;
 
             currentChatId = chatId;
+            lastModelFailed = false;
             document.getElementById('welcomeScreen').classList.add('hidden');
             const messagesList = document.getElementById('messagesList');
             messagesList.innerHTML = '';
@@ -366,10 +369,12 @@
         function handleModelChange() {
             updateVariants();
             updateDynamicGreeting();
+            lastModelFailed = false;
         }
 
         function handleVariantChange() {
             updateDynamicGreeting();
+            lastModelFailed = false;
         }
 
         function updateDynamicGreeting() {
@@ -618,9 +623,15 @@
             saveStoredChats(chats);
         }
 
+        // Sistema universal de saludos y respuestas con Natsu
         function getLocalIntelligence(query, userName, modelName) {
-            const q = query.toLowerCase();
+            const q = query.toLowerCase().trim();
             const name = userName ? `, ${userName}` : '';
+
+            // Pregunta explícita sobre qué falló
+            if ((q.includes('que fallo') || q.includes('qué fallo') || q.includes('que paso') || q.includes('qué pasó') || q.includes('porque fallo') || q.includes('por qué falló') || q.includes('error')) && lastModelFailed) {
+                return `Ah, ¿quieres saber qué pasó? Resulta que el modelo anterior no tenía configurada su API Key o dio un error de conexión, así que tomé el control yo para que no te quedaras sin respuesta.`;
+            }
 
             if (q.includes('qué modelo es') || q.includes('que modelo es') || q.includes('qué modelo usas') || q.includes('que modelo usas') || q.includes('qué modelo eres') || q.includes('que modelo eres') || q.includes('modelo actual')) {
                 return `Actualmente estoy usando ${modelName}.`;
@@ -628,9 +639,14 @@
             if (q.includes('imagen') || q.includes('genera') || q.includes('dibuja')) {
                 return `Aquí tienes tu imagen generada con ${modelName}. ¿Qué te parece el resultado?`;
             }
-            if (q.includes('hola') || q.includes('buenas') || q.includes('saludos')) {
-                return `¡Hola${name}! Todo listo con ${modelName}. ¿En qué te puedo ayudar hoy?`;
+
+            // Saludos universales (Hi, Hello, Saludos, Que tal, Buenas, Hola, Hey, etc.)
+            const isGreeting = q.startsWith('hola') || q.startsWith('hi') || q.startsWith('hello') || q.startsWith('saludos') || q.startsWith('que tal') || q.startsWith('qué tal') || q.startsWith('buenas') || q.startsWith('hey') || q.startsWith('buen dia') || q.startsWith('buenos dias');
+            
+            if (isGreeting || q.length <= 10) {
+                return `¡Hola${name}! Qué gusto verte por aquí usando ${modelName}. ¿En qué te puedo ayudar hoy?`;
             }
+
             return `Entendido${name}. Usando ${modelName}, sobre "${query}": dime qué necesitas exactamente y lo resolvemos paso a paso.`;
         }
 
@@ -650,6 +666,7 @@
             const userName = localStorage.getItem('natsune_username') || '';
 
             if (modelKey === 'natsune') {
+                lastModelFailed = false;
                 setTimeout(() => {
                     const reply = getLocalIntelligence(text, userName, modelName);
                     renderMessage('natsune', reply, null, modelKey, modelName, true);
@@ -660,13 +677,12 @@
             if (modelKey === 'gemini') {
                 const apiKey = localStorage.getItem('key_gemini');
                 if (!apiKey) {
-                    // Mostrar mensaje de error y respaldo transparente a Natsune Core
-                    renderMessage('natsune', `[Error: No se encontró la API Key de Gemini configurada. Cambiando a Natsune Core como respaldo.]`, null, modelKey, modelName, false);
+                    lastModelFailed = true;
                     setTimeout(() => {
-                        const fallbackKey = 'natsune';
-                        const fallbackName = 'Natsune Core';
-                        const fallbackReply = `¡Hola${userName ? `, ${userName}` : ''}! Ocurrió un problema con Gemini (falta configurar la API Key). Ya tomé el control con ${fallbackName}. ¿En qué te ayudo?`;
-                        renderMessage('natsune', fallbackReply, null, fallbackKey, fallbackName, true);
+                        modelKey = 'natsune';
+                        modelName = 'Natsune Core';
+                        const fallbackReply = `Vaya, parece que la otra IA se quedó sin llave y me dejó aquí cubriéndole el turno. Si quieres saber exactamente qué falló, solo dime. ¿En qué te ayudo mientras tanto?`;
+                        renderMessage('natsune', fallbackReply, null, modelKey, modelName, true);
                     }, 300);
                     return;
                 }
@@ -680,27 +696,28 @@
                     });
                     const data = await res.json();
                     const aiText = data.candidates?.[0]?.content?.parts?.[0]?.text;
-                    if (!aiText) throw new Error(data.error?.message || "Error desconocido de API");
+                    if (!aiText) throw new Error(data.error?.message || "Error desconocido");
+                    lastModelFailed = false;
                     renderMessage('natsune', aiText, null, modelKey, modelName, true);
                 } catch (err) {
-                    renderMessage('natsune', `[Error en Gemini: ${err.message || 'Fallo de conexión'}. Cambiando a Natsune Core como respaldo.]`, null, modelKey, modelName, false);
+                    lastModelFailed = true;
                     setTimeout(() => {
-                        const fallbackKey = 'natsune';
-                        const fallbackName = 'Natsune Core';
-                        const fallbackReply = `¡Hola${userName ? `, ${userName}` : ''}! Tuvimos un pequeño problema de conexión con Gemini. Ya tomé el relevo con ${fallbackName}. ¿Cómo seguimos?`;
-                        renderMessage('natsune', fallbackReply, null, fallbackKey, fallbackName, true);
+                        modelKey = 'natsune';
+                        modelName = 'Natsune Core';
+                        const fallbackReply = `Ups, la conexión con Gemini decidió tomarse un descanso inesperado. Si tienes curiosidad por los detalles técnicos del fallo, pregúntame. ¿Seguimos con ${modelName}?`;
+                        renderMessage('natsune', fallbackReply, null, modelKey, modelName, true);
                     }, 300);
                 }
                 return;
             }
 
-            // Para ChatGPT o Claude sin API Key configurada
-            renderMessage('natsune', `[Error: No se encontró la API Key para ${modelName}. Cambiando a Natsune Core como respaldo.]`, null, modelKey, modelName, false);
+            // Para ChatGPT o Claude sin API Key
+            lastModelFailed = true;
             setTimeout(() => {
-                const fallbackKey = 'natsune';
-                const fallbackName = 'Natsune Core';
-                const fallbackReply = `¡Hola${userName ? `, ${userName}` : ''}! No detecté la clave API para este modelo. He activado ${fallbackName} para continuar. ¿Qué necesitas?`;
-                renderMessage('natsune', fallbackReply, null, fallbackKey, fallbackName, true);
+                modelKey = 'natsune';
+                modelName = 'Natsune Core';
+                const fallbackReply = `Parece que este modelo está de adorno porque no hay llave que lo abra. Ya tomé el control yo. Si quieres saber qué falló, avísame. ¿Qué hacemos ahora?`;
+                renderMessage('natsune', fallbackReply, null, modelKey, modelName, true);
             }, 300);
         }
 
