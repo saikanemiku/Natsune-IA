@@ -660,13 +660,13 @@
             if (modelKey === 'gemini') {
                 const apiKey = localStorage.getItem('key_gemini');
                 if (!apiKey) {
-                    // Mostrar mensaje explícito de error/falta de API key y cambiar a respaldo
+                    // Mostrar mensaje de error y respaldo transparente a Natsune Core
+                    renderMessage('natsune', `[Error: No se encontró la API Key de Gemini configurada. Cambiando a Natsune Core como respaldo.]`, null, modelKey, modelName, false);
                     setTimeout(() => {
-                        renderMessage('natsune', `[Error: No se encontró la API Key de Gemini configurada. Cambiando a Natsune Core como respaldo.]`, null, modelKey, modelName, false);
-                        modelKey = 'natsune';
-                        modelName = 'Natsune Core';
-                        const fallbackReply = getLocalIntelligence(text, userName, modelName);
-                        renderMessage('natsune', fallbackReply, null, modelKey, modelName, true);
+                        const fallbackKey = 'natsune';
+                        const fallbackName = 'Natsune Core';
+                        const fallbackReply = `¡Hola${userName ? `, ${userName}` : ''}! Ocurrió un problema con Gemini (falta configurar la API Key). Ya tomé el control con ${fallbackName}. ¿En qué te ayudo?`;
+                        renderMessage('natsune', fallbackReply, null, fallbackKey, fallbackName, true);
                     }, 300);
                     return;
                 }
@@ -683,24 +683,24 @@
                     if (!aiText) throw new Error(data.error?.message || "Error desconocido de API");
                     renderMessage('natsune', aiText, null, modelKey, modelName, true);
                 } catch (err) {
+                    renderMessage('natsune', `[Error en Gemini: ${err.message || 'Fallo de conexión'}. Cambiando a Natsune Core como respaldo.]`, null, modelKey, modelName, false);
                     setTimeout(() => {
-                        renderMessage('natsune', `[Error en Gemini: ${err.message || 'Fallo de conexión'}. Cambiando a Natsune Core como respaldo.]`, null, modelKey, modelName, false);
-                        modelKey = 'natsune';
-                        modelName = 'Natsune Core';
-                        const fallbackReply = getLocalIntelligence(text, userName, modelName);
-                        renderMessage('natsune', fallbackReply, null, modelKey, modelName, true);
+                        const fallbackKey = 'natsune';
+                        const fallbackName = 'Natsune Core';
+                        const fallbackReply = `¡Hola${userName ? `, ${userName}` : ''}! Tuvimos un pequeño problema de conexión con Gemini. Ya tomé el relevo con ${fallbackName}. ¿Cómo seguimos?`;
+                        renderMessage('natsune', fallbackReply, null, fallbackKey, fallbackName, true);
                     }, 300);
                 }
                 return;
             }
 
-            // Para ChatGPT o Claude sin API key configurada
+            // Para ChatGPT o Claude sin API Key configurada
+            renderMessage('natsune', `[Error: No se encontró la API Key para ${modelName}. Cambiando a Natsune Core como respaldo.]`, null, modelKey, modelName, false);
             setTimeout(() => {
-                renderMessage('natsune', `[Error: No se encontró la API Key para ${modelName}. Cambiando a Natsune Core como respaldo.]`, null, modelKey, modelName, false);
-                modelKey = 'natsune';
-                modelName = 'Natsune Core';
-                const fallbackReply = getLocalIntelligence(text, userName, modelName);
-                renderMessage('natsune', fallbackReply, null, modelKey, modelName, true);
+                const fallbackKey = 'natsune';
+                const fallbackName = 'Natsune Core';
+                const fallbackReply = `¡Hola${userName ? `, ${userName}` : ''}! No detecté la clave API para este modelo. He activado ${fallbackName} para continuar. ¿Qué necesitas?`;
+                renderMessage('natsune', fallbackReply, null, fallbackKey, fallbackName, true);
             }, 300);
         }
 
