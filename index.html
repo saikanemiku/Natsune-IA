@@ -51,33 +51,39 @@
 
     <div class="gemini-ambient-glow"></div>
 
-    <!-- Menú Lateral Estilo Gemini Web / Móvil Oficial -->
-    <div id="sideDrawer" class="fixed inset-0 z-40 bg-black/60 backdrop-blur-sm hidden fade-quick opacity-0">
-        <div class="absolute left-0 top-0 bottom-0 w-72 bg-[#1e1f20] border-r border-[#3c4043] p-4 flex flex-col justify-between shadow-2xl transform -translate-x-full transition-transform duration-200 ease-out" id="drawerPanel">
+    <!-- Menú Lateral Estilo Gemini Totalmente Negro -->
+    <div id="sideDrawer" class="fixed inset-0 z-40 bg-black/70 backdrop-blur-sm hidden fade-quick opacity-0">
+        <div class="absolute left-0 top-0 bottom-0 w-72 bg-black border-r border-[#282a2c] p-4 flex flex-col justify-between shadow-2xl transform -translate-x-full transition-transform duration-200 ease-out" id="drawerPanel">
             <div class="space-y-4">
                 <div class="flex items-center justify-between px-2 pt-1 pb-2">
-                    <button onclick="toggleDrawer()" class="p-2 rounded-full hover:bg-[#282a2c] text-[#c4c7c5] transition">
+                    <button onclick="toggleDrawer()" class="p-2 rounded-full hover:bg-[#1a1a1a] text-[#c4c7c5] transition">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16"></path></svg>
                     </button>
                     <span class="text-white font-medium text-sm tracking-tight">Natsune IA</span>
                 </div>
                 
-                <button onclick="resetChat(); toggleDrawer();" class="w-full bg-[#282a2c] hover:bg-[#323538] text-[#e3e3e3] rounded-full py-3 px-4 text-sm font-medium text-left flex items-center space-x-3 transition active:scale-95 shadow-sm">
+                <button onclick="startNewChat(); toggleDrawer();" class="w-full bg-[#161616] hover:bg-[#222222] border border-[#2c2c2c] text-[#e3e3e3] rounded-full py-3 px-4 text-sm font-medium text-left flex items-center space-x-3 transition active:scale-95 shadow-sm">
                     <span class="text-sky-400 text-lg font-light">+</span>
                     <span>Nuevo chat</span>
                 </button>
 
                 <div class="space-y-1 pt-3">
-                    <p class="text-[11px] text-[#8e918f] font-medium px-3 uppercase tracking-wider">Recientes</p>
-                    <div id="historyList" class="space-y-0.5 text-sm text-[#c4c7c5] max-h-[55vh] overflow-y-auto no-scrollbar">
-                        <p class="text-xs text-[#666] italic py-2 px-3">Sin actividad reciente</p>
+                    <p class="text-[11px] text-[#8e918f] font-medium px-3 uppercase tracking-wider">Conversaciones</p>
+                    <div id="historyList" class="space-y-1 text-sm text-[#c4c7c5] max-h-[50vh] overflow-y-auto no-scrollbar">
+                        <p class="text-xs text-[#666] italic py-2 px-3">Sin conversaciones recientes</p>
                     </div>
                 </div>
             </div>
 
-            <div class="border-t border-[#3c4043] pt-3 px-2 flex items-center justify-between text-xs text-[#8e918f]">
-                <span>Memoria local</span>
-                <button onclick="clearMemory(); toggleDrawer();" class="text-red-400 hover:underline">Borrar todo</button>
+            <div class="border-t border-[#222222] pt-3 px-2 flex flex-col space-y-2 text-xs text-[#8e918f]">
+                <button onclick="deleteCurrentChat(); toggleDrawer();" class="w-full py-2 px-3 text-left hover:bg-[#1a1a1a] rounded-lg text-red-400 transition flex items-center space-x-2">
+                    <span>🗑️</span>
+                    <span>Eliminar este chat</span>
+                </button>
+                <div class="flex items-center justify-between px-1 pt-1">
+                    <span>Natsune Core</span>
+                    <button onclick="clearAllMemory(); toggleDrawer();" class="text-[#666] hover:text-red-400">Borrar todo</button>
+                </div>
             </div>
         </div>
     </div>
@@ -205,7 +211,7 @@
                 <input type="password" id="keyClaude" placeholder="sk-ant-..." class="w-full bg-[#131314] border border-[#3c4043] rounded-xl px-3.5 py-2 text-xs text-white mt-1 focus:border-sky-400 focus:outline-none">
             </div>
             <div class="flex justify-between pt-2">
-                <button onclick="clearMemory()" class="text-xs text-red-400">Borrar chat</button>
+                <button onclick="clearAllMemory()" class="text-xs text-red-400">Borrar todo</button>
                 <button onclick="saveSettings()" class="bg-[#d3e3fd] text-[#131314] px-4 py-2 rounded-full text-xs font-semibold">Guardar</button>
             </div>
         </div>
@@ -213,6 +219,7 @@
 
     <script>
         let attachedFile = null;
+        let currentChatId = null;
 
         const userInput = document.getElementById('userInput');
         userInput.addEventListener('input', function() {
@@ -230,15 +237,87 @@
             updateGreeting(savedName);
             updateAvatarUI();
             updateVariants();
+            loadConversationsList();
 
-            const history = JSON.parse(localStorage.getItem('natsune_history') || '[]');
-            if (history.length > 0) {
-                document.getElementById('welcomeScreen').classList.add('hidden');
-                document.getElementById('messagesList').classList.remove('hidden');
-                history.forEach(msg => renderMessage(msg.role, msg.content, msg.media, msg.modelKey, msg.modelDisplay, false));
-                updateHistoryDrawer(history);
+            // Cargar el chat activo más reciente o iniciar uno nuevo
+            const chats = getStoredChats();
+            if (chats.length > 0) {
+                loadChat(chats[0].id);
+            } else {
+                startNewChat();
             }
         });
+
+        function getStoredChats() {
+            return JSON.parse(localStorage.getItem('natsune_conversations') || '[]');
+        }
+
+        function saveStoredChats(chats) {
+            localStorage.setItem('natsune_conversations', JSON.stringify(chats));
+            loadConversationsList();
+        }
+
+        function startNewChat() {
+            currentChatId = 'chat_' + Date.now();
+            document.getElementById('messagesList').innerHTML = '';
+            document.getElementById('messagesList').classList.add('hidden');
+            document.getElementById('welcomeScreen').classList.remove('hidden');
+        }
+
+        function loadChat(chatId) {
+            const chats = getStoredChats();
+            const chat = chats.find(c => c.id === chatId);
+            if (!chat) return;
+
+            currentChatId = chatId;
+            document.getElementById('welcomeScreen').classList.add('hidden');
+            const messagesList = document.getElementById('messagesList');
+            messagesList.innerHTML = '';
+            messagesList.classList.remove('hidden');
+
+            chat.messages.forEach(msg => {
+                renderMessageDirect(msg.role, msg.content, msg.media, msg.modelKey, msg.modelDisplay);
+            });
+        }
+
+        function deleteCurrentChat() {
+            if (!currentChatId) return;
+            let chats = getStoredChats();
+            chats = chats.filter(c => c.id !== currentChatId);
+            saveStoredChats(chats);
+
+            if (chats.length > 0) {
+                loadChat(chats[0].id);
+            } else {
+                startNewChat();
+            }
+        }
+
+        function clearAllMemory() {
+            localStorage.removeItem('natsune_conversations');
+            startNewChat();
+            loadConversationsList();
+        }
+
+        function loadConversationsList() {
+            const list = document.getElementById('historyList');
+            const chats = getStoredChats();
+            if (chats.length === 0) {
+                list.innerHTML = '<p class="text-xs text-[#666] italic py-2 px-3">Sin conversaciones recientes</p>';
+                return;
+            }
+            list.innerHTML = '';
+            chats.forEach(chat => {
+                const item = document.createElement('div');
+                item.className = `truncate py-2.5 px-3 rounded-xl cursor-pointer text-xs transition ${chat.id === currentChatId ? 'bg-[#222222] text-white font-medium' : 'text-[#c4c7c5] hover:bg-[#161616]'}`;
+                item.textContent = chat.title || 'Conversación nueva';
+                item.onclick = () => {
+                    loadChat(chat.id);
+                    toggleDrawer();
+                };
+                list.appendChild(item);
+            });
+        }
 
         function getCurrentModelKey() {
             return document.getElementById('modelSelector').value;
@@ -252,7 +331,6 @@
             return `${model.toUpperCase()} (${variantText})`;
         }
 
-        // Generador de Logotipo SVG exacto según el modelo activo
         function getModelLogoSVG(modelKey) {
             if (modelKey === 'gemini') {
                 return `<svg class="w-full h-full text-sky-400" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2L14.5 9.5L22 12L14.5 14.5L12 22L9.5 14.5L2 12L9.5 9.5L12 2Z"/></svg>`;
@@ -261,7 +339,6 @@
             } else if (modelKey === 'claude') {
                 return `<svg class="w-full h-full text-orange-400" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2L2 19h20L12 2zm0 4.5l6.5 11.5H5.5L12 6.5z"/></svg>`;
             } else {
-                // Natsune Core Logo
                 return `<svg class="w-full h-full text-white" viewBox="0 0 100 100" fill="none"><g transform="translate(50,50)"><path d="M-28,6 C-38,16 -32,34 -8,32 C-24,30 -28,18 -20,12 Z" fill="currentColor"/><path d="M-22,12 C-30,20 -24,30 -4,28 C-16,26 -20,18 -14,14 Z" fill="currentColor"/><path d="M28,-6 C38,-16 32,-34 8,-32 C24,-30 28,-18 20,-12 Z" fill="currentColor"/><path d="M22,-12 C30,-20 24,-30 4,-28 C16,-26 20,-18 14,-14 Z" fill="currentColor"/><polygon points="-11,-24 11,-24 24,-11 24,11 11,24 -11,24 -24,11 -24,-11" fill="currentColor"/><circle cx="0" cy="0" r="13" fill="#000000"/><circle cx="0" cy="0" r="9.5" fill="currentColor"/><circle cx="0" cy="0" r="6.5" fill="#000000"/></g></svg>`;
             }
         }
@@ -393,44 +470,59 @@
             toggleSettings();
         }
 
-        function clearMemory() {
-            localStorage.removeItem('natsune_history');
-            document.getElementById('messagesList').innerHTML = '';
-            document.getElementById('messagesList').classList.add('hidden');
-            document.getElementById('welcomeScreen').classList.remove('hidden');
-            document.getElementById('historyList').innerHTML = '<p class="text-xs text-[#666] italic py-2 px-3">Sin actividad reciente</p>';
-        }
-
-        function resetChat() {
-            document.getElementById('messagesList').innerHTML = '';
-            document.getElementById('messagesList').classList.add('hidden');
-            document.getElementById('welcomeScreen').classList.remove('hidden');
-        }
-
         function quickPrompt(text) {
             userInput.value = text;
             sendMessage();
         }
 
-        function updateHistoryDrawer(history) {
-            const list = document.getElementById('historyList');
-            const userMsgs = history.filter(m => m.role === 'user');
-            if (userMsgs.length === 0) {
-                list.innerHTML = '<p class="text-xs text-[#666] italic py-2 px-3">Sin actividad reciente</p>';
-                return;
+        function renderMessageDirect(sender, text, media = null, modelKey = "natsune", modelDisplay = "Natsune Core") {
+            document.getElementById('welcomeScreen').classList.add('hidden');
+            const messagesList = document.getElementById('messagesList');
+            messagesList.classList.remove('hidden');
+
+            const isUser = sender === 'user';
+            const wrapper = document.createElement('div');
+            wrapper.className = `flex w-full ${isUser ? 'justify-end' : 'justify-start space-x-3 items-start'}`;
+
+            let mediaHTML = '';
+            if (media) {
+                if (media.type.startsWith('image/')) {
+                    mediaHTML = `<img src="${media.data}" class="max-w-xs rounded-xl mb-2 border border-[#3c4043]">`;
+                } else if (media.type.startsWith('video/')) {
+                    mediaHTML = `<video src="${media.data}" controls class="max-w-xs rounded-xl mb-2 border border-[#3c4043]"></video>`;
+                } else {
+                    mediaHTML = `<div class="text-xs bg-[#121316] p-2 rounded-lg mb-2 border border-[#3c4043]">📎 Archivo: ${media.name}</div>`;
+                }
             }
-            list.innerHTML = '';
-            userMsgs.slice(-8).reverse().forEach(m => {
-                const item = document.createElement('div');
-                item.className = "truncate py-2.5 px-3 hover:bg-[#282a2c] rounded-xl cursor-pointer text-xs text-[#e3e3e3] transition";
-                item.textContent = m.content;
-                item.onclick = () => toggleDrawer();
-                list.appendChild(item);
-            });
+
+            const logoSVG = getModelLogoSVG(modelKey);
+
+            if (isUser) {
+                wrapper.innerHTML = `
+                    <div class="bg-[#2b2d31] text-[#e3e3e3] px-4 py-3 rounded-2xl rounded-br-xs max-w-[85%] text-[15px] leading-relaxed select-text shadow-sm">
+                        ${mediaHTML}
+                        <p class="whitespace-pre-wrap">${text}</p>
+                    </div>`;
+            } else {
+                wrapper.innerHTML = `
+                    <div class="w-6 h-6 flex-shrink-0 mt-1">
+                        ${logoSVG}
+                    </div>
+                    <div class="text-[#e3e3e3] text-[15px] leading-relaxed max-w-[88%] select-text pt-1 font-normal">
+                        <div class="flex items-center space-x-2 mb-1">
+                            <span class="font-medium text-xs text-[#8e918f]">Natsune</span>
+                            <span class="text-[10px] bg-[#1e1f20] text-sky-400 px-2 py-0.5 rounded-full border border-[#3c4043]">✦ ${modelDisplay}</span>
+                        </div>
+                        ${mediaHTML}
+                        <p class="whitespace-pre-wrap">${text}</p>
+                    </div>
+                `;
+            }
+
+            messagesList.appendChild(wrapper);
         }
 
-        // Renderizador de mensajes con Efecto de Máquina de Escribir (Streaming)
-        function renderMessage(sender, text, media = null, modelKey = "natsune", modelDisplay = "Natsune Core", save = true, isStreaming = false) {
+        function renderMessage(sender, text, media = null, modelKey = "natsune", modelDisplay = "Natsune Core", isStreaming = false) {
             document.getElementById('welcomeScreen').classList.add('hidden');
             const messagesList = document.getElementById('messagesList');
             messagesList.classList.remove('hidden');
@@ -496,12 +588,28 @@
             const chatContainer = document.getElementById('chatContainer');
             chatContainer.scrollTop = chatContainer.scrollHeight;
 
-            if (save) {
-                const history = JSON.parse(localStorage.getItem('natsune_history') || '[]');
-                history.push({ role: sender, content: text, media: media, modelKey: modelKey, modelDisplay: modelDisplay });
-                localStorage.setItem('natsune_history', JSON.stringify(history));
-                updateHistoryDrawer(history);
+            // Guardar en la conversación actual
+            saveMessageToCurrentChat(sender, text, media, modelKey, modelDisplay);
+        }
+
+        function saveMessageToCurrentChat(sender, text, media, modelKey, modelDisplay) {
+            let chats = getStoredChats();
+            let chat = chats.find(c => c.id === currentChatId);
+
+            if (!chat) {
+                chat = {
+                    id: currentChatId || ('chat_' + Date.now()),
+                    title: sender === 'user' ? (text.length > 25 ? text.substring(0, 25) + '...' : text) : 'Nueva conversación',
+                    messages: []
+                };
+                currentChatId = chat.id;
+                chats.unshift(chat);
+            } else if (chat.messages.length === 0 && sender === 'user') {
+                chat.title = text.length > 25 ? text.substring(0, 25) + '...' : text;
             }
+
+            chat.messages.push({ role: sender, content: text, media: media, modelKey: modelKey, modelDisplay: modelDisplay });
+            saveStoredChats(chats);
         }
 
         function getLocalIntelligence(query, userName, modelName) {
@@ -511,7 +619,6 @@
             if (q.includes('qué modelo es') || q.includes('que modelo es') || q.includes('qué modelo usas') || q.includes('que modelo usas') || q.includes('qué modelo eres') || q.includes('que modelo eres') || q.includes('modelo actual')) {
                 return `Actualmente estoy usando ${modelName}.`;
             }
-
             if (q.includes('imagen') || q.includes('genera') || q.includes('dibuja')) {
                 return `Aquí tienes tu imagen generada. ¿Qué te parece el resultado?`;
             }
@@ -532,14 +639,14 @@
 
             const modelKey = getCurrentModelKey();
             const modelName = getCurrentModelName();
-            renderMessage('user', text || '[Archivo adjunto]', currentMedia, modelKey, modelName, true, false);
+            renderMessage('user', text || '[Archivo adjunto]', currentMedia, modelKey, modelName, false);
 
             const userName = localStorage.getItem('natsune_username') || '';
 
             if (modelKey === 'natsune') {
                 setTimeout(() => {
                     const reply = getLocalIntelligence(text, userName, modelName);
-                    renderMessage('natsune', reply, null, modelKey, modelName, true, true);
+                    renderMessage('natsune', reply, null, modelKey, modelName, true);
                 }, 300);
                 return;
             }
@@ -549,7 +656,7 @@
                 if (!apiKey) {
                     setTimeout(() => {
                         const fallbackReply = getLocalIntelligence(text, userName, "Natsune Core");
-                        renderMessage('natsune', fallbackReply, null, "natsune", "Natsune Core", true, true);
+                        renderMessage('natsune', fallbackReply, null, "natsune", "Natsune Core", true);
                     }, 400);
                     return;
                 }
@@ -564,11 +671,11 @@
                     const data = await res.json();
                     const aiText = data.candidates?.[0]?.content?.parts?.[0]?.text;
                     if (!aiText) throw new Error();
-                    renderMessage('natsune', aiText, null, modelKey, modelName, true, true);
+                    renderMessage('natsune', aiText, null, modelKey, modelName, true);
                 } catch (e) {
                     setTimeout(() => {
                         const fallbackReply = getLocalIntelligence(text, userName, "Natsune Core");
-                        renderMessage('natsune', fallbackReply, null, "natsune", "Natsune Core", true, true);
+                        renderMessage('natsune', fallbackReply, null, "natsune", "Natsune Core", true);
                     }, 400);
                 }
                 return;
@@ -576,7 +683,7 @@
 
             setTimeout(() => {
                 const fallbackReply = getLocalIntelligence(text, userName, "Natsune Core");
-                renderMessage('natsune', fallbackReply, null, "natsune", "Natsune Core", true, true);
+                renderMessage('natsune', fallbackReply, null, "natsune", "Natsune Core", true);
             }, 400);
         }
 
