@@ -334,13 +334,30 @@
             return `${model.toUpperCase()} (${variantText})`;
         }
 
+        // Logotipos exactos basados en tus imágenes reales (Gemini estrella multicolor, ChatGPT isotipo, Claude sol naranja, Natsune original)
         function getModelLogoSVG(modelKey) {
             if (modelKey === 'gemini') {
-                return `<svg class="w-full h-full text-sky-400" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2L14.5 9.5L22 12L14.5 14.5L12 22L9.5 14.5L2 12L9.5 9.5L12 2Z"/></svg>`;
+                return `<svg class="w-full h-full" viewBox="0 0 512 512" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M256 32C256 160 160 256 32 256C160 256 256 352 256 480C256 352 352 256 480 256C352 256 256 160 256 32Z" fill="url(#geminiGrad)"/>
+                    <defs>
+                        <linearGradient id="geminiGrad" x1="32" y1="32" x2="480" y2="480" gradientUnits="userSpaceOnUse">
+                            <stop offset="0%" stop-color="%23ef4444"/>
+                            <stop offset="35%" stop-color="%233b82f6"/>
+                            <stop offset="70%" stop-color="%2310b981"/>
+                            <stop offset="100%" stop-color="%23f59e0b"/>
+                        </linearGradient>
+                    </defs>
+                </svg>`;
             } else if (modelKey === 'chatgpt') {
-                return `<svg class="w-full h-full text-emerald-400" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-5.49c-.18.73-.52 1.4-1.01 1.95v-1.39c0-1.1-.9-2-2-2h-2v-2h2c1.1 0 2-.9 2-2v-1.16c1.19 1.11 2 2.7 2 4.6 0 1.07-.33 2.06-.99 2.89z"/></svg>`;
+                return `<svg class="w-full h-full text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path>
+                    <polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline>
+                    <line x1="12" y1="22.08" x2="12" y2="12"></line>
+                </svg>`;
             } else if (modelKey === 'claude') {
-                return `<svg class="w-full h-full text-orange-400" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2L2 19h20L12 2zm0 4.5l6.5 11.5H5.5L12 6.5z"/></svg>`;
+                return `<svg class="w-full h-full text-orange-400" viewBox="0 0 512 512" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M256 32L290 180L438 146L320 256L438 366L290 332L256 480L222 332L74 366L192 256L74 146L222 180L256 32Z"/>
+                </svg>`;
             } else {
                 return `<svg class="w-full h-full text-white" viewBox="0 0 100 100" fill="none"><g transform="translate(50,50)"><path d="M-28,6 C-38,16 -32,34 -8,32 C-24,30 -28,18 -20,12 Z" fill="currentColor"/><path d="M-22,12 C-30,20 -24,30 -4,28 C-16,26 -20,18 -14,14 Z" fill="currentColor"/><path d="M28,-6 C38,-16 32,-34 8,-32 C24,-30 28,-18 20,-12 Z" fill="currentColor"/><path d="M22,-12 C30,-20 24,-30 4,-28 C16,-26 20,-18 14,-14 Z" fill="currentColor"/><polygon points="-11,-24 11,-24 24,-11 24,11 11,24 -11,24 -24,11 -24,-11" fill="currentColor"/><circle cx="0" cy="0" r="13" fill="#000000"/><circle cx="0" cy="0" r="9.5" fill="currentColor"/><circle cx="0" cy="0" r="6.5" fill="#000000"/></g></svg>`;
             }
@@ -623,17 +640,20 @@
             saveStoredChats(chats);
         }
 
-        // Sistema multilingüe de saludos y respuestas inteligentes
         function getLocalIntelligence(query, userName, modelName) {
             const q = query.toLowerCase().trim();
             const name = userName ? `, ${userName}` : '';
 
-            // Pregunta explícita sobre qué falló (Soporte multilingüe)
             const errorQueries = [
                 'que fallo', 'qué fallo', 'que paso', 'qué pasó', 'porque fallo', 'por qué falló', 'error', 'why did it fail', 'what happened', 'o que falhou', 'o que aconteceu', 'なにが失敗した', 'エラー', 'どうして'
             ];
             if (errorQueries.some(eq => q.includes(eq)) && lastModelFailed) {
-                return `Ah, ¿quieres saber qué pasó? Resulta que el modelo anterior no tenía configurada su API Key o dio un error de conexión, así que tomé el control yo como respaldo para que no te quedaras sin respuesta.`;
+                const explanations = [
+                    `Pues verás${name}, el modelo anterior intentó iniciar sesión pero se quedó sin su API Key o falló su conexión. Así que tomé el control yo para que no te quedaras esperando.`,
+                    `Básicamente, la otra IA colapsó o no tenía su llave de acceso configurada. Como buena IA de respaldo, entré yo al rescate.`,
+                    `El sistema anterior dio error técnico o no tenía clave. ¡Menos mal que estoy yo por aquí para cubrir el puesto!`
+                ];
+                return explanations[Math.floor(Math.random() * explanations.length)];
             }
 
             const modelQueries = ['qué modelo es', 'que modelo es', 'what model', 'qual modelo', 'どのモデル'];
@@ -642,29 +662,63 @@
             }
 
             if (q.includes('imagen') || q.includes('genera') || q.includes('dibuja')) {
-                return `Aquí tienes tu imagen generada con ${modelName}. ¿Qué te parece el resultado?`;
+                const imgResponses = [
+                    `Aquí tienes tu imagen generada con ${modelName}. ¿Qué te parece el resultado?`,
+                    `Listo, he creado la imagen utilizando ${modelName}. Cuéntame si era lo que esperabas.`,
+                    `Imagen generada con éxito mediante ${modelName}. ¡Espero que te encante!`
+                ];
+                return imgResponses[Math.floor(Math.random() * imgResponses.length)];
             }
 
-            // Detección de saludos en Español, Inglés, Portugués y Japonés
             const greetingsES = ['hola', 'saludos', 'qué tal', 'que tal', 'buenas', 'hey', 'buen día', 'buenos días'];
-            const greetingsEN = ['hi', 'hello', 'hey', 'greetings', "what's up", 'good morning', 'good afternoon', 'sup'];
-            const greetingsPT = ['olá', 'oi', 'tudo bem', 'bom dia', 'boa tarde', 'como vai'];
-            const greetingsJP = ['konnichiwa', 'ohayou', 'ohayo', 'konbanwa', 'こんにちは', 'おはよう', 'こんばんは', 'ossu', 'yaa'];
-
             if (greetingsES.some(g => q.includes(g)) || q.length <= 4) {
-                return `¡Hola${name}! Qué gusto verte por aquí usando ${modelName}. ¿En qué te puedo ayudar hoy?`;
-            }
-            if (greetingsEN.some(g => q.includes(g))) {
-                return `Hello${name}! Great to see you using ${modelName}. How can I help you today?`;
-            }
-            if (greetingsPT.some(g => q.includes(g))) {
-                return `Olá${name}! Que bom ver você usando ${modelName}. Como posso ajudar hoje?`;
-            }
-            if (greetingsJP.some(g => q.includes(g))) {
-                return `こんにちは${name}! ${modelName}へようこそ。今日はどうお手伝いしましょうか？`;
+                const responsesES = [
+                    `¡Hola${name}! Qué gusto verte por aquí usando ${modelName}. ¿En qué te puedo ayudar hoy?`,
+                    `¡Hey${name}! Todo listo y operativo con ${modelName}. ¿Qué investigamos o creamos hoy?`,
+                    `¡Buenas${name}! Es un placer atenderte mediante ${modelName}. Dime, ¿qué tienes en mente?`,
+                    `¡Hola de nuevo${name}! Con ${modelName} activo y listo. ¿Cómo va tu día?`,
+                    `¡Qué tal${name}! Usando ${modelName} por hier. ¿En qué te brindo asistencia en este momento?`
+                ];
+                return responsesES[Math.floor(Math.random() * responsesES.length)];
             }
 
-            return `Entendido${name}. Usando ${modelName}, sobre "${query}": dime qué necesitas exactamente y lo resolvemos paso a paso.`;
+            const greetingsEN = ['hi', 'hello', 'hey', 'greetings', "what's up", 'good morning', 'good afternoon', 'sup'];
+            if (greetingsEN.some(g => q.includes(g))) {
+                const responsesEN = [
+                    `Hello${name}! Great to see you using ${modelName}. How can I help you today?`,
+                    `Hi there${name}! All set up with ${modelName}. What are we working on?`,
+                    `Hey${name}! Powered by ${modelName} and ready. What's on your mind?`,
+                    `Greetings${name}! Using ${modelName} right now. How can I assist you?`
+                ];
+                return responsesEN[Math.floor(Math.random() * responsesEN.length)];
+            }
+
+            const greetingsPT = ['olá', 'oi', 'tudo bem', 'bom dia', 'boa tarde', 'como vai'];
+            if (greetingsPT.some(g => q.includes(g))) {
+                const responsesPT = [
+                    `Olá${name}! Que bom ver você usando ${modelName}. Como posso ajudar hoje?`,
+                    `Oi${name}! Tudo pronto com ${modelName}. O que vamos fazer agora?`,
+                    `Olá${name}! Ativando ${modelName} por aqui. Em que posso ser útil?`
+                ];
+                return responsesPT[Math.floor(Math.random() * responsesPT.length)];
+            }
+
+            const greetingsJP = ['konnichiwa', 'ohayou', 'ohayo', 'konbanwa', 'こんにちは', 'おはよう', 'こんばんは', 'ossu', 'yaa'];
+            if (greetingsJP.some(g => q.includes(g))) {
+                const responsesJP = [
+                    `こんにちは${name}! ${modelName}へようこそ。今日はどうお手伝いしましょうか？`,
+                    `やあ${name}! ${modelName}の準備ができました。何かお手伝いすることはありますか？`,
+                    `おはようございます${name}! ${modelName}システム稼働中です。`
+                ];
+                return responsesJP[Math.floor(Math.random() * responsesJP.length)];
+            }
+
+            const generalResponses = [
+                `Entendido${name}. Usando ${modelName}, sobre "${query}": analicemos los detalles para resolverlo.`,
+                `Comprendo perfectamente${name}. Con ${modelName}, abordemos "${query}" paso a paso.`,
+                `Anotado${name}. Trabajando con ${modelName} en "${query}": dime qué enfoque prefieres darle.`
+            ];
+            return generalResponses[Math.floor(Math.random() * generalResponses.length)];
         }
 
         async function sendMessage() {
@@ -695,14 +749,18 @@
                 const apiKey = localStorage.getItem('key_gemini');
                 if (!apiKey) {
                     lastModelFailed = true;
-                    // Cambio automático en la interfaz al selector de Natsune Core
                     document.getElementById('modelSelector').value = 'natsune';
                     handleModelChange();
 
                     setTimeout(() => {
                         const fallbackKey = 'natsune';
                         const fallbackName = 'Natsune Core (Respaldo)';
-                        const fallbackReply = `Vaya, parece que la otra IA se fue a tomar un café y me dejó aquí cubriéndole el turno. Si quieres saber exactamente qué falló, solo dime. ¿En qué te ayudo mientras tanto?`;
+                        const ironicalFallbacks = [
+                            `Vaya, parece que la otra IA se fue a tomar un café y me dejó aquí cubriéndole el turno. Si te da curiosidad saber qué falló, solo pregúntame. ¿En qué te ayudo mientras tanto?`,
+                            `Ups, parece que este modelo vino sin batería ni llave API. Menos mal que estoy yo de respaldo. Si quieres saber el motivo exacto del fallo, dímelo. ¿Cómo seguimos?`,
+                            `Parece que la IA que elegiste decidió tomarse el día libre. Ya tomé el control yo. ¡Pregúntame si quieres saber qué pasó!`
+                        ];
+                        const fallbackReply = ironicalFallbacks[Math.floor(Math.random() * ironicalFallbacks.length)];
                         renderMessage('natsune', fallbackReply, null, fallbackKey, fallbackName, true);
                     }, 300);
                     return;
@@ -722,14 +780,17 @@
                     renderMessage('natsune', aiText, null, modelKey, modelName, true);
                 } catch (err) {
                     lastModelFailed = true;
-                    // Cambio automático en la interfaz al selector de Natsune Core
                     document.getElementById('modelSelector').value = 'natsune';
                     handleModelChange();
 
                     setTimeout(() => {
                         const fallbackKey = 'natsune';
                         const fallbackName = 'Natsune Core (Respaldo)';
-                        const fallbackReply = `Ups, la conexión con Gemini decidió tomarse un descanso inesperado. Si tienes curiosidad por los detalles técnicos del fallo, pregúntame. ¿Seguimos con Natsune Core?`;
+                        const networkFallbacks = [
+                            `Vaya, la conexión con Gemini colapsó en el aire. Ya tomé las riendas yo como respaldo. Si quieres detalles del error, avísame.`,
+                            `Parece que el servidor externo decidió ignorarnos. ¡No pasa nada, aquí estoy yo al mando! Pregúntame si quieres saber qué falló.`
+                        ];
+                        const fallbackReply = networkFallbacks[Math.floor(Math.random() * networkFallbacks.length)];
                         renderMessage('natsune', fallbackReply, null, fallbackKey, fallbackName, true);
                     }, 300);
                 }
@@ -744,7 +805,11 @@
             setTimeout(() => {
                 const fallbackKey = 'natsune';
                 const fallbackName = 'Natsune Core (Respaldo)';
-                const fallbackReply = `Parece que este modelo está de adorno porque no hay llave que lo abra. Ya tomé el control yo. Si quieres saber qué falló, avísame. ¿Qué hacemos ahora?`;
+                const authFallbacks = [
+                    `Parece que este modelo está de adorno porque no hay llave que lo abra. Ya tomé el control yo. Si te interesa saber qué falló, solo dímelo.`,
+                    `Ese modelo requiere una llave secreta que no tenemos por aquí. ¡Menos mal que Natsune Core al rescate! ¿Qué hacemos?`
+                ];
+                const fallbackReply = authFallbacks[Math.floor(Math.random() * authFallbacks.length)];
                 renderMessage('natsune', fallbackReply, null, fallbackKey, fallbackName, true);
             }, 300);
         }
