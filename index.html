@@ -353,6 +353,15 @@
             return "Natsune";
         }
 
+        function switchToNatsuneUI() {
+            const selector = document.getElementById('modelSelector');
+            if (selector) {
+                selector.value = 'natsune';
+                updateVariants();
+                updateDynamicGreeting();
+            }
+        }
+
         function getModelLogoSVG(modelKey, isWelcomeScreen = false) {
             const sizeClass = isWelcomeScreen ? "w-16 h-16 sm:w-20 sm:h-20" : "w-8 h-8";
             if (modelKey === 'gemini') {
@@ -527,7 +536,6 @@
             const cleanName = userName.trim();
             const firstWord = cleanName.split(' ')[0].toLowerCase();
 
-            // Apodos dinámicos y variados según el nombre del usuario
             if (firstWord === 'saikane') {
                 const variants = ["Saikane-chan", "chiquitín(a)", "mi estrellita", "dulzura"];
                 return variants[Math.floor(Math.random() * variants.length)];
@@ -678,7 +686,7 @@
         }
 
         // =========================================================================
-        // MOTOR DE INTELIGENCIA CON FRASES DE ERROR VARIADAS Y EMOJIS MÁGICOS
+        // MOTOR DE INTELIGENCIA CON CAMBIO AUTOMÁTICO A NATSUNE EN EL SELECTOR
         // =========================================================================
         async function getChainedIntelligence(query, userName, chatHistory = []) {
             const nick = getAutoNickname(userName);
@@ -700,6 +708,7 @@
             const geminiKey = localStorage.getItem('key_gemini');
             if (selectedModel === 'gemini') {
                 if (!geminiKey) {
+                    switchToNatsuneUI();
                     const missingKeyPhrases = [
                         `¡Vaya, ${nick}! Parece que olvidaste colocar tu llave API de Gemini en los ajustes. Toca tu foto de perfil arriba para configurarla. 🗝️✨`,
                         `Uy ${nick}, no encuentro la llave API de Gemini configurada. Pásala por los ajustes para que desatemos todo el poder. ⚡💫`,
@@ -732,10 +741,11 @@
             const openAIKey = localStorage.getItem('key_openai');
             if (selectedModel === 'chatgpt') {
                 if (!openAIKey) {
+                    switchToNatsuneUI();
                     const missingKeyPhrases = [
                         `¡Oye ${nick}, espera! Necesitamos tu llave API de OpenAI (ChatGPT) en los ajustes para hablar con este modelo. 🗝️✨`,
                         `Parece que falta la llave de ChatGPT, ${nick}. Configúrala tocando tu perfil arriba a la derecha. ⚙️💖`,
-                        `¡ ${nick}, mi gran ${nick}!, falta poner tu llave de OpenAI en la configuración para que funcione. 🌟📝`
+                        `¡${nick}, mi gran ${nick}!, falta poner tu llave de OpenAI en la configuración para que funcione. 🌟📝`
                     ];
                     return { text: missingKeyPhrases[Math.floor(Math.random() * missingKeyPhrases.length)], isNatsune: true };
                 }
@@ -767,6 +777,7 @@
             const claudeKey = localStorage.getItem('key_claude');
             if (selectedModel === 'claude') {
                 if (!claudeKey) {
+                    switchToNatsuneUI();
                     const missingKeyPhrases = [
                         `¡Ey, ${nick}! No veo la llave API de Claude por aquí. Entra a los ajustes y agrégala para echar a andar el motor. 🗝️🌸`,
                         `Falta tu llave de Claude (Anthropic), ${nick}. Configúrala en el menú superior para que podamos platicar. 📜✨`,
@@ -800,7 +811,8 @@
                 } catch (e) {}
             }
 
-            // Errores generales de conexión variados
+            // Error de conexión general
+            switchToNatsuneUI();
             const connectionErrorPhrases = [
                 `¡Vaya giro inesperado, ${nick}! Tuvimos un pequeño tropiezo al conectar con el servidor. ¿Lo intentamos otra vez? 🌌💫`,
                 `Ocurrió un mini contratiempo en la red, ${nick}. Dame un segundito y vuelve a enviarlo. 🔌✨`,
