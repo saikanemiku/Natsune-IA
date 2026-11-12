@@ -33,9 +33,8 @@
             pointer-events: none;
             z-index: 10;
         }
-        /* Transición de desvanecimiento suave */
         .fade-quick {
-            transition: opacity 0.25s ease-in-out, transform 0.25s ease-in-out;
+            transition: opacity 0.2s ease-in-out;
         }
         @keyframes geminiFadeIn {
             from { opacity: 0; transform: translateY(6px); }
@@ -52,36 +51,27 @@
 
     <div class="gemini-ambient-glow"></div>
 
-    <!-- Indicador de Carga / Transición Suave al Cambiar de IA -->
-    <div id="modelLoader" class="fixed inset-0 z-50 bg-black/60 backdrop-blur-md hidden flex flex-col items-center justify-center space-y-3 fade-quick opacity-0">
-        <div class="w-6 h-6 border-2 border-sky-400 border-t-transparent rounded-full animate-spin"></div>
-        <p id="loaderText" class="text-xs text-sky-300 font-medium tracking-wide">Cambiando modelo...</p>
-    </div>
-
-    <!-- Menú Lateral Estilo Gemini Limpio -->
+    <!-- Menú Lateral Estilo Gemini Oficial -->
     <div id="sideDrawer" class="fixed inset-0 z-40 bg-black/60 backdrop-blur-sm hidden fade-quick opacity-0">
-        <div class="absolute left-0 top-0 bottom-0 w-80 bg-[#131314] border-r border-[#282a2c] p-5 flex flex-col justify-between shadow-2xl transform -translate-x-full transition-transform duration-200 ease-out" id="drawerPanel">
-            <div class="space-y-6">
-                <div class="flex items-center justify-between pb-2 border-b border-[#282a2c]">
-                    <div class="flex items-center space-x-2">
-                        <span class="text-white font-medium text-base">Natsune IA</span>
-                        <span class="text-[10px] bg-[#1e1f20] text-sky-400 px-2 py-0.5 rounded-full">Menu</span>
-                    </div>
-                    <button onclick="toggleDrawer()" class="text-[#8e918f] hover:text-white p-2 rounded-full hover:bg-[#1e1f20] transition">✕</button>
+        <div class="absolute left-0 top-0 bottom-0 w-72 bg-[#131314] border-r border-[#282a2c] p-4 flex flex-col justify-between shadow-2xl transform -translate-x-full transition-transform duration-200 ease-out" id="drawerPanel">
+            <div class="space-y-4">
+                <div class="flex items-center justify-between px-2 pt-1">
+                    <span class="text-[#e3e3e3] font-medium text-sm">Menú</span>
+                    <button onclick="toggleDrawer()" class="text-[#c4c7c5] hover:text-white p-2 rounded-full hover:bg-[#1e1f20] transition">✕</button>
                 </div>
-                <button onclick="resetChat(); toggleDrawer();" class="w-full bg-[#1e1f20] hover:bg-[#282a2c] text-[#e3e3e3] border border-[#3c4043] rounded-full py-3 px-4 text-sm font-medium text-left flex items-center space-x-3 transition active:scale-95 shadow-sm">
-                    <span class="text-sky-400 text-lg font-light">+</span>
+                <button onclick="resetChat(); toggleDrawer();" class="w-full bg-[#1e1f20] hover:bg-[#282a2c] text-[#e3e3e3] rounded-full py-3 px-4 text-sm font-medium text-left flex items-center space-x-3 transition active:scale-95">
+                    <svg class="w-5 h-5 text-sky-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"></path></svg>
                     <span>Nuevo chat</span>
                 </button>
-                <div class="space-y-2 pt-2">
-                    <p class="text-[11px] text-[#8e918f] uppercase tracking-wider px-1">Actividad reciente</p>
-                    <div id="historyList" class="space-y-1 text-sm text-[#c4c7c5] max-h-[55vh] overflow-y-auto no-scrollbar">
-                        <p class="text-xs text-[#666] italic py-2 px-1">Sin chats recientes</p>
+                <div class="space-y-1 pt-3">
+                    <p class="text-[11px] text-[#8e918f] font-medium px-3 uppercase tracking-wider">Recientes</p>
+                    <div id="historyList" class="space-y-0.5 text-sm text-[#c4c7c5] max-h-[60vh] overflow-y-auto no-scrollbar">
+                        <p class="text-xs text-[#666] italic py-2 px-3">Sin actividad reciente</p>
                     </div>
                 </div>
             </div>
-            <div class="text-xs text-[#8e918f] border-t border-[#282a2c] pt-4 flex items-center justify-between px-1">
-                <span>Memoria Local Segura</span>
+            <div class="border-t border-[#282a2c] pt-3 px-2 flex items-center justify-between text-xs text-[#8e918f]">
+                <span>Natsune IA</span>
                 <button onclick="clearMemory(); toggleDrawer();" class="text-red-400 hover:underline">Borrar todo</button>
             </div>
         </div>
@@ -128,14 +118,14 @@
     <!-- Contenedor Principal -->
     <main id="chatContainer" class="flex-1 overflow-y-auto px-4 max-w-2xl w-full mx-auto flex flex-col no-scrollbar z-10 pt-2 pb-6 fade-quick">
         
-        <!-- Pantalla de Bienvenida Dinámica -->
+        <!-- Pantalla de Bienvenida Dinámica con indicador de modelo activo -->
         <div id="welcomeScreen" class="my-auto space-y-6 text-left py-8 fade-quick">
             <div class="space-y-1.5">
                 <h1 id="welcomeTitle" class="text-4xl sm:text-5xl font-medium tracking-tight natsune-rainbow-text">
                     Hola
                 </h1>
                 <p id="welcomeSubtitle" class="text-3xl sm:text-4xl font-medium text-[#444746] tracking-tight">
-                    ¿En qué te puedo ayudar hoy?
+                    Usando Natsune Core. ¿Qué investigamos?
                 </p>
             </div>
 
@@ -242,7 +232,7 @@
             if (history.length > 0) {
                 document.getElementById('welcomeScreen').classList.add('hidden');
                 document.getElementById('messagesList').classList.remove('hidden');
-                history.forEach(msg => renderMessage(msg.role, msg.content, msg.media, msg.modelName, false));
+                history.forEach(msg => renderMessage(msg.role, msg.content, msg.media, msg.modelDisplay, false));
                 updateHistoryDrawer(history);
             }
         });
@@ -275,42 +265,20 @@
             });
         }
 
-        // Transición de carga suave al cambiar de modelo
         function handleModelChange() {
-            showLoader("Cambiando modelo de IA...");
-            setTimeout(() => {
-                updateVariants();
-                updateDynamicGreeting();
-                hideLoader();
-            }, 400);
+            updateVariants();
+            updateDynamicGreeting();
         }
 
         function handleVariantChange() {
-            showLoader("Actualizando variante...");
-            setTimeout(() => {
-                updateDynamicGreeting();
-                hideLoader();
-            }, 300);
-        }
-
-        function showLoader(text) {
-            const loader = document.getElementById('modelLoader');
-            document.getElementById('loaderText').textContent = text;
-            loader.classList.remove('hidden');
-            setTimeout(() => loader.classList.remove('opacity-0'), 10);
-        }
-
-        function hideLoader() {
-            const loader = document.getElementById('modelLoader');
-            loader.classList.add('opacity-0');
-            setTimeout(() => loader.classList.add('hidden'), 200);
+            updateDynamicGreeting();
         }
 
         function updateDynamicGreeting() {
             const name = localStorage.getItem('natsune_username') || '';
             const modelName = getCurrentModelName();
             document.getElementById('welcomeTitle').textContent = name ? `Hola, ${name}` : 'Hola';
-            document.getElementById('welcomeSubtitle').textContent = `Activo con ${modelName}. ¿Qué investigamos?`;
+            document.getElementById('welcomeSubtitle').textContent = `Usando ${modelName}. ¿Qué investigamos?`;
         }
 
         function updateAvatarUI() {
@@ -409,7 +377,7 @@
             document.getElementById('messagesList').innerHTML = '';
             document.getElementById('messagesList').classList.add('hidden');
             document.getElementById('welcomeScreen').classList.remove('hidden');
-            document.getElementById('historyList').innerHTML = '<p class="text-xs text-[#666] italic py-2">Sin chats recientes</p>';
+            document.getElementById('historyList').innerHTML = '<p class="text-xs text-[#666] italic py-2 px-3">Sin actividad reciente</p>';
         }
 
         function resetChat() {
@@ -427,13 +395,13 @@
             const list = document.getElementById('historyList');
             const userMsgs = history.filter(m => m.role === 'user');
             if (userMsgs.length === 0) {
-                list.innerHTML = '<p class="text-xs text-[#666] italic py-2">Sin chats recientes</p>';
+                list.innerHTML = '<p class="text-xs text-[#666] italic py-2 px-3">Sin actividad reciente</p>';
                 return;
             }
             list.innerHTML = '';
             userMsgs.slice(-8).reverse().forEach(m => {
                 const item = document.createElement('div');
-                item.className = "truncate py-2 px-3 hover:bg-[#1e1f20] rounded-xl cursor-pointer text-xs text-[#e3e3e3] transition";
+                item.className = "truncate py-2.5 px-3 hover:bg-[#1e1f20] rounded-xl cursor-pointer text-xs text-[#e3e3e3] transition";
                 item.textContent = m.content;
                 item.onclick = () => toggleDrawer();
                 list.appendChild(item);
@@ -505,7 +473,6 @@
             }
         }
 
-        // Inteligencia Local con humor, disculpas y recomendación de modelos al fallar
         function getLocalIntelligence(query, userName, modelName, isFallback = false) {
             const q = query.toLowerCase();
             const name = userName ? `, ${userName}` : '';
@@ -555,7 +522,6 @@
                 return;
             }
 
-            // Manejo de modelos externos con Smart Fallback e ironía/disculpas
             if (model === 'gemini') {
                 const apiKey = localStorage.getItem('key_gemini');
                 if (!apiKey) {
@@ -586,16 +552,16 @@
                 return;
             }
 
-            // Para ChatGPT o Claude sin API Key
             setTimeout(() => {
                 const fallbackReply = getLocalIntelligence(text, userName, "Natsune Core", true);
                 renderMessage('natsune', fallbackReply, null, "Natsune Core (Respaldo)", true);
             }, 400);
         }
 
+        // Teclado reparado y optimizado
         userInput.addEventListener('keydown', function(e) {
-            e.preventDefault();
             if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
                 sendMessage();
             }
         });
