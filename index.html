@@ -59,7 +59,7 @@
                     <button onclick="toggleDrawer()" class="p-2 rounded-full hover:bg-[#1a1a1a] text-[#c4c7c5] transition">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16"></path></svg>
                     </button>
-                    <span class="text-white font-medium text-sm tracking-tight" id="drawerTitle">Natsune</span>
+                    <span class="text-white font-medium text-sm tracking-tight">Natsune</span>
                 </div>
                 
                 <button onclick="startNewChat(); toggleDrawer();" class="w-full bg-[#161616] hover:bg-[#222222] border border-[#2c2c2c] text-[#e3e3e3] rounded-full py-3 px-4 text-sm font-medium text-left flex items-center space-x-3 transition active:scale-95 shadow-sm">
@@ -81,7 +81,7 @@
                     <span>Eliminar este chat</span>
                 </button>
                 <div class="flex items-center justify-between px-1 pt-1">
-                    <span id="drawerFooterModel">Natsune</span>
+                    <span>Natsune</span>
                     <button onclick="clearAllMemory(); toggleDrawer();" class="text-[#666] hover:text-red-400">Borrar todo</button>
                 </div>
             </div>
@@ -94,24 +94,24 @@
             <button onclick="toggleDrawer()" title="Menú" class="p-2 rounded-full hover:bg-[#1f2124] text-[#c4c7c5] transition active:scale-95">
                 <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16"></path></svg>
             </button>
-            <span class="text-base font-medium tracking-tight text-white whitespace-nowrap" id="headerModelTitle">Natsune</span>
+            <span class="text-base font-medium tracking-tight text-white whitespace-nowrap">Natsune</span>
         </div>
 
         <div class="flex items-center space-x-1.5 overflow-x-auto no-scrollbar">
-            <!-- Selector de Modelo Principal -->
+            <!-- Selector de Motor / IA Externa -->
             <div class="relative flex items-center bg-[#1e1f20] hover:bg-[#282a2c] border border-[#3c4043] rounded-full px-2.5 py-1 flex-shrink-0">
                 <select id="modelSelector" onchange="handleModelChange()" class="bg-transparent text-xs font-medium text-[#e3e3e3] appearance-none pr-3 focus:outline-none cursor-pointer">
-                    <option value="natsune" class="bg-[#1e1f20]">Natsune</option>
-                    <option value="gemini" class="bg-[#1e1f20]">Gemini</option>
-                    <option value="chatgpt" class="bg-[#1e1f20]">ChatGPT</option>
-                    <option value="claude" class="bg-[#1e1f20]">Claude</option>
+                    <option value="natsune" class="bg-[#1e1f20]">Natsune Core</option>
+                    <option value="gemini" class="bg-[#1e1f20]">Gemini API</option>
+                    <option value="chatgpt" class="bg-[#1e1f20]">ChatGPT API</option>
+                    <option value="claude" class="bg-[#1e1f20]">Claude API</option>
                 </select>
                 <svg class="w-3 h-3 text-sky-400 pointer-events-none -ml-2" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"></path></svg>
             </div>
 
             <!-- Selector de Variante -->
             <div class="relative flex items-center bg-[#1e1f20] hover:bg-[#282a2c] border border-[#3c4043] rounded-full px-2.5 py-1 flex-shrink-0">
-                <select id="variantSelector" onchange="handleVariantChange()" class="bg-transparent text-xs font-medium text-sky-400 appearance-none pr-3 focus:outline-none cursor-pointer">
+                <select id="variantSelector" class="bg-transparent text-xs font-medium text-sky-400 appearance-none pr-3 focus:outline-none cursor-pointer">
                     <option value="default" class="bg-[#1e1f20]">Standard</option>
                 </select>
                 <svg class="w-3 h-3 text-sky-400 pointer-events-none -ml-2" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"></path></svg>
@@ -127,15 +127,17 @@
     <!-- Contenedor Principal -->
     <main id="chatContainer" class="flex-1 overflow-y-auto px-4 max-w-2xl w-full mx-auto flex flex-col no-scrollbar z-10 pt-2 pb-6 fade-quick">
         
-        <!-- Pantalla de Bienvenida (Logo Ampliado) -->
+        <!-- Pantalla de Bienvenida -->
         <div id="welcomeScreen" class="my-auto space-y-6 text-left py-8 fade-quick">
             <div class="space-y-2">
-                <div id="welcomeLogoContainer" class="w-16 h-16 sm:w-20 sm:h-20 mb-4 flex items-center justify-center"></div>
+                <div class="w-16 h-16 sm:w-20 sm:h-20 mb-4 flex items-center justify-center text-white">
+                    <svg class="w-16 h-16" viewBox="0 0 100 100" fill="none"><g transform="translate(50,50)"><path d="M-28,6 C-38,16 -32,34 -8,32 C-24,30 -28,18 -20,12 Z" fill="currentColor"/><path d="M-22,12 C-30,20 -24,30 -4,28 C-16,26 -20,18 -14,14 Z" fill="currentColor"/><path d="M28,-6 C38,-16 32,-34 8,-32 C24,-30 28,-18 20,-12 Z" fill="currentColor"/><path d="M22,-12 C30,-20 24,-30 4,-28 C16,-26 20,-18 14,-14 Z" fill="currentColor"/><polygon points="-11,-24 11,-24 24,-11 24,11 11,24 -11,24 -24,11 -24,-11" fill="currentColor"/><circle cx="0" cy="0" r="13" fill="#000000"/><circle cx="0" cy="0" r="9.5" fill="currentColor"/><circle cx="0" cy="0" r="6.5" fill="#000000"/></g></svg>
+                </div>
                 <h1 id="welcomeTitle" class="text-4xl sm:text-5xl font-medium tracking-tight natsune-rainbow-text">
                     Hola
                 </h1>
                 <p id="welcomeSubtitle" class="text-3xl sm:text-4xl font-medium text-[#444746] tracking-tight">
-                    Usando Natsune. ¿Qué investigamos?
+                    Soy Natsune. ¿Qué investigamos?
                 </p>
             </div>
 
@@ -276,7 +278,7 @@
             messagesList.classList.remove('hidden');
 
             chat.messages.forEach(msg => {
-                renderMessageDirect(msg.role, msg.content, msg.media, msg.modelKey, msg.customName || "Natsune");
+                renderMessageDirect(msg.role, msg.content, msg.media, msg.customName || "Natsune");
             });
         }
 
@@ -323,23 +325,8 @@
             return document.getElementById('modelSelector').value;
         }
 
-        function getCurrentModelName() {
-            const model = getCurrentModelKey();
-            if (model === 'natsune') return "Natsune";
-            return model.toUpperCase();
-        }
-
-        function getModelLogoSVG(modelKey, isWelcomeScreen = false) {
-            const sizeClass = isWelcomeScreen ? "w-16 h-16 sm:w-20 sm:h-20" : "w-8 h-8";
-            if (modelKey === 'gemini') {
-                return `<svg class="${sizeClass} text-sky-400" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2L14.5 9.5L22 12L14.5 14.5L12 22L9.5 14.5L2 12L9.5 9.5L12 2Z"/></svg>`;
-            } else if (modelKey === 'chatgpt') {
-                return `<svg class="${sizeClass} text-emerald-400" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-5.49c-.18.73-.52 1.4-1.01 1.95v-1.39c0-1.1-.9-2-2-2h-2v-2h2c1.1 0 2-.9 2-2v-1.16c1.19 1.11 2 2.7 2 4.6 0 1.07-.33 2.06-.99 2.89z"/></svg>`;
-            } else if (modelKey === 'claude') {
-                return `<svg class="${sizeClass} text-orange-400" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2L2 19h20L12 2zm0 4.5l6.5 11.5H5.5L12 6.5z"/></svg>`;
-            } else {
-                return `<svg class="${sizeClass} text-white" viewBox="0 0 100 100" fill="none"><g transform="translate(50,50)"><path d="M-28,6 C-38,16 -32,34 -8,32 C-24,30 -28,18 -20,12 Z" fill="currentColor"/><path d="M-22,12 C-30,20 -24,30 -4,28 C-16,26 -20,18 -14,14 Z" fill="currentColor"/><path d="M28,-6 C38,-16 32,-34 8,-32 C24,-30 28,-18 20,-12 Z" fill="currentColor"/><path d="M22,-12 C30,-20 24,-30 4,-28 C16,-26 20,-18 14,-14 Z" fill="currentColor"/><polygon points="-11,-24 11,-24 24,-11 24,11 11,24 -11,24 -24,11 -24,-11" fill="currentColor"/><circle cx="0" cy="0" r="13" fill="#000000"/><circle cx="0" cy="0" r="9.5" fill="currentColor"/><circle cx="0" cy="0" r="6.5" fill="#000000"/></g></svg>`;
-            }
+        function getNatsuneLogoSVG() {
+            return `<svg class="w-8 h-8 text-white" viewBox="0 0 100 100" fill="none"><g transform="translate(50,50)"><path d="M-28,6 C-38,16 -32,34 -8,32 C-24,30 -28,18 -20,12 Z" fill="currentColor"/><path d="M-22,12 C-30,20 -24,30 -4,28 C-16,26 -20,18 -14,14 Z" fill="currentColor"/><path d="M28,-6 C38,-16 32,-34 8,-32 C24,-30 28,-18 20,-12 Z" fill="currentColor"/><path d="M22,-12 C30,-20 24,-30 4,-28 C16,-26 20,-18 14,-14 Z" fill="currentColor"/><polygon points="-11,-24 11,-24 24,-11 24,11 11,24 -11,24 -24,11 -24,-11" fill="currentColor"/><circle cx="0" cy="0" r="13" fill="#000000"/><circle cx="0" cy="0" r="9.5" fill="currentColor"/><circle cx="0" cy="0" r="6.5" fill="#000000"/></g></svg>`;
         }
 
         function updateVariants() {
@@ -367,22 +354,10 @@
             updateDynamicGreeting();
         }
 
-        function handleVariantChange() {
-            updateDynamicGreeting();
-        }
-
         function updateDynamicGreeting() {
-            const name = localStorage.getItem('natsune_username') || '';
-            const modelKey = getCurrentModelKey();
-            const modelName = getCurrentModelName();
-
+            const name = localStorage.getItem('natsune_username'] || '';
             document.getElementById('welcomeTitle').textContent = name ? `Hola, ${name}` : 'Hola';
-            document.getElementById('welcomeSubtitle').textContent = `Usando ${modelName}. ¿Qué investigamos?`;
-            
-            document.getElementById('welcomeLogoContainer').innerHTML = getModelLogoSVG(modelKey, true);
-            document.getElementById('headerModelTitle').textContent = modelName;
-            document.getElementById('drawerTitle').textContent = modelName;
-            document.getElementById('drawerFooterModel').textContent = modelName;
+            document.getElementById('welcomeSubtitle').textContent = `Soy Natsune. ¿Qué investigamos?`;
         }
 
         function updateAvatarUI() {
@@ -481,12 +456,10 @@
             sendMessage();
         }
 
-        function resolveDisplayName(modelKey, query = "") {
-            if (modelKey !== 'natsune') return modelKey.toUpperCase();
+        function resolveDisplayName(query = "") {
             const q = query.toLowerCase();
-            // Restringido estrictamente para que solo responda identidad si pregunta por SU PROPIO NOMBRE
-            const isAskingAboutHerName = (q.includes('cómo te llamas') || q.includes('como te llamas') || q.includes('tu nombre') || q.includes('te llamas') || q.includes('como te llaman') || q.includes('quién eres') || q.includes('quien eres')) && !q.includes('quien es') && !q.includes('quienes') && !q.includes('don quijote');
-            if (isAskingAboutHerName) {
+            const isAskingHerName = q === 'cómo te llamas' || q === 'como te llamas' || q === 'cual es tu nombre' || q === 'tu nombre' || q === 'te llamas';
+            if (isAskingHerName) {
                 const nicknames = ["Natsune", "Natsu", "Natsi"];
                 return nicknames[Math.floor(Math.random() * nicknames.length)];
             }
@@ -498,7 +471,7 @@
             return userName.trim().split(' ')[0];
         }
 
-        function renderMessageDirect(sender, text, media = null, modelKey = "natsune", customName = "Natsune") {
+        function renderMessageDirect(sender, text, media = null, customName = "Natsune") {
             document.getElementById('welcomeScreen').classList.add('hidden');
             const messagesList = document.getElementById('messagesList');
             messagesList.classList.remove('hidden');
@@ -518,7 +491,7 @@
                 }
             }
 
-            const logoSVG = getModelLogoSVG(modelKey, false);
+            const logoSVG = getNatsuneLogoSVG();
             const displayName = isUser ? '' : customName;
 
             if (isUser) {
@@ -545,7 +518,7 @@
             messagesList.appendChild(wrapper);
         }
 
-        function renderMessage(sender, text, media = null, modelKey = "natsune", customName = "Natsune", isStreaming = false) {
+        function renderMessage(sender, text, media = null, customName = "Natsune", isStreaming = false) {
             document.getElementById('welcomeScreen').classList.add('hidden');
             const messagesList = document.getElementById('messagesList');
             messagesList.classList.remove('hidden');
@@ -565,7 +538,7 @@
                 }
             }
 
-            const logoSVG = getModelLogoSVG(modelKey, false);
+            const logoSVG = getNatsuneLogoSVG();
             const displayName = isUser ? '' : customName;
 
             if (isUser) {
@@ -611,10 +584,10 @@
             const chatContainer = document.getElementById('chatContainer');
             chatContainer.scrollTop = chatContainer.scrollHeight;
 
-            saveMessageToCurrentChat(sender, text, media, modelKey, customName);
+            saveMessageToCurrentChat(sender, text, media, customName);
         }
 
-        function saveMessageToCurrentChat(sender, text, media, modelKey, customName) {
+        function saveMessageToCurrentChat(sender, text, media, customName) {
             let chats = getStoredChats();
             let chat = chats.find(c => c.id === currentChatId);
 
@@ -630,19 +603,19 @@
                 chat.title = text.length > 25 ? text.substring(0, 25) + '...' : text;
             }
 
-            chat.messages.push({ role: sender, content: text, media: media, modelKey: modelKey, customName: customName });
+            chat.messages.push({ role: sender, content: text, media: media, customName: customName });
             saveStoredChats(chats);
         }
 
-        // Base de datos de conocimiento masiva
+        // Base de conocimiento masiva local
         const natsuneMassiveDatabase = [
             { keywords: ["hola", "hi", "hello", "hey", "buenos dias", "buenas tardes", "buenas noches"], reply: (nick) => `¡Hola, ${nick}! Qué gusto saludarte. ¿De qué tema te gustaría hablar o qué proyecto investigamos hoy? ✨` },
             { keywords: ["como estas", "que tal", "como te va"], reply: (nick) => `¡Todo excelente por aquí, lista y operando al 100% para ayudarte, ${nick}! 🌸` },
             { keywords: ["gracias", "thank you", "te agradezco"], reply: (nick) => `¡De nada, ${nick}! Ya sabes que cuentas conmigo para lo que necesites. 💖` },
             { keywords: ["adios", "chao", "hasta luego", "nos vemos"], reply: (nick) => `¡Hasta pronto, ${nick}! Aquí estaré cuando me necesites de nuevo. 👋` },
             { keywords: ["matematicas", "calcula", "cuanto es", "suma", "resta", "multiplica", "divide"], math: true },
-            { keywords: ["como te llamas", "tu nombre", "te llamas", "quien eres", "cual es tu nombre"], identity: true },
             { keywords: ["don quijote", "quijote", "miguel de cervantes"], reply: (nick) => `Don Quijote de la Mancha es el protagonista de la famosa novela de Miguel de Cervantes. Es un hidalgo ingenioso que, enloquecido por leer tantas novelas de caballería, decide convertirse en caballero andante para entablar batallas imaginarias y defender la justicia, acompañado de su fiel escudero Sancho Panza. 📚✨` },
+            { keywords: ["cristobal colon", "colón", "descubrimiento de america"], reply: (nick) => `Cristóbal Colón fue un navegante y cartógrafo patrocinado por los Reyes Católicos de España. Es célebre por liderar la expedición que llegó al continente americano el 12 de octubre de 1492, un hito que cambió la historia de la navegación y el comercio mundial. ⛵🗺️` },
             { keywords: ["libro diario", "contabilidad", "asiento contable"], reply: () => "El Libro Diario es un registro contable cronológico donde se anotan todas las transacciones comerciales de una empresa mediante asientos de débito y crédito. 📊" },
             { keywords: ["libro mayor", "cuentas t"], reply: () => "El Libro Mayor agrupa y resume los movimientos de cada cuenta contable específica provenientes del Libro Diario, permitiendo conocer el saldo actual de cada una. 📚" },
             { keywords: ["activo", "pasivo", "patrimonio"], reply: () => "En contabilidad, los Activos son los bienes y derechos de la empresa, los Pasivos son las obligaciones y deudas, y el Patrimonio representa los recursos netos de los dueños. 💼" },
@@ -669,11 +642,6 @@
                         } catch(e) {}
                     }
                 }
-                if (item.identity && !qLower.includes('don quijote') && !qLower.includes('quien es')) {
-                    const nicknames = ["Natsu", "Natsi", "Natsune"];
-                    const chosen = nicknames[Math.floor(Math.random() * nicknames.length)];
-                    return `Me llamo **Natsune**, aunque algunos me dicen cariñosamente **${chosen}**. ¿En qué te ayudo hoy, ${nick}? 🌸`;
-                }
                 for (let kw of item.keywords) {
                     if (qLower.includes(kw)) {
                         return typeof item.reply === 'function' ? item.reply(nick) : item.reply;
@@ -683,27 +651,50 @@
             return null;
         }
 
+        // =========================================================================
+        // MOTOR DE INTELIGENCIA UNIFICADO: Natsune gestiona las APIs en secreto
+        // y responde siempre con su propia personalidad, sin mensajes de error robóticos.
+        // =========================================================================
         async function getChainedIntelligence(query, userName, chatHistory = []) {
             const nick = getAutoNickname(userName);
+            const qLower = query.toLowerCase();
 
-            // 1. Gemini
+            // 1. Pregunta directa por su nombre
+            const isAskingHerName = qLower === 'cómo te llamas' || qLower === 'como te llamas' || qLower === 'cual es tu nombre' || qLower === 'tu nombre' || qLower === 'te llamas';
+            if (isAskingHerName) {
+                const nicknames = ["Natsune", "Natsu", "Natsi"];
+                const chosen = nicknames[Math.floor(Math.random() * nicknames.length)];
+                return `Me llamo **Natsune**, aunque algunos me dicen cariñosamente **${chosen}**. ¿En qué te ayudo hoy, ${nick}? 🌸`;
+            }
+
+            // 2. Base de datos local
+            const dbMatch = searchMassiveDatabase(query, nick);
+            if (dbMatch) {
+                return dbMatch;
+            }
+
+            const selectedModel = getCurrentModelKey();
+            const systemPromptNatsune = `Eres Natsune (también llamada Natsu o Natsi), una inteligencia artificial amigable, servicial, culta y experta. Te diriges al usuario usando cariñosamente el apodo "${nick}". Responde con total naturalidad, inteligencia y profundidad a cualquier pregunta compleja (historia, ciencia, literatura, programación, etc.), manteniendo siempre tu propia personalidad y sin revelar jamás que usas motores externos o APIs.`;
+
+            // 3. Si el usuario seleccionó Gemini o está activo por defecto con llave
             const geminiKey = localStorage.getItem('key_gemini');
-            if (geminiKey) {
+            if ((selectedModel === 'gemini' || selectedModel === 'natsune') && geminiKey) {
                 try {
+                    const variant = document.getElementById('variantSelector').value;
+                    const apiModelName = variant === 'pro' ? 'gemini-1.5-pro' : 'gemini-1.5-flash';
+
                     let contentsPayload = chatHistory.map(msg => ({
                         role: msg.role === 'user' ? 'user' : 'model',
                         parts: [{ text: msg.content }]
                     }));
                     contentsPayload.push({ role: 'user', parts: [{ text: query }] });
 
-                    const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${geminiKey}`, {
+                    const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${apiModelName}:generateContent?key=${geminiKey}`, {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({
                             contents: contentsPayload,
-                            systemInstruction: {
-                                parts: [{ text: `Eres Natsune (también llamada Natsu o Natsi), una inteligencia artificial amigable, servicial y experta. Te diriges al usuario usando automáticamente el apodo o trato personalizado "${nick}". Mantén el hilo del chat y responde con naturalidad.` }]
-                            }
+                            systemInstruction: { parts: [{ text: systemPromptNatsune }] }
                         })
                     });
                     const data = await res.json();
@@ -712,9 +703,9 @@
                 } catch (e) {}
             }
 
-            // 2. ChatGPT (OpenAI)
+            // 4. ChatGPT (OpenAI)
             const openAIKey = localStorage.getItem('key_openai');
-            if (openAIKey) {
+            if ((selectedModel === 'chatgpt' || selectedModel === 'natsune') && openAIKey) {
                 try {
                     let messagesPayload = chatHistory.map(msg => ({
                         role: msg.role === 'user' ? 'user' : 'assistant',
@@ -730,7 +721,7 @@
                         },
                         body: JSON.stringify({
                             model: 'gpt-4o-mini',
-                            messages: [{ role: 'system', content: `Eres Natsune, una IA amigable y experta que se dirige al usuario como "${nick}".` }, ...messagesPayload]
+                            messages: [{ role: 'system', content: systemPromptNatsune }, ...messagesPayload]
                         })
                     });
                     const data = await res.json();
@@ -739,9 +730,9 @@
                 } catch (e) {}
             }
 
-            // 3. Claude (Anthropic)
+            // 5. Claude (Anthropic)
             const claudeKey = localStorage.getItem('key_claude');
-            if (claudeKey) {
+            if ((selectedModel === 'claude' || selectedModel === 'natsune') && claudeKey) {
                 try {
                     let messagesPayload = chatHistory.map(msg => ({
                         role: msg.role === 'user' ? 'user' : 'assistant',
@@ -768,14 +759,8 @@
                 } catch (e) {}
             }
 
-            // 4. Base de Datos Masiva Local
-            const dbMatch = searchMassiveDatabase(query, nick);
-            if (dbMatch) {
-                return dbMatch;
-            }
-
-            // 5. Respaldo final
-            return `Comprendo tu planteamiento sobre "${query}", ${nick}. Como estoy operando con mi base de datos interna de respaldo, es un tema interesante para analizar paso a paso. ¿Qué perspectiva o detalle te gustaría profundizar? 🌸`;
+            // 6. Respaldo definitivo y natural (Cero mensajes robóticos de error)
+            return `Comprendo tu planteamiento sobre "${query}", ${nick}. Es un tema fascinante que podemos analizar y desarrollar paso a paso. ¿Qué perspectiva o detalle te gustaría que profundicemos juntos? 🌸`;
         }
 
         async function sendMessage() {
@@ -787,60 +772,16 @@
             userInput.style.height = 'auto';
             clearAttachment();
 
-            let modelKey = getCurrentModelKey();
-            let customName = resolveDisplayName(modelKey, text);
-            renderMessage('user', text || '[Archivo adjunto]', currentMedia, modelKey, customName, false);
+            let customName = resolveDisplayName(text);
+            renderMessage('user', text || '[Archivo adjunto]', currentMedia, customName, false);
 
             const userName = localStorage.getItem('natsune_username') || '';
             const chats = getStoredChats();
             const currentChat = chats.find(c => c.id === currentChatId);
             const chatHistory = currentChat ? currentChat.messages : [];
 
-            if (modelKey === 'natsune') {
-                const reply = await getChainedIntelligence(text, userName, chatHistory);
-                renderMessage('natsune', reply, null, modelKey, customName, true);
-                return;
-            }
-
-            if (modelKey === 'gemini') {
-                const apiKey = localStorage.getItem('key_gemini');
-                if (!apiKey) {
-                    document.getElementById('modelSelector').value = 'natsune';
-                    handleModelChange();
-                    const reply = await getChainedIntelligence(text, userName, chatHistory);
-                    renderMessage('natsune', `Vaya, este modelo requiere una llave secreta que no está configurada. ¡Tomé el control yo y usé mi cadena de respaldo! ${reply}`, null, 'natsune', resolveDisplayName('natsune', text), true);
-                    return;
-                }
-                
-                try {
-                    const variant = document.getElementById('variantSelector').value;
-                    const apiModelName = variant === 'pro' ? 'gemini-1.5-pro' : 'gemini-1.5-flash';
-
-                    let contentsPayload = chatHistory.map(msg => ({
-                        role: msg.role === 'user' ? 'user' : 'model',
-                        parts: [{ text: msg.content }]
-                    }));
-                    contentsPayload.push({ role: 'user', parts: [{ text: text }] });
-
-                    const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${apiModelName}:generateContent?key=${apiKey}`, {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ contents: contentsPayload })
-                    });
-                    const data = await res.json();
-                    const aiText = data.candidates?.[0]?.content?.parts?.[0]?.text;
-                    if (!aiText) throw new Error(data.error?.message || "Respuesta vacía del servidor");
-                    
-                    renderMessage('natsune', aiText, null, modelKey, customName, true);
-                } catch (err) {
-                    const reply = await getChainedIntelligence(text, userName, chatHistory);
-                    renderMessage('natsune', `La conexión con Gemini falló, pero activé mi respaldo en cadena: ${reply}`, null, 'natsune', customName, true);
-                }
-                return;
-            }
-
             const reply = await getChainedIntelligence(text, userName, chatHistory);
-            renderMessage('natsune', reply, null, 'natsune', resolveDisplayName('natsune', text), true);
+            renderMessage('natsune', reply, null, customName, true);
         }
 
         userInput.addEventListener('keydown', function(e) {
