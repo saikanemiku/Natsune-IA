@@ -127,7 +127,7 @@
     <!-- Contenedor Principal -->
     <main id="chatContainer" class="flex-1 overflow-y-auto px-4 max-w-2xl w-full mx-auto flex flex-col no-scrollbar z-10 pt-2 pb-6 fade-quick">
         
-        <!-- Pantalla de Bienvenida (Logo Ampliado) -->
+        <!-- Pantalla de Bienvenida -->
         <div id="welcomeScreen" class="my-auto space-y-6 text-left py-8 fade-quick">
             <div class="space-y-2">
                 <div id="welcomeLogoContainer" class="w-16 h-16 sm:w-20 sm:h-20 mb-4 flex items-center justify-center"></div>
@@ -223,17 +223,24 @@
         let currentChatId = null;
 
         const userInput = document.getElementById('userInput');
-        userInput.addEventListener('input', function() {
-            this.style.height = 'auto';
-            this.style.height = (this.scrollHeight) + 'px';
-        });
+        if (userInput) {
+            userInput.addEventListener('input', function() {
+                this.style.height = 'auto';
+                this.style.height = (this.scrollHeight) + 'px';
+            });
+        }
 
         document.addEventListener("DOMContentLoaded", () => {
             const savedName = localStorage.getItem('natsune_username') || '';
-            document.getElementById('userNameInput').value = savedName;
-            document.getElementById('keyGemini').value = localStorage.getItem('key_gemini') || '';
-            document.getElementById('keyOpenAI').value = localStorage.getItem('key_openai') || '';
-            document.getElementById('keyClaude').value = localStorage.getItem('key_claude') || '';
+            const keyGemini = document.getElementById('keyGemini');
+            const keyOpenAI = document.getElementById('keyOpenAI');
+            const keyClaude = document.getElementById('keyClaude');
+            const userNameInput = document.getElementById('userNameInput');
+
+            if (userNameInput) userNameInput.value = savedName;
+            if (keyGemini) keyGemini.value = localStorage.getItem('key_gemini') || '';
+            if (keyOpenAI) keyOpenAI.value = localStorage.getItem('key_openai') || '';
+            if (keyClaude) keyClaude.value = localStorage.getItem('key_claude') || '';
             
             updateGreeting(savedName);
             updateAvatarUI();
@@ -249,7 +256,11 @@
         });
 
         function getStoredChats() {
-            return JSON.parse(localStorage.getItem('natsune_conversations') || '[]');
+            try {
+                return JSON.parse(localStorage.getItem('natsune_conversations') || '[]');
+            } catch(e) {
+                return [];
+            }
         }
 
         function saveStoredChats(chats) {
@@ -259,9 +270,13 @@
 
         function startNewChat() {
             currentChatId = 'chat_' + Date.now();
-            document.getElementById('messagesList').innerHTML = '';
-            document.getElementById('messagesList').classList.add('hidden');
-            document.getElementById('welcomeScreen').classList.remove('hidden');
+            const msgList = document.getElementById('messagesList');
+            const welcome = document.getElementById('welcomeScreen');
+            if (msgList) {
+                msgList.innerHTML = '';
+                msgList.classList.add('hidden');
+            }
+            if (welcome) welcome.classList.remove('hidden');
         }
 
         function loadChat(chatId) {
@@ -270,14 +285,18 @@
             if (!chat) return;
 
             currentChatId = chatId;
-            document.getElementById('welcomeScreen').classList.add('hidden');
-            const messagesList = document.getElementById('messagesList');
-            messagesList.innerHTML = '';
-            messagesList.classList.remove('hidden');
+            const welcome = document.getElementById('welcomeScreen');
+            if (welcome) welcome.classList.add('hidden');
 
-            chat.messages.forEach(msg => {
-                renderMessageDirect(msg.role, msg.content, msg.media, msg.modelKey || "natsune", msg.customName || "Natsune");
-            });
+            const messagesList = document.getElementById('messagesList');
+            if (messagesList) {
+                messagesList.innerHTML = '';
+                messagesList.classList.remove('hidden');
+
+                chat.messages.forEach(msg => {
+                    renderMessageDirect(msg.role, msg.content, msg.media, msg.modelKey || "natsune", msg.customName || "Natsune");
+                });
+            }
         }
 
         function deleteCurrentChat() {
@@ -301,6 +320,7 @@
 
         function loadConversationsList() {
             const list = document.getElementById('historyList');
+            if (!list) return;
             const chats = getStoredChats();
             if (chats.length === 0) {
                 list.innerHTML = '<p class="text-xs text-[#666] italic py-2 px-3">Sin conversaciones recientes</p>';
@@ -320,7 +340,8 @@
         }
 
         function getCurrentModelKey() {
-            return document.getElementById('modelSelector').value;
+            const selector = document.getElementById('modelSelector');
+            return selector ? selector.value : 'natsune';
         }
 
         function getCurrentModelName() {
@@ -348,6 +369,7 @@
         function updateVariants() {
             const model = getCurrentModelKey();
             const variantSel = document.getElementById('variantSelector');
+            if (!variantSel) return;
             variantSel.innerHTML = '';
 
             let variants = [];
@@ -375,21 +397,28 @@
         }
 
         function updateDynamicGreeting() {
-            const name = localStorage.getItem('natsune_username'] || '';
+            const name = localStorage.getItem('natsune_username') || '';
             const modelKey = getCurrentModelKey();
             const modelName = getCurrentModelName();
 
-            document.getElementById('welcomeTitle').textContent = name ? `Hola, ${name}` : 'Hola';
-            document.getElementById('welcomeSubtitle').textContent = `Usando ${modelName}. ¿Qué investigamos?`;
-            
-            document.getElementById('welcomeLogoContainer').innerHTML = getModelLogoSVG(modelKey, true);
-            document.getElementById('headerModelTitle').textContent = modelName;
-            document.getElementById('drawerTitle').textContent = modelName;
-            document.getElementById('drawerFooterModel').textContent = modelName;
+            const welcomeTitle = document.getElementById('welcomeTitle');
+            const welcomeSubtitle = document.getElementById('welcomeSubtitle');
+            const welcomeLogoContainer = document.getElementById('welcomeLogoContainer');
+            const headerModelTitle = document.getElementById('headerModelTitle');
+            const drawerTitle = document.getElementById('drawerTitle');
+            const drawerFooterModel = document.getElementById('drawerFooterModel');
+
+            if (welcomeTitle) welcomeTitle.textContent = name ? `Hola, ${name}` : 'Hola';
+            if (welcomeSubtitle) welcomeSubtitle.textContent = `Usando ${modelName}. ¿Qué investigamos?`;
+            if (welcomeLogoContainer) welcomeLogoContainer.innerHTML = getModelLogoSVG(modelKey, true);
+            if (headerModelTitle) headerModelTitle.textContent = "Natsune";
+            if (drawerTitle) drawerTitle.textContent = "Natsune";
+            if (drawerFooterModel) drawerFooterModel.textContent = "Natsune";
         }
 
         function updateAvatarUI() {
             const btn = document.getElementById('profileAvatarBtn');
+            if (!btn) return;
             const savedImg = localStorage.getItem('natsune_avatar_img');
             const savedName = localStorage.getItem('natsune_username');
             
@@ -407,6 +436,7 @@
 
         function toggleSettings() { 
             const modal = document.getElementById('settingsModal');
+            if (!modal) return;
             if (modal.classList.contains('hidden')) {
                 modal.classList.remove('hidden');
                 setTimeout(() => modal.classList.remove('opacity-0'), 10);
@@ -419,6 +449,7 @@
         function toggleDrawer() { 
             const drawer = document.getElementById('sideDrawer');
             const panel = document.getElementById('drawerPanel');
+            if (!drawer || !panel) return;
             if (drawer.classList.contains('hidden')) {
                 drawer.classList.remove('hidden');
                 setTimeout(() => {
@@ -438,23 +469,29 @@
             const reader = new FileReader();
             reader.onload = function(e) {
                 attachedFile = { name: file.name, type: file.type, data: e.target.result };
-                document.getElementById('fileNameDisplay').textContent = `Adjunto: ${file.name}`;
-                document.getElementById('attachmentPreview').classList.remove('hidden');
+                const display = document.getElementById('fileNameDisplay');
+                const preview = document.getElementById('attachmentPreview');
+                if (display) display.textContent = `Adjunto: ${file.name}`;
+                if (preview) preview.classList.remove('hidden');
             }
             reader.readAsDataURL(file);
         }
 
         function clearAttachment() {
             attachedFile = null;
-            document.getElementById('attachmentPreview').classList.add('hidden');
-            document.getElementById('fileInput').value = '';
+            const preview = document.getElementById('attachmentPreview');
+            const fileInput = document.getElementById('fileInput');
+            if (preview) preview.classList.add('hidden');
+            if (fileInput) fileInput.value = '';
         }
 
         function saveSettings() {
-            const name = document.getElementById('userNameInput').value.trim();
+            const nameInput = document.getElementById('userNameInput');
+            const name = nameInput ? nameInput.value.trim() : '';
             localStorage.setItem('natsune_username', name);
 
-            const avatarFile = document.getElementById('avatarImageInput').files[0];
+            const avatarInput = document.getElementById('avatarImageInput');
+            const avatarFile = avatarInput && avatarInput.files ? avatarInput.files[0] : null;
             if (avatarFile) {
                 const reader = new FileReader();
                 reader.onload = function(e) {
@@ -464,9 +501,13 @@
                 reader.readAsDataURL(avatarFile);
             }
 
-            localStorage.setItem('key_gemini', document.getElementById('keyGemini').value.trim());
-            localStorage.setItem('key_openai', document.getElementById('keyOpenAI').value.trim());
-            localStorage.setItem('key_claude', document.getElementById('keyClaude').value.trim());
+            const kGemini = document.getElementById('keyGemini');
+            const kOpenAI = document.getElementById('keyOpenAI');
+            const kClaude = document.getElementById('keyClaude');
+
+            if (kGemini) localStorage.setItem('key_gemini', kGemini.value.trim());
+            if (kOpenAI) localStorage.setItem('key_openai', kOpenAI.value.trim());
+            if (kClaude) localStorage.setItem('key_claude', kClaude.value.trim());
             
             updateGreeting(name);
             updateAvatarUI();
@@ -480,8 +521,11 @@
         }
 
         function quickPrompt(text) {
-            userInput.value = text;
-            sendMessage();
+            const input = document.getElementById('userInput');
+            if (input) {
+                input.value = text;
+                sendMessage();
+            }
         }
 
         function resolveDisplayName(query = "", modelKey = "natsune") {
@@ -497,9 +541,10 @@
         }
 
         function renderMessageDirect(sender, text, media = null, modelKey = "natsune", customName = "Natsune") {
-            document.getElementById('welcomeScreen').classList.add('hidden');
+            const welcome = document.getElementById('welcomeScreen');
             const messagesList = document.getElementById('messagesList');
-            messagesList.classList.remove('hidden');
+            if (welcome) welcome.classList.add('hidden');
+            if (messagesList) messagesList.classList.remove('hidden');
 
             const isUser = sender === 'user';
             const wrapper = document.createElement('div');
@@ -540,13 +585,14 @@
                 `;
             }
 
-            messagesList.appendChild(wrapper);
+            if (messagesList) messagesList.appendChild(wrapper);
         }
 
         function renderMessage(sender, text, media = null, modelKey = "natsune", customName = "Natsune", isStreaming = false) {
-            document.getElementById('welcomeScreen').classList.add('hidden');
+            const welcome = document.getElementById('welcomeScreen');
             const messagesList = document.getElementById('messagesList');
-            messagesList.classList.remove('hidden');
+            if (welcome) welcome.classList.add('hidden');
+            if (messagesList) messagesList.classList.remove('hidden');
 
             const isUser = sender === 'user';
             const wrapper = document.createElement('div');
@@ -572,7 +618,7 @@
                         ${mediaHTML}
                         <p class="whitespace-pre-wrap">${text}</p>
                     </div>`;
-                messagesList.appendChild(wrapper);
+                if (messagesList) messagesList.appendChild(wrapper);
             } else {
                 wrapper.innerHTML = `
                     <div class="w-8 h-8 flex-shrink-0 mt-0.5 flex items-center justify-center">
@@ -586,28 +632,28 @@
                         <p class="whitespace-pre-wrap message-text"></p>
                     </div>
                 `;
-                messagesList.appendChild(wrapper);
+                if (messagesList) messagesList.appendChild(wrapper);
                 const textParagraph = wrapper.querySelector('.message-text');
 
-                if (isStreaming) {
+                if (isStreaming && textParagraph) {
                     let i = 0;
                     function typeWriter() {
                         if (i < text.length) {
                             textParagraph.textContent += text.charAt(i);
                             i++;
                             const chatContainer = document.getElementById('chatContainer');
-                            chatContainer.scrollTop = chatContainer.scrollHeight;
+                            if (chatContainer) chatContainer.scrollTop = chatContainer.scrollHeight;
                             setTimeout(typeWriter, 5);
                         }
                     }
                     typeWriter();
-                } else {
+                } else if (textParagraph) {
                     textParagraph.textContent = text;
                 }
             }
 
             const chatContainer = document.getElementById('chatContainer');
-            chatContainer.scrollTop = chatContainer.scrollHeight;
+            if (chatContainer) chatContainer.scrollTop = chatContainer.scrollHeight;
 
             saveMessageToCurrentChat(sender, text, media, modelKey, customName);
         }
@@ -632,7 +678,7 @@
             saveStoredChats(chats);
         }
 
-        // Base de conocimiento masiva local (para cuando se usa Natsune)
+        // Base de conocimiento masiva local
         const natsuneMassiveDatabase = [
             { keywords: ["hola", "hi", "hello", "hey", "buenos dias", "buenas tardes", "buenas noches"], reply: (nick) => `¡Hola, ${nick}! Qué gusto saludarte. ¿De qué tema te gustaría hablar o qué proyecto investigamos hoy? ✨` },
             { keywords: ["como estas", "que tal", "como te va"], reply: (nick) => `¡Todo excelente por aquí, lista y operando al 100% para ayudarte, ${nick}! 🌸` },
@@ -683,7 +729,6 @@
             const nick = getAutoNickname(userName);
             const selectedModel = getCurrentModelKey();
 
-            // 1. Si el usuario seleccionó Natsune o su motor local
             if (selectedModel === 'natsune') {
                 const qLower = query.toLowerCase();
                 const isAskingHerName = qLower.includes('cómo te llamas') || qLower.includes('como te llamas') || qLower.includes('tu nombre') || qLower.includes('te llamas') || qLower.includes('quién eres') || qLower.includes('quien eres');
@@ -699,7 +744,6 @@
                 return `Comprendo tu planteamiento sobre "${query}", ${nick}. Es un tema fascinante que podemos analizar y desarrollar paso a paso. ¿Qué perspectiva o detalle te gustaría que profundizemos juntos? 🌸`;
             }
 
-            // 2. Si se usa GEMINI API (Responde con la personalidad nativa original de Gemini)
             const geminiKey = localStorage.getItem('key_gemini');
             if (selectedModel === 'gemini' && geminiKey) {
                 try {
@@ -723,7 +767,6 @@
                 } catch (e) {}
             }
 
-            // 3. Si se usa CHATGPT API (Responde con la personalidad nativa original de OpenAI)
             const openAIKey = localStorage.getItem('key_openai');
             if (selectedModel === 'chatgpt' && openAIKey) {
                 try {
@@ -750,7 +793,6 @@
                 } catch (e) {}
             }
 
-            // 4. Si se usa CLAUDE API (Responde con la personalidad nativa original de Anthropic)
             const claudeKey = localStorage.getItem('key_claude');
             if (selectedModel === 'claude' && claudeKey) {
                 try {
@@ -779,17 +821,18 @@
                 } catch (e) {}
             }
 
-            // 5. Respaldo por si no hay llave configurada para ese modelo
             return `Para utilizar **${getCurrentModelName()}**, por favor configura tu llave API correspondiente en el menú de configuración (toqueando tu avatar arriba a la derecha).`;
         }
 
         async function sendMessage() {
-            const text = userInput.value.trim();
+            const input = document.getElementById('userInput');
+            if (!input) return;
+            const text = input.value.trim();
             if (!text && !attachedFile) return;
 
             const currentMedia = attachedFile;
-            userInput.value = '';
-            userInput.style.height = 'auto';
+            input.value = '';
+            input.style.height = 'auto';
             clearAttachment();
 
             let modelKey = getCurrentModelKey();
@@ -805,12 +848,14 @@
             renderMessage('natsune', reply, null, modelKey, customName, true);
         }
 
-        userInput.addEventListener('keydown', function(e) {
-            if (e.key === 'Enter' && !e.shiftKey) {
-                e.preventDefault();
-                sendMessage();
-            }
-        });
+        if (userInput) {
+            userInput.addEventListener('keydown', function(e) {
+                if (e.key === 'Enter' && !e.shiftKey) {
+                    e.preventDefault();
+                    sendMessage();
+                }
+            });
+        }
     </script>
 </body>
 </html>
