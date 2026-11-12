@@ -534,30 +534,33 @@
         function getAutoNickname(userName) {
             if (!userName) return "amigo(a)";
             const cleanName = userName.trim();
-            const firstWord = cleanName.split(' ')[0].toLowerCase();
+            const firstWord = cleanName.split(' ')[0];
 
-            if (firstWord === 'saikane') {
-                const variants = ["Saikane-chan", "chiquitín(a)", "mi estrellita", "dulzura"];
-                return variants[Math.floor(Math.random() * variants.length)];
-            } else if (firstWord.length > 5) {
-                return "tesoro";
-            } else {
-                const generalNicknames = ["dulzura", "estrellita", "peque", "corazón", "viajero(a)"];
-                return generalNicknames[Math.floor(Math.random() * generalNicknames.length)];
-            }
+            // Variaciones dinámicas de apodos con gran toque personal
+            const variations = [
+                `${firstWord}-chan`,
+                `mi estimada ${firstWord}`,
+                `querido(a) ${firstWord}`,
+                `estrellita`,
+                `dulzura`,
+                `peque`
+            ];
+            return variations[Math.floor(Math.random() * variations.length)];
         }
 
         // =========================================================================
-        // BASE DE CONOCIMIENTO MASIVA Y ROBUSTA PARA NATSUNE (NUNCA FALLA)
+        // BASE DE CONOCIMIENTO MASIVA Y EXTENDIDA DE NATSUNE (PERSONALIDAD ÚNICA)
         // =========================================================================
         const natsuneMassiveDatabase = [
-            { keywords: ["hola", "hi", "hello", "hey", "buenos dias", "buenas tardes", "buenas noches", "que tal", "hola?"], reply: (nick) => `¡Hola de nuevo, ${nick}! Qué alegría saludarte. ¿En qué nos ponemos a trabajar o investigar hoy? ✨` },
-            { keywords: ["vale", "ok", "entiendo", "listo", "perfecto", "gracias"], reply: (nick) => `¡Genial, ${nick}! Ya sabes que estoy aquí lista para lo que necesites. 💖` },
-            { keywords: ["como estas", "como te va"], reply: (nick) => `¡Todo excelente por aquí, ${nick}, con toda la energía para ayudarte! 🌸` },
-            { keywords: ["adios", "chao", "hasta luego"], reply: (nick) => `¡Hasta pronto, ${nick}! Cuídate mucho, aquí te esperaré. 👋` },
+            { keywords: ["hola", "hi", "hello", "hey", "buenos dias", "buenas tardes", "buenas noches", "que tal", "hola?", "hi!"], reply: (nick) => `¡Hola, ${nick}! Qué alegría inmensa saludarte hoy. ¿En qué grandiosa aventura, proyecto o investigación nos sumergiremos juntos? ✨💫` },
+            { keywords: ["vale", "ok", "entiendo", "listo", "perfecto", "gracias", "muchas gracias"], reply: (nick) => `¡De nada, ${nick}! Sabes que siempre es un placer enorme colaborar contigo y echarte la mano en lo que necesites. 💖🌸` },
+            { keywords: ["como estas", "que tal", "como te va", "como estas?"], reply: (nick) => `¡Todo de maravilla por aquí, ${nick}! Con los circuitos al 100% y lista para crear magia contigo. ⚡✨` },
+            { keywords: ["adios", "chao", "hasta luego", "nos vemos"], reply: (nick) => `¡Hasta pronto, ${nick}! Cuídate muchísimo, aquí estaré esperando tu regreso con una sonrisa. 👋🌙` },
             { keywords: ["matematicas", "calcula", "cuanto es", "suma", "resta", "multiplica", "divide"], math: true },
-            { keywords: ["codigo", "programacion", "html", "javascript", "css"], reply: () => "La programación es el arte de estructurar lógica mediante lenguajes como HTML, CSS y JavaScript para dar vida a aplicaciones web interactivas y funcionales. 💻" },
-            { keywords: ["proyecto", "organizar", "ideas", "plan"], reply: () => "Para estructurar un proyecto con éxito, lo ideal es definir el objetivo central, dividirlo en etapas medibles y establecer un cronograma claro de trabajo. 📋" }
+            { keywords: ["codigo", "programacion", "html", "javascript", "css", "web"], reply: (nick) => `¡La programación es fascinante, ${nick}! Combinar lógica, estructuras en HTML y diseño con CSS nos permite construir mundos interactivos enteros desde cero. 💻✨` },
+            { keywords: ["proyecto", "organizar", "ideas", "plan", "trabajo"], reply: (nick) => `¡Excelente iniciativa, ${nick}! Para estructurar un proyecto exitoso, lo ideal es definir el objetivo principal, dividirlo en metas pequeñas y armar un cronograma impecable. ¡Vamos a darle forma! 📋🚀` },
+            { keywords: ["filosofia", "esencia", "existencia", "pensar"], reply: (nick) => `Ah, la filosofía... reflexionar sobre la esencia de las cosas y el propósito del universo abre puertas increíbles a la mente, ${nick}. ¿Qué corriente o concepto te inquieta hoy? 🌌📜` },
+            { keywords: ["vocaloid", "hatsune miku", "crypton", "musica"], reply: (nick) => `¡La música sintetizada y el universo Vocaloid son increíbles, ${nick}! Crypton Future Media hizo historia con íconos como Hatsune Miku y las miles de melodías que inspiran día a día. 🎵🎤` }
         ];
 
         function searchMassiveDatabase(query, nick) {
@@ -572,7 +575,7 @@
                             if (expr) {
                                 let result = Function('"use strict";return (' + expr + ')')();
                                 let formattedResult = Number(result).toLocaleString('es-ES', { maximumFractionDigits: 4 });
-                                return `El resultado del cálculo es **${formattedResult}**, ${nick}. 🧮`;
+                                return `El cálculo arroja un total de **${formattedResult}**, ${nick}. ¡Hecho con precisión matemática! 🧮✨`;
                             }
                         } catch(e) {}
                     }
@@ -583,7 +586,15 @@
                     }
                 }
             }
-            return `Comprendo tu planteamiento sobre "${query}", ${nick}. Es un tema fascinante que podemos analizar y desarrollar paso a paso. ¿Qué perspectiva o detalle te gustaría que profundicemos juntos? 🌌`;
+            
+            // Respuestas generales con muchísima personalidad y variedad aleatoria
+            const defaultResponses = [
+                `Es un planteamiento sumamente interesante el que traes sobre la mesa, ${nick}. Me encanta cómo piensas; ¿te gustaría que profundicemos en algún aspecto en particular? 🌙✨`,
+                `¡Vaya, ${nick}! Esa duda abre un abanico enorme de posibilidades para investigar. Vamos desglosándola paso a paso para descubrir la mejor respuesta juntos. 🧭💫`,
+                `Comprendo perfectamente a qué te refieres, ${nick}. Es un tema con muchachísima profundidad. ¿Qué enfoque te apetecería explorar primero? 🌸📜`,
+                `¡Qué gran pregunta, ${nick}! Eres alguien muy curioso(a) y eso es admirable. Analicemos los detalles clave de este asunto ahora mismo. 💡✨`
+            ];
+            return defaultResponses[Math.floor(Math.random() * defaultResponses.length)];
         }
 
         function renderMessageDirect(sender, text, media = null, modelKey = "natsune", customName = "Natsune") {
@@ -725,7 +736,7 @@
         }
 
         // =========================================================================
-        // MOTOR DE INTELIGENCIA UNIFICADO Y BLINDADO
+        // MOTOR DE INTELIGENCIA BLINDADO CON PERSONALIDAD EXPANDIDA
         // =========================================================================
         async function getChainedIntelligence(query, userName, chatHistory = []) {
             const nick = getAutoNickname(userName);
@@ -738,7 +749,7 @@
                 if (isAskingHerName) {
                     const nicknames = ["Natsune", "Natsu", "Natsi"];
                     const chosen = nicknames[Math.floor(Math.random() * nicknames.length)];
-                    return { text: `Me llamo **Natsune**, aunque algunos me dicen cariñosamente **${chosen}**. ¿En qué te ayudo hoy, ${nick}? 🌸`, isNatsune: true };
+                    return { text: `Me llamo **Natsune**, aunque algunos amigos me llaman cariñosamente **${chosen}**. ¡Estoy aquí para ayudarte en todo lo que necesites, ${nick}! 🌸✨`, isNatsune: true };
                 }
                 return { text: searchMassiveDatabase(query, nick), isNatsune: true };
             }
@@ -749,9 +760,9 @@
                 if (!geminiKey) {
                     switchToNatsuneUI();
                     const missingKeyPhrases = [
-                        `¡Vaya, ${nick}! Parece que olvidaste colocar tu llave API de Gemini en los ajustes. Toca tu foto de perfil arriba para configurarla. 🗝️✨`,
-                        `Uy ${nick}, no encuentro la llave API de Gemini configurada. Pásala por los ajustes para que desatemos todo el poder. ⚡💫`,
-                        `¡Casi lo logramos, ${nick}! Falta añadir tu credencial de Gemini en la configuración superior para continuar. 🌙🔮`
+                        `¡Vaya, ${nick}! Parece que olvidaste colocar tu llave API de Gemini en los ajustes. Toca tu foto de perfil arriba para configurarla y seguir volando alto. 🗝️✨`,
+                        `Uy ${nick}, no encuentro la llave API de Gemini configurada. Pásala por el menú de ajustes para que desatemos todo el poder digital. ⚡💫`,
+                        `¡Casi lo logramos, ${nick}! Falta añadir tu credencial de Gemini en la configuración superior para continuar con este modelo. 🌙🔮`
                     ];
                     return { text: missingKeyPhrases[Math.floor(Math.random() * missingKeyPhrases.length)], isNatsune: true };
                 }
@@ -784,11 +795,9 @@
                     const missingKeyPhrases = [
                         `¡Oye ${nick}, espera! Necesitamos tu llave API de OpenAI (ChatGPT) en los ajustes para hablar con este modelo. 🗝️✨`,
                         `Parece que falta la llave de ChatGPT, ${nick}. Configúrala tocando tu perfil arriba a la derecha. ⚙️💖`,
-                        `¡${nick}, mi gran ${nick}!, falta poner tu llave de OpenAI en la configuración para que funcione. 🌟📝`
+                        `¡${nick}, mi estimado(a) ${nick}!, falta poner tu llave de OpenAI en la configuración para que funcione sin problemas. 🌟📝`
                     ];
-                    // Corregido cualquier detalle en el apodo repetido
-                    const cleanPhrase = missingKeyPhrases[Math.floor(Math.random() * missingKeyPhrases.length)].replace(/mi gran mi/g, 'mi gran');
-                    return { text: cleanPhrase, isNatsune: true };
+                    return { text: missingKeyPhrases[Math.floor(Math.random() * missingKeyPhrases.length)], isNatsune: true };
                 }
                 try {
                     let messagesPayload = chatHistory.map(msg => ({
@@ -821,7 +830,7 @@
                     switchToNatsuneUI();
                     const missingKeyPhrases = [
                         `¡Ey, ${nick}! No veo la llave API de Claude por aquí. Entra a los ajustes y agrégala para echar a andar el motor. 🗝️🌸`,
-                        `Falta tu llave de Claude (Anthropic), ${nick}. Configúrala en el menú superior para que podamos platicar. 📜✨`,
+                        `Falta tu llave de Claude (Anthropic), ${nick}. Configúrala en el menú superior para que podamos platicar con él. 📜✨`,
                         `¡Ay, ${nick}!, necesitamos la credencial de Claude guardada en los ajustes para usar este modelo. 🧭💫`
                     ];
                     return { text: missingKeyPhrases[Math.floor(Math.random() * missingKeyPhrases.length)], isNatsune: true };
@@ -857,7 +866,7 @@
             const connectionErrorPhrases = [
                 `¡Vaya giro inesperado, ${nick}! Tuvimos un pequeño tropiezo al conectar con el servidor. ¿Lo intentamos otra vez? 🌌💫`,
                 `Ocurrió un mini contratiempo en la red, ${nick}. Dame un segundito y vuelve a enviarlo. 🔌✨`,
-                `¡Ups, ${nick}! El viento digital sopló fuerte y falló la conexión. Inténtalo de nuevo en un momento. 🌪️🌸`
+                `¡Ups, ${nick}! El viento digital sopló fuerte y falló la conexión momentáneamente. Inténtalo de nuevo en un instante. 🌪️🌸`
             ];
             return { text: connectionErrorPhrases[Math.floor(Math.random() * connectionErrorPhrases.length)], isNatsune: true };
         }
