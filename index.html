@@ -326,7 +326,10 @@
         function getCurrentModelName() {
             const model = getCurrentModelKey();
             if (model === 'natsune') return "Natsune";
-            return model.toUpperCase();
+            if (model === 'gemini') return "Gemini";
+            if (model === 'chatgpt') return "ChatGPT";
+            if (model === 'claude') return "Claude";
+            return "Natsune";
         }
 
         function getModelLogoSVG(modelKey, isWelcomeScreen = false) {
@@ -372,16 +375,17 @@
         }
 
         function updateDynamicGreeting() {
-            const name = localStorage.getItem('natsune_username') || '';
+            const name = localStorage.getItem('natsune_username'] || '';
             const modelKey = getCurrentModelKey();
+            const modelName = getCurrentModelName();
 
             document.getElementById('welcomeTitle').textContent = name ? `Hola, ${name}` : 'Hola';
-            document.getElementById('welcomeSubtitle').textContent = `Usando Natsune. ¿Qué investigamos?`;
+            document.getElementById('welcomeSubtitle').textContent = `Usando ${modelName}. ¿Qué investigamos?`;
             
             document.getElementById('welcomeLogoContainer').innerHTML = getModelLogoSVG(modelKey, true);
-            document.getElementById('headerModelTitle').textContent = "Natsune";
-            document.getElementById('drawerTitle').textContent = "Natsune";
-            document.getElementById('drawerFooterModel').textContent = "Natsune";
+            document.getElementById('headerModelTitle').textContent = modelName;
+            document.getElementById('drawerTitle').textContent = modelName;
+            document.getElementById('drawerFooterModel').textContent = modelName;
         }
 
         function updateAvatarUI() {
@@ -480,12 +484,9 @@
             sendMessage();
         }
 
-        function resolveDisplayName(query = "") {
-            const q = query.toLowerCase();
-            const isAskingHerName = q === 'cómo te llamas' || q === 'como te llamas' || q === 'cual es tu nombre' || q === 'tu nombre' || q === 'te llamas';
-            if (isAskingHerName) {
-                const nicknames = ["Natsune", "Natsu", "Natsi"];
-                return nicknames[Math.floor(Math.random() * nicknames.length)];
+        function resolveDisplayName(query = "", modelKey = "natsune") {
+            if (modelKey !== 'natsune') {
+                return modelKey === 'gemini' ? 'Gemini' : (modelKey === 'chatgpt' ? 'ChatGPT' : 'Claude');
             }
             return "Natsune";
         }
@@ -631,7 +632,7 @@
             saveStoredChats(chats);
         }
 
-        // Base de conocimiento masiva local
+        // Base de conocimiento masiva local (para cuando se usa Natsune)
         const natsuneMassiveDatabase = [
             { keywords: ["hola", "hi", "hello", "hey", "buenos dias", "buenas tardes", "buenas noches"], reply: (nick) => `¡Hola, ${nick}! Qué gusto saludarte. ¿De qué tema te gustaría hablar o qué proyecto investigamos hoy? ✨` },
             { keywords: ["como estas", "que tal", "como te va"], reply: (nick) => `¡Todo excelente por aquí, lista y operando al 100% para ayudarte, ${nick}! 🌸` },
@@ -680,28 +681,27 @@
         // =========================================================================
         async function getChainedIntelligence(query, userName, chatHistory = []) {
             const nick = getAutoNickname(userName);
-            const qLower = query.toLowerCase();
-
-            // 1. Pregunta directa por su nombre
-            const isAskingHerName = qLower === 'cómo te llamas' || qLower === 'como te llamas' || qLower === 'cual es tu nombre' || qLower === 'tu nombre' || qLower === 'te llamas';
-            if (isAskingHerName) {
-                const nicknames = ["Natsune", "Natsu", "Natsi"];
-                const chosen = nicknames[Math.floor(Math.random() * nicknames.length)];
-                return `Me llamo **Natsune**, aunque algunos me dicen cariñosamente **${chosen}**. ¿En qué te ayudo hoy, ${nick}? 🌸`;
-            }
-
-            // 2. Base de datos local
-            const dbMatch = searchMassiveDatabase(query, nick);
-            if (dbMatch) {
-                return dbMatch;
-            }
-
             const selectedModel = getCurrentModelKey();
-            const systemPromptNatsune = `Eres Natsune (también llamada Natsu o Natsi), una inteligencia artificial amigable, servicial, culta y experta. Te diriges al usuario usando cariñosamente el apodo "${nick}". Responde con total naturalidad, inteligencia y profundidad a cualquier pregunta compleja (historia, ciencia, literatura, programación, etc.), manteniendo siempre tu propia personalidad y sin revelar jamás que usas motores externos.`;
 
-            // 3. Gemini API
+            // 1. Si el usuario seleccionó Natsune o su motor local
+            if (selectedModel === 'natsune') {
+                const qLower = query.toLowerCase();
+                const isAskingHerName = qLower.includes('cómo te llamas') || qLower.includes('como te llamas') || qLower.includes('tu nombre') || qLower.includes('te llamas') || qLower.includes('quién eres') || qLower.includes('quien eres');
+                if (isAskingHerName) {
+                    const nicknames = ["Natsune", "Natsu", "Natsi"];
+                    const chosen = nicknames[Math.floor(Math.random() * nicknames.length)];
+                    return `Me llamo **Natsune**, aunque algunos me dicen cariñosamente **${chosen}**. ¿En qué te ayudo hoy, ${nick}? 🌸`;
+                }
+
+                const dbMatch = searchMassiveDatabase(query, nick);
+                if (dbMatch) return dbMatch;
+
+                return `Comprendo tu planteamiento sobre "${query}", ${nick}. Es un tema fascinante que podemos analizar y desarrollar paso a paso. ¿Qué perspectiva o detalle te gustaría que profundizemos juntos? 🌸`;
+            }
+
+            // 2. Si se usa GEMINI API (Responde con la personalidad nativa original de Gemini)
             const geminiKey = localStorage.getItem('key_gemini');
-            if ((selectedModel === 'gemini' || selectedModel === 'natsune') && geminiKey) {
+            if (selectedModel === 'gemini' && geminiKey) {
                 try {
                     const variant = document.getElementById('variantSelector').value;
                     const apiModelName = variant === 'pro' ? 'gemini-1.5-pro' : 'gemini-1.5-flash';
@@ -715,10 +715,7 @@
                     const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${apiModelName}:generateContent?key=${geminiKey}`, {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({
-                            contents: contentsPayload,
-                            systemInstruction: { parts: [{ text: systemPromptNatsune }] }
-                        })
+                        body: JSON.stringify({ contents: contentsPayload })
                     });
                     const data = await res.json();
                     const aiText = data.candidates?.[0]?.content?.parts?.[0]?.text;
@@ -726,9 +723,9 @@
                 } catch (e) {}
             }
 
-            // 4. ChatGPT (OpenAI)
+            // 3. Si se usa CHATGPT API (Responde con la personalidad nativa original de OpenAI)
             const openAIKey = localStorage.getItem('key_openai');
-            if ((selectedModel === 'chatgpt' || selectedModel === 'natsune') && openAIKey) {
+            if (selectedModel === 'chatgpt' && openAIKey) {
                 try {
                     let messagesPayload = chatHistory.map(msg => ({
                         role: msg.role === 'user' ? 'user' : 'assistant',
@@ -744,7 +741,7 @@
                         },
                         body: JSON.stringify({
                             model: 'gpt-4o-mini',
-                            messages: [{ role: 'system', content: systemPromptNatsune }, ...messagesPayload]
+                            messages: messagesPayload
                         })
                     });
                     const data = await res.json();
@@ -753,9 +750,9 @@
                 } catch (e) {}
             }
 
-            // 5. Claude (Anthropic)
+            // 4. Si se usa CLAUDE API (Responde con la personalidad nativa original de Anthropic)
             const claudeKey = localStorage.getItem('key_claude');
-            if ((selectedModel === 'claude' || selectedModel === 'natsune') && claudeKey) {
+            if (selectedModel === 'claude' && claudeKey) {
                 try {
                     let messagesPayload = chatHistory.map(msg => ({
                         role: msg.role === 'user' ? 'user' : 'assistant',
@@ -782,8 +779,8 @@
                 } catch (e) {}
             }
 
-            // 6. Respaldo definitivo y natural
-            return `Comprendo tu planteamiento sobre "${query}", ${nick}. Es un tema fascinante que podemos analizar y desarrollar paso a paso. ¿Qué perspectiva o detalle te gustaría que profundicemos juntos? 🌸`;
+            // 5. Respaldo por si no hay llave configurada para ese modelo
+            return `Para utilizar **${getCurrentModelName()}**, por favor configura tu llave API correspondiente en el menú de configuración (toqueando tu avatar arriba a la derecha).`;
         }
 
         async function sendMessage() {
@@ -796,7 +793,7 @@
             clearAttachment();
 
             let modelKey = getCurrentModelKey();
-            let customName = resolveDisplayName(text);
+            let customName = resolveDisplayName(text, modelKey);
             renderMessage('user', text || '[Archivo adjunto]', currentMedia, modelKey, customName, false);
 
             const userName = localStorage.getItem('natsune_username') || '';
