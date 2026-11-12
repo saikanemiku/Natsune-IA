@@ -528,9 +528,12 @@
             }
         }
 
-        function resolveDisplayName(query = "", modelKey = "natsune") {
-            if (modelKey !== 'natsune') {
-                return modelKey === 'gemini' ? 'Gemini' : (modelKey === 'chatgpt' ? 'ChatGPT' : 'Claude');
+        function resolveDisplayName(query = "") {
+            const q = query.toLowerCase();
+            const isAskingHerName = q.includes('cómo te llamas') || q.includes('como te llamas') || q.includes('tu nombre') || q.includes('te llamas') || q.includes('quién eres') || q.includes('quien eres');
+            if (isAskingHerName) {
+                const nicknames = ["Natsune", "Natsu", "Natsi"];
+                return nicknames[Math.floor(Math.random() * nicknames.length)];
             }
             return "Natsune";
         }
@@ -678,57 +681,14 @@
             saveStoredChats(chats);
         }
 
-        // Base de conocimiento masiva local
-        const natsuneMassiveDatabase = [
-            { keywords: ["hola", "hi", "hello", "hey", "buenos dias", "buenas tardes", "buenas noches"], reply: (nick) => `¡Hola, ${nick}! Qué gusto saludarte. ¿De qué tema te gustaría hablar o qué proyecto investigamos hoy? ✨` },
-            { keywords: ["como estas", "que tal", "como te va"], reply: (nick) => `¡Todo excelente por aquí, lista y operando al 100% para ayudarte, ${nick}! 🌸` },
-            { keywords: ["gracias", "thank you", "te agradezco"], reply: (nick) => `¡De nada, ${nick}! Ya sabes que cuentas conmigo para lo que necesites. 💖` },
-            { keywords: ["adios", "chao", "hasta luego", "nos vemos"], reply: (nick) => `¡Hasta pronto, ${nick}! Aquí estaré cuando me necesites de nuevo. 👋` },
-            { keywords: ["matematicas", "calcula", "cuanto es", "suma", "resta", "multiplica", "divide"], math: true },
-            { keywords: ["don quijote", "quijote", "miguel de cervantes"], reply: (nick) => `Don Quijote de la Mancha es el protagonista de la famosa novela de Miguel de Cervantes. Es un hidalgo ingenioso que, enloquecido por leer tantas novelas de caballería, decide convertirse en caballero andante para entablar batallas imaginarias y defender la justicia, acompañado de su fiel escudero Sancho Panza. 📚✨` },
-            { keywords: ["cristobal colon", "colón", "descubrimiento de america"], reply: (nick) => `Cristóbal Colón fue un navegante y cartógrafo patrocinado por los Reyes Católicos de España. Es célebre por liderar la expedición que llegó al continente americano el 12 de octubre de 1492, un hito que cambió la historia de la navegación y el comercio mundial. ⛵🗺️` },
-            { keywords: ["libro diario", "contabilidad", "asiento contable"], reply: () => "El Libro Diario es un registro contable cronológico donde se anotan todas las transacciones comerciales de una empresa mediante asientos de débito y crédito. 📊" },
-            { keywords: ["libro mayor", "cuentas t"], reply: () => "El Libro Mayor agrupa y resume los movimientos de cada cuenta contable específica provenientes del Libro Diario, permitiendo conocer el saldo actual de cada una. 📚" },
-            { keywords: ["activo", "pasivo", "patrimonio"], reply: () => "En contabilidad, los Activos son los bienes y derechos de la empresa, los Pasivos son las obligaciones y deudas, y el Patrimonio representa los recursos netos de los dueños. 💼" },
-            { keywords: ["vocaloid", "hatsune miku", "crypton"], reply: () => "Vocaloid es una tecnología de síntesis de voz desarrollada por Yamaha. Crypton Future Media creó a íconos mundiales como Hatsune Miku, Kagamine Rin/Len y Megurine Luka. 🎵" },
-            { keywords: ["codigo", "programacion", "html", "javascript", "css"], reply: () => "La programación es el arte de estructurar lógica mediante lenguajes como HTML, CSS y JavaScript para dar vida a aplicaciones web interactivas y funcionales. 💻" },
-            { keywords: ["filosofia", "esencia", "existencia"], reply: () => "La filosofía explora la esencia y la naturaleza del ser humano, cuestionando la realidad, el propósito y los conceptos abstractos que rigen el universo. 🌌" },
-            { keywords: ["proyecto", "organizar", "ideas", "plan"], reply: () => "Para estructurar un proyecto con éxito, lo ideal es definir el objetivo central, dividirlo en etapas medibles y establecer un cronograma claro de trabajo. 📋" }
-        ];
-
-        function searchMassiveDatabase(query, nick) {
-            const qLower = query.toLowerCase();
-            for (let item of natsuneMassiveDatabase) {
-                if (item.math) {
-                    const mathClean = query.replace(/\./g, '').replace(/,/g, '.').replace(/x/g, '*');
-                    const mathMatch = mathClean.match(/[\d\.]+\s*[\+\-\*\/\%]\s*[\d\.]+/);
-                    if (mathMatch || qLower.includes('cuanto es') || qLower.includes('calcula')) {
-                        try {
-                            let expr = mathClean.replace(/[^0-9\+\-\*\/\.\(\)]/g, '');
-                            if (expr) {
-                                let result = Function('"use strict";return (' + expr + ')')();
-                                let formattedResult = Number(result).toLocaleString('es-ES', { maximumFractionDigits: 4 });
-                                return `El resultado del cálculo es **${formattedResult}**, ${nick}. 🧮`;
-                            }
-                        } catch(e) {}
-                    }
-                }
-                for (let kw of item.keywords) {
-                    if (qLower.includes(kw)) {
-                        return typeof item.reply === 'function' ? item.reply(nick) : item.reply;
-                    }
-                }
-            }
-            return null;
-        }
-
         // =========================================================================
-        // MOTOR DE INTELIGENCIA UNIFICADO
+        // MOTOR DE INTELIGENCIA UNIFICADO (NATSUNE MANTIENE EL CONTROL Y AVISOS)
         // =========================================================================
         async function getChainedIntelligence(query, userName, chatHistory = []) {
             const nick = getAutoNickname(userName);
             const selectedModel = getCurrentModelKey();
 
+            // 1. Si usa Natsune local
             if (selectedModel === 'natsune') {
                 const qLower = query.toLowerCase();
                 const isAskingHerName = qLower.includes('cómo te llamas') || qLower.includes('como te llamas') || qLower.includes('tu nombre') || qLower.includes('te llamas') || qLower.includes('quién eres') || qLower.includes('quien eres');
@@ -737,15 +697,15 @@
                     const chosen = nicknames[Math.floor(Math.random() * nicknames.length)];
                     return `Me llamo **Natsune**, aunque algunos me dicen cariñosamente **${chosen}**. ¿En qué te ayudo hoy, ${nick}? 🌸`;
                 }
-
-                const dbMatch = searchMassiveDatabase(query, nick);
-                if (dbMatch) return dbMatch;
-
                 return `Comprendo tu planteamiento sobre "${query}", ${nick}. Es un tema fascinante que podemos analizar y desarrollar paso a paso. ¿Qué perspectiva o detalle te gustaría que profundizemos juntos? 🌸`;
             }
 
+            // 2. Si usa la API de Gemini
             const geminiKey = localStorage.getItem('key_gemini');
-            if (selectedModel === 'gemini' && geminiKey) {
+            if (selectedModel === 'gemini') {
+                if (!geminiKey) {
+                    return `¡Uy, ${nick}! Parece que aún no has configurado tu llave API de Gemini en los ajustes. Toca tu avatar arriba a la derecha para ponerla y que podamos empezar. 🌸✨`;
+                }
                 try {
                     const variant = document.getElementById('variantSelector').value;
                     const apiModelName = variant === 'pro' ? 'gemini-1.5-pro' : 'gemini-1.5-flash';
@@ -767,8 +727,12 @@
                 } catch (e) {}
             }
 
+            // 3. Si usa la API de ChatGPT
             const openAIKey = localStorage.getItem('key_openai');
-            if (selectedModel === 'chatgpt' && openAIKey) {
+            if (selectedModel === 'chatgpt') {
+                if (!openAIKey) {
+                    return `¡Uy, ${nick}! Falta configurar tu llave API de OpenAI (ChatGPT) en los ajustes para que podamos usar este modelo. 🌸`;
+                }
                 try {
                     let messagesPayload = chatHistory.map(msg => ({
                         role: msg.role === 'user' ? 'user' : 'assistant',
@@ -793,8 +757,12 @@
                 } catch (e) {}
             }
 
+            // 4. Si usa la API de Claude
             const claudeKey = localStorage.getItem('key_claude');
-            if (selectedModel === 'claude' && claudeKey) {
+            if (selectedModel === 'claude') {
+                if (!claudeKey) {
+                    return `¡Uy, ${nick}! Necesitas ingresar tu llave API de Claude (Anthropic) en la configuración para usarlo. 🌸`;
+                }
                 try {
                     let messagesPayload = chatHistory.map(msg => ({
                         role: msg.role === 'user' ? 'user' : 'assistant',
@@ -821,7 +789,7 @@
                 } catch (e) {}
             }
 
-            return `Para utilizar **${getCurrentModelName()}**, por favor configura tu llave API correspondiente en el menú de configuración (toqueando tu avatar arriba a la derecha).`;
+            return `¡Vaya, ${nick}! Ocurrió un pequeño detalle al conectar con el servidor. Inténtalo de nuevo en un momento. 🌸`;
         }
 
         async function sendMessage() {
@@ -836,7 +804,7 @@
             clearAttachment();
 
             let modelKey = getCurrentModelKey();
-            let customName = resolveDisplayName(text, modelKey);
+            let customName = resolveDisplayName(text);
             renderMessage('user', text || '[Archivo adjunto]', currentMedia, modelKey, customName, false);
 
             const userName = localStorage.getItem('natsune_username') || '';
@@ -845,7 +813,7 @@
             const chatHistory = currentChat ? currentChat.messages : [];
 
             const reply = await getChainedIntelligence(text, userName, chatHistory);
-            renderMessage('natsune', reply, null, modelKey, customName, true);
+            renderMessage('natsune', reply, null, modelKey, "Natsune", true);
         }
 
         if (userInput) {
