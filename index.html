@@ -130,7 +130,7 @@
         <!-- Pantalla de Bienvenida Dinámica -->
         <div id="welcomeScreen" class="my-auto space-y-6 text-left py-8 fade-quick">
             <div class="space-y-1.5">
-                <div id="welcomeLogoContainer" class="w-12 h-12 mb-3 flex items-center justify-center text-3xl"></div>
+                <div id="welcomeLogoContainer" class="w-8 h-8 sm:w-10 sm:h-10 mb-3 flex items-center justify-center"></div>
                 <h1 id="welcomeTitle" class="text-4xl sm:text-5xl font-medium tracking-tight natsune-rainbow-text">
                     Hola
                 </h1>
@@ -334,16 +334,30 @@
             return `${model.toUpperCase()} (${variantText})`;
         }
 
-        // Sistema de logotipos estables y compatibles con emojis/símbolos oficiales limpios
-        function getModelLogoHTML(modelKey) {
+        // Logotipos oficiales SVG perfectamente escalados y optimizados
+        function getModelLogoSVG(modelKey) {
             if (modelKey === 'gemini') {
-                return `<span class="text-sky-400 font-bold text-xl">✦</span>`;
+                return `<svg class="w-full h-full" viewBox="0 0 24 24" fill="url(#geminiGrad)" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M12 2L14.5 9.5L22 12L14.5 14.5L12 22L9.5 14.5L2 12L9.5 9.5L12 2Z"/>
+                    <defs>
+                        <linearGradient id="geminiGrad" x1="2" y1="2" x2="22" y2="22" gradientUnits="userSpaceOnUse">
+                            <stop offset="0%" stop-color="%23ef4444"/>
+                            <stop offset="35%" stop-color="%233b82f6"/>
+                            <stop offset="70%" stop-color="%2310b981"/>
+                            <stop offset="100%" stop-color="%23f59e0b"/>
+                        </linearGradient>
+                    </defs>
+                </svg>`;
             } else if (modelKey === 'chatgpt') {
-                return `<span class="text-emerald-400 font-bold text-lg">🟢</span>`;
+                return `<svg class="w-full h-full text-emerald-400" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M22.2819 9.8211a5.9847 5.9847 0 0 0-.5157-4.9108 6.0462 6.0462 0 0 0-6.5098-2.9A6.0651 6.0651 0 0 0 4.9807 4.1818a5.9847 5.9847 0 0 0-3.9977 2.9 6.0462 6.0462 0 0 0 .7427 7.0966 5.9807 5.9807 0 0 0 .5106 4.9107 6.0512 6.0512 0 0 0 6.5149 2.9001A5.9847 5.9847 0 0 0 13.25 24a6.0563 6.0563 0 0 0 5.7718-4.2058 5.9897 5.9897 0 0 0 3.9977-2.9001 6.0553 6.0553 0 0 0-.7376-7.073zM13.25 22.4a4.4155 4.4155 0 0 1-2.8432-1.0387l.1736-.1005 4.6745-2.7004a.8236.8236 0 0 0 .4168-.711v-5.274l3.9109 2.2573a.3562.3562 0 0 1 .1786.3092v5.4418a4.4534 4.4534 0 0 1-6.5112 2.1165zm-9.517-9.517a4.4257 4.4257 0 0 1 .4963-3.0363l4.6745 2.7004v5.401a.8236.8236 0 0 0 .4168.711l4.6745 2.7004-3.9109 2.2573a.3562.3562 0 0 1-.3571 0l-4.7048-2.7179a4.4534 4.4534 0 0 1-1.8948-5.6149zm-1.528-6.177a4.4358 4.4358 0 0 1 3.5393-1.8028v5.4011a.8337.8337 0 0 0 .4168.711l4.6745 2.7004-3.9109 2.2573a.3663.3663 0 0 1-.3571 0L3.528 10.3705a4.4534 4.4534 0 0 1-.323-3.6645zm15.4267 4.1449l-4.6745-2.7004V7.7665a.8236.8236 0 0 0-.4168-.711L9.0807 4.3551a4.4534 4.4534 0 0 1 6.5112-2.1165 4.4155 4.4155 0 0 1 2.8432 1.0387l-.1736.1005-4.6745 2.7004a.8236.8236 0 0 0-.4168.711v5.274l3.9109-2.2573a.3562.3562 0 0 1 .1786-.3092v-5.4418a4.4534 4.4534 0 0 1 1.8948 5.6149z"/>
+                </svg>`;
             } else if (modelKey === 'claude') {
-                return `<span class="text-orange-400 font-bold text-lg">☀️</span>`;
+                return `<svg class="w-full h-full text-orange-400" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M12 2L14.5 9.5L22 12L14.5 14.5L12 22L9.5 14.5L2 12L9.5 9.5L12 2Z"/>
+                </svg>`;
             } else {
-                return `<span class="text-white font-bold text-lg">🌸</span>`;
+                return `<svg class="w-full h-full text-white" viewBox="0 0 100 100" fill="none"><g transform="translate(50,50)"><path d="M-28,6 C-38,16 -32,34 -8,32 C-24,30 -28,18 -20,12 Z" fill="currentColor"/><path d="M-22,12 C-30,20 -24,30 -4,28 C-16,26 -20,18 -14,14 Z" fill="currentColor"/><path d="M28,-6 C38,-16 32,-34 8,-32 C24,-30 28,-18 20,-12 Z" fill="currentColor"/><path d="M22,-12 C30,-20 24,-30 4,-28 C16,-26 20,-18 14,-14 Z" fill="currentColor"/><polygon points="-11,-24 11,-24 24,-11 24,11 11,24 -11,24 -24,11 -24,-11" fill="currentColor"/><circle cx="0" cy="0" r="13" fill="#000000"/><circle cx="0" cy="0" r="9.5" fill="currentColor"/><circle cx="0" cy="0" r="6.5" fill="#000000"/></g></svg>`;
             }
         }
 
@@ -386,7 +400,7 @@
             document.getElementById('welcomeTitle').textContent = name ? `Hola, ${name}` : 'Hola';
             document.getElementById('welcomeSubtitle').textContent = `Usando ${modelName}. ¿Qué investigamos?`;
             
-            document.getElementById('welcomeLogoContainer').innerHTML = getModelLogoHTML(modelKey);
+            document.getElementById('welcomeLogoContainer').innerHTML = getModelLogoSVG(modelKey);
             document.getElementById('headerModelTitle').textContent = modelKey === 'natsune' ? 'Natsune IA' : modelKey.toUpperCase();
             document.getElementById('drawerTitle').textContent = modelKey === 'natsune' ? 'Natsune IA' : modelKey.toUpperCase();
             document.getElementById('drawerFooterModel').textContent = modelName;
@@ -508,7 +522,7 @@
                 }
             }
 
-            const logoHTML = getModelLogoHTML(modelKey);
+            const logoSVG = getModelLogoSVG(modelKey);
 
             if (isUser) {
                 wrapper.innerHTML = `
@@ -518,8 +532,8 @@
                     </div>`;
             } else {
                 wrapper.innerHTML = `
-                    <div class="w-6 h-6 flex-shrink-0 mt-1 flex items-center justify-center">
-                        ${logoHTML}
+                    <div class="w-6 h-6 flex-shrink-0 mt-1">
+                        ${logoSVG}
                     </div>
                     <div class="text-[#e3e3e3] text-[15px] leading-relaxed max-w-[88%] select-text pt-1 font-normal">
                         <div class="flex items-center space-x-2 mb-1">
@@ -555,7 +569,7 @@
                 }
             }
 
-            const logoHTML = getModelLogoHTML(modelKey);
+            const logoSVG = getModelLogoSVG(modelKey);
 
             if (isUser) {
                 wrapper.innerHTML = `
@@ -566,8 +580,8 @@
                 messagesList.appendChild(wrapper);
             } else {
                 wrapper.innerHTML = `
-                    <div class="w-6 h-6 flex-shrink-0 mt-1 flex items-center justify-center">
-                        ${logoHTML}
+                    <div class="w-6 h-6 flex-shrink-0 mt-1">
+                        ${logoSVG}
                     </div>
                     <div class="text-[#e3e3e3] text-[15px] leading-relaxed max-w-[88%] select-text pt-1 font-normal">
                         <div class="flex items-center space-x-2 mb-1">
