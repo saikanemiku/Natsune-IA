@@ -59,7 +59,7 @@
                     <button onclick="toggleDrawer()" class="p-2 rounded-full hover:bg-[#1a1a1a] text-[#c4c7c5] transition">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16"></path></svg>
                     </button>
-                    <span class="text-white font-medium text-sm tracking-tight" id="drawerTitle">Natsune</span>
+                    <span class="text-white font-medium text-sm tracking-tight">Natsune IA</span>
                 </div>
                 
                 <button onclick="startNewChat(); toggleDrawer();" class="w-full bg-[#161616] hover:bg-[#222222] border border-[#2c2c2c] text-[#e3e3e3] rounded-full py-3 px-4 text-sm font-medium text-left flex items-center space-x-3 transition active:scale-95 shadow-sm">
@@ -81,7 +81,7 @@
                     <span>Eliminar este chat</span>
                 </button>
                 <div class="flex items-center justify-between px-1 pt-1">
-                    <span id="drawerFooterModel">Natsune</span>
+                    <span>Natsune IA</span>
                     <button onclick="clearAllMemory(); toggleDrawer();" class="text-[#666] hover:text-red-400">Borrar todo</button>
                 </div>
             </div>
@@ -94,7 +94,7 @@
             <button onclick="toggleDrawer()" title="Menú" class="p-2 rounded-full hover:bg-[#1f2124] text-[#c4c7c5] transition active:scale-95">
                 <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16"></path></svg>
             </button>
-            <span class="text-base font-medium tracking-tight text-white whitespace-nowrap" id="headerModelTitle">Natsune</span>
+            <span class="text-base font-medium tracking-tight text-white whitespace-nowrap">Natsune</span>
         </div>
 
         <div class="flex items-center space-x-1.5 overflow-x-auto no-scrollbar">
@@ -404,16 +404,10 @@
             const welcomeTitle = document.getElementById('welcomeTitle');
             const welcomeSubtitle = document.getElementById('welcomeSubtitle');
             const welcomeLogoContainer = document.getElementById('welcomeLogoContainer');
-            const headerModelTitle = document.getElementById('headerModelTitle');
-            const drawerTitle = document.getElementById('drawerTitle');
-            const drawerFooterModel = document.getElementById('drawerFooterModel');
 
             if (welcomeTitle) welcomeTitle.textContent = name ? `Hola, ${name}` : 'Hola';
             if (welcomeSubtitle) welcomeSubtitle.textContent = `Usando ${modelName}. ¿Qué investigamos?`;
             if (welcomeLogoContainer) welcomeLogoContainer.innerHTML = getModelLogoSVG(modelKey, true);
-            if (headerModelTitle) headerModelTitle.textContent = "Natsune";
-            if (drawerTitle) drawerTitle.textContent = "Natsune";
-            if (drawerFooterModel) drawerFooterModel.textContent = "Natsune";
         }
 
         function updateAvatarUI() {
@@ -526,16 +520,6 @@
                 input.value = text;
                 sendMessage();
             }
-        }
-
-        function resolveDisplayName(query = "") {
-            const q = query.toLowerCase();
-            const isAskingHerName = q.includes('cómo te llamas') || q.includes('como te llamas') || q.includes('tu nombre') || q.includes('te llamas') || q.includes('quién eres') || q.includes('quien eres');
-            if (isAskingHerName) {
-                const nicknames = ["Natsune", "Natsu", "Natsi"];
-                return nicknames[Math.floor(Math.random() * nicknames.length)];
-            }
-            return "Natsune";
         }
 
         function getAutoNickname(userName) {
@@ -682,7 +666,7 @@
         }
 
         // =========================================================================
-        // MOTOR DE INTELIGENCIA UNIFICADO (NATSUNE MANTIENE EL CONTROL Y AVISOS)
+        // MOTOR DE INTELIGENCIA UNIFICADO CON MEMORIA COMPARTIDA Y AVISO DE N的话
         // =========================================================================
         async function getChainedIntelligence(query, userName, chatHistory = []) {
             const nick = getAutoNickname(userName);
@@ -700,7 +684,7 @@
                 return `Comprendo tu planteamiento sobre "${query}", ${nick}. Es un tema fascinante que podemos analizar y desarrollar paso a paso. ¿Qué perspectiva o detalle te gustaría que profundizemos juntos? 🌸`;
             }
 
-            // 2. Si usa la API de Gemini
+            // 2. Si usa la API de Gemini (con memoria unificada del chat anterior)
             const geminiKey = localStorage.getItem('key_gemini');
             if (selectedModel === 'gemini') {
                 if (!geminiKey) {
@@ -727,7 +711,7 @@
                 } catch (e) {}
             }
 
-            // 3. Si usa la API de ChatGPT
+            // 3. Si usa la API de ChatGPT (con memoria unificada)
             const openAIKey = localStorage.getItem('key_openai');
             if (selectedModel === 'chatgpt') {
                 if (!openAIKey) {
@@ -757,7 +741,7 @@
                 } catch (e) {}
             }
 
-            // 4. Si usa la API de Claude
+            // 4. Si usa la API de Claude (con memoria unificada)
             const claudeKey = localStorage.getItem('key_claude');
             if (selectedModel === 'claude') {
                 if (!claudeKey) {
@@ -804,8 +788,18 @@
             clearAttachment();
 
             let modelKey = getCurrentModelKey();
-            let customName = resolveDisplayName(text);
-            renderMessage('user', text || '[Archivo adjunto]', currentMedia, modelKey, customName, false);
+            
+            // Si Natsune responde al avisar que falta la llave, usamos su identidad ("Natsune")
+            // Si responde la IA externa, usamos su nombre correspondiente (Gemini, ChatGPT, Claude)
+            const hasKey = (modelKey === 'natsune') || 
+                           (modelKey === 'gemini' && localStorage.getItem('key_gemini')) || 
+                           (modelKey === 'chatgpt' && localStorage.getItem('key_openai')) || 
+                           (modelKey === 'claude' && localStorage.getItem('key_claude'));
+
+            let respondingModelKey = hasKey ? modelKey : 'natsune';
+            let customName = hasKey ? getCurrentModelName() : 'Natsune';
+
+            renderMessage('user', text || '[Archivo adjunto]', currentMedia, modelKey, 'Tú', false);
 
             const userName = localStorage.getItem('natsune_username') || '';
             const chats = getStoredChats();
@@ -813,7 +807,7 @@
             const chatHistory = currentChat ? currentChat.messages : [];
 
             const reply = await getChainedIntelligence(text, userName, chatHistory);
-            renderMessage('natsune', reply, null, modelKey, "Natsune", true);
+            renderMessage('natsune', reply, null, respondingModelKey, customName, true);
         }
 
         if (userInput) {
@@ -827,3 +821,4 @@
     </script>
 </body>
 </html>
+ñ
