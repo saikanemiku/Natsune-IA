@@ -380,7 +380,6 @@
             document.getElementById('welcomeTitle').textContent = name ? `Hola, ${name}` : 'Hola';
             document.getElementById('welcomeSubtitle').textContent = `Usando ${modelName}. ¿Qué investigamos?`;
             
-            // Actualizar logotipo en bienvenida y títulos
             document.getElementById('welcomeLogoContainer').innerHTML = getModelLogoSVG(modelKey);
             document.getElementById('headerModelTitle').textContent = modelKey === 'natsune' ? 'Natsune IA' : modelKey.toUpperCase();
             document.getElementById('drawerTitle').textContent = modelKey === 'natsune' ? 'Natsune IA' : modelKey.toUpperCase();
@@ -530,7 +529,6 @@
             messagesList.appendChild(wrapper);
         }
 
-        // Renderizador con Streaming Ultrarrápido (Máquina de escribir optimizada)
         function renderMessage(sender, text, media = null, modelKey = "natsune", modelDisplay = "Natsune Core", isStreaming = false) {
             document.getElementById('welcomeScreen').classList.add('hidden');
             const messagesList = document.getElementById('messagesList');
@@ -585,7 +583,7 @@
                             i++;
                             const chatContainer = document.getElementById('chatContainer');
                             chatContainer.scrollTop = chatContainer.scrollHeight;
-                            setTimeout(typeWriter, 5); // Velocidad optimizada y rápida
+                            setTimeout(typeWriter, 5);
                         }
                     }
                     typeWriter();
@@ -662,8 +660,9 @@
             if (modelKey === 'gemini') {
                 const apiKey = localStorage.getItem('key_gemini');
                 if (!apiKey) {
-                    // Fallback transparente a Natsune Core registrando correctamente el modelo activo
+                    // Mostrar mensaje explícito de error/falta de API key y cambiar a respaldo
                     setTimeout(() => {
+                        renderMessage('natsune', `[Error: No se encontró la API Key de Gemini configurada. Cambiando a Natsune Core como respaldo.]`, null, modelKey, modelName, false);
                         modelKey = 'natsune';
                         modelName = 'Natsune Core';
                         const fallbackReply = getLocalIntelligence(text, userName, modelName);
@@ -681,10 +680,11 @@
                     });
                     const data = await res.json();
                     const aiText = data.candidates?.[0]?.content?.parts?.[0]?.text;
-                    if (!aiText) throw new Error();
+                    if (!aiText) throw new Error(data.error?.message || "Error desconocido de API");
                     renderMessage('natsune', aiText, null, modelKey, modelName, true);
-                } catch (e) {
+                } catch (err) {
                     setTimeout(() => {
+                        renderMessage('natsune', `[Error en Gemini: ${err.message || 'Fallo de conexión'}. Cambiando a Natsune Core como respaldo.]`, null, modelKey, modelName, false);
                         modelKey = 'natsune';
                         modelName = 'Natsune Core';
                         const fallbackReply = getLocalIntelligence(text, userName, modelName);
@@ -694,7 +694,9 @@
                 return;
             }
 
+            // Para ChatGPT o Claude sin API key configurada
             setTimeout(() => {
+                renderMessage('natsune', `[Error: No se encontró la API Key para ${modelName}. Cambiando a Natsune Core como respaldo.]`, null, modelKey, modelName, false);
                 modelKey = 'natsune';
                 modelName = 'Natsune Core';
                 const fallbackReply = getLocalIntelligence(text, userName, modelName);
