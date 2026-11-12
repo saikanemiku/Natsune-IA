@@ -130,7 +130,7 @@
         <!-- Pantalla de Bienvenida Dinámica -->
         <div id="welcomeScreen" class="my-auto space-y-6 text-left py-8 fade-quick">
             <div class="space-y-1.5">
-                <div id="welcomeLogoContainer" class="w-12 h-12 mb-3"></div>
+                <div id="welcomeLogoContainer" class="w-12 h-12 mb-3 flex items-center justify-center text-3xl"></div>
                 <h1 id="welcomeTitle" class="text-4xl sm:text-5xl font-medium tracking-tight natsune-rainbow-text">
                     Hola
                 </h1>
@@ -334,32 +334,16 @@
             return `${model.toUpperCase()} (${variantText})`;
         }
 
-        // Logotipos exactos basados en tus imágenes reales (Gemini estrella multicolor, ChatGPT isotipo, Claude sol naranja, Natsune original)
-        function getModelLogoSVG(modelKey) {
+        // Sistema de logotipos estables y compatibles con emojis/símbolos oficiales limpios
+        function getModelLogoHTML(modelKey) {
             if (modelKey === 'gemini') {
-                return `<svg class="w-full h-full" viewBox="0 0 512 512" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M256 32C256 160 160 256 32 256C160 256 256 352 256 480C256 352 352 256 480 256C352 256 256 160 256 32Z" fill="url(#geminiGrad)"/>
-                    <defs>
-                        <linearGradient id="geminiGrad" x1="32" y1="32" x2="480" y2="480" gradientUnits="userSpaceOnUse">
-                            <stop offset="0%" stop-color="%23ef4444"/>
-                            <stop offset="35%" stop-color="%233b82f6"/>
-                            <stop offset="70%" stop-color="%2310b981"/>
-                            <stop offset="100%" stop-color="%23f59e0b"/>
-                        </linearGradient>
-                    </defs>
-                </svg>`;
+                return `<span class="text-sky-400 font-bold text-xl">✦</span>`;
             } else if (modelKey === 'chatgpt') {
-                return `<svg class="w-full h-full text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path>
-                    <polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline>
-                    <line x1="12" y1="22.08" x2="12" y2="12"></line>
-                </svg>`;
+                return `<span class="text-emerald-400 font-bold text-lg">🟢</span>`;
             } else if (modelKey === 'claude') {
-                return `<svg class="w-full h-full text-orange-400" viewBox="0 0 512 512" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M256 32L290 180L438 146L320 256L438 366L290 332L256 480L222 332L74 366L192 256L74 146L222 180L256 32Z"/>
-                </svg>`;
+                return `<span class="text-orange-400 font-bold text-lg">☀️</span>`;
             } else {
-                return `<svg class="w-full h-full text-white" viewBox="0 0 100 100" fill="none"><g transform="translate(50,50)"><path d="M-28,6 C-38,16 -32,34 -8,32 C-24,30 -28,18 -20,12 Z" fill="currentColor"/><path d="M-22,12 C-30,20 -24,30 -4,28 C-16,26 -20,18 -14,14 Z" fill="currentColor"/><path d="M28,-6 C38,-16 32,-34 8,-32 C24,-30 28,-18 20,-12 Z" fill="currentColor"/><path d="M22,-12 C30,-20 24,-30 4,-28 C16,-26 20,-18 14,-14 Z" fill="currentColor"/><polygon points="-11,-24 11,-24 24,-11 24,11 11,24 -11,24 -24,11 -24,-11" fill="currentColor"/><circle cx="0" cy="0" r="13" fill="#000000"/><circle cx="0" cy="0" r="9.5" fill="currentColor"/><circle cx="0" cy="0" r="6.5" fill="#000000"/></g></svg>`;
+                return `<span class="text-white font-bold text-lg">🌸</span>`;
             }
         }
 
@@ -402,7 +386,7 @@
             document.getElementById('welcomeTitle').textContent = name ? `Hola, ${name}` : 'Hola';
             document.getElementById('welcomeSubtitle').textContent = `Usando ${modelName}. ¿Qué investigamos?`;
             
-            document.getElementById('welcomeLogoContainer').innerHTML = getModelLogoSVG(modelKey);
+            document.getElementById('welcomeLogoContainer').innerHTML = getModelLogoHTML(modelKey);
             document.getElementById('headerModelTitle').textContent = modelKey === 'natsune' ? 'Natsune IA' : modelKey.toUpperCase();
             document.getElementById('drawerTitle').textContent = modelKey === 'natsune' ? 'Natsune IA' : modelKey.toUpperCase();
             document.getElementById('drawerFooterModel').textContent = modelName;
@@ -524,7 +508,7 @@
                 }
             }
 
-            const logoSVG = getModelLogoSVG(modelKey);
+            const logoHTML = getModelLogoHTML(modelKey);
 
             if (isUser) {
                 wrapper.innerHTML = `
@@ -534,8 +518,8 @@
                     </div>`;
             } else {
                 wrapper.innerHTML = `
-                    <div class="w-6 h-6 flex-shrink-0 mt-1">
-                        ${logoSVG}
+                    <div class="w-6 h-6 flex-shrink-0 mt-1 flex items-center justify-center">
+                        ${logoHTML}
                     </div>
                     <div class="text-[#e3e3e3] text-[15px] leading-relaxed max-w-[88%] select-text pt-1 font-normal">
                         <div class="flex items-center space-x-2 mb-1">
@@ -571,7 +555,7 @@
                 }
             }
 
-            const logoSVG = getModelLogoSVG(modelKey);
+            const logoHTML = getModelLogoHTML(modelKey);
 
             if (isUser) {
                 wrapper.innerHTML = `
@@ -582,8 +566,8 @@
                 messagesList.appendChild(wrapper);
             } else {
                 wrapper.innerHTML = `
-                    <div class="w-6 h-6 flex-shrink-0 mt-1">
-                        ${logoSVG}
+                    <div class="w-6 h-6 flex-shrink-0 mt-1 flex items-center justify-center">
+                        ${logoHTML}
                     </div>
                     <div class="text-[#e3e3e3] text-[15px] leading-relaxed max-w-[88%] select-text pt-1 font-normal">
                         <div class="flex items-center space-x-2 mb-1">
@@ -677,7 +661,7 @@
                     `¡Hey${name}! Todo listo y operativo con ${modelName}. ¿Qué investigamos o creamos hoy?`,
                     `¡Buenas${name}! Es un placer atenderte mediante ${modelName}. Dime, ¿qué tienes en mente?`,
                     `¡Hola de nuevo${name}! Con ${modelName} activo y listo. ¿Cómo va tu día?`,
-                    `¡Qué tal${name}! Usando ${modelName} por hier. ¿En qué te brindo asistencia en este momento?`
+                    `¡Qué tal${name}! Usando ${modelName} por aquí. ¿En qué te brindo asistencia en este momento?`
                 ];
                 return responsesES[Math.floor(Math.random() * responsesES.length)];
             }
