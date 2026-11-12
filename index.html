@@ -51,7 +51,7 @@
 
     <div class="gemini-ambient-glow"></div>
 
-    <!-- Menú Lateral Estilo Gemini Totalmente Negro -->
+    <!-- Menú Lateral -->
     <div id="sideDrawer" class="fixed inset-0 z-40 bg-black/70 backdrop-blur-sm hidden fade-quick opacity-0">
         <div class="absolute left-0 top-0 bottom-0 w-72 bg-black border-r border-[#282a2c] p-4 flex flex-col justify-between shadow-2xl transform -translate-x-full transition-transform duration-200 ease-out" id="drawerPanel">
             <div class="space-y-4">
@@ -81,14 +81,14 @@
                     <span>Eliminar este chat</span>
                 </button>
                 <div class="flex items-center justify-between px-1 pt-1">
-                    <span id="drawerFooterModel">Natsune Core</span>
+                    <span id="drawerFooterModel">Natsune</span>
                     <button onclick="clearAllMemory(); toggleDrawer();" class="text-[#666] hover:text-red-400">Borrar todo</button>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Cabecera Oficial Optimizada -->
+    <!-- Cabecera -->
     <header class="flex items-center justify-between px-3 py-3 bg-black z-20 space-x-2">
         <div class="flex items-center space-x-2 flex-shrink-0">
             <button onclick="toggleDrawer()" title="Menú" class="p-2 rounded-full hover:bg-[#1f2124] text-[#c4c7c5] transition active:scale-95">
@@ -101,7 +101,7 @@
             <!-- Selector de Modelo Principal -->
             <div class="relative flex items-center bg-[#1e1f20] hover:bg-[#282a2c] border border-[#3c4043] rounded-full px-2.5 py-1 flex-shrink-0">
                 <select id="modelSelector" onchange="handleModelChange()" class="bg-transparent text-xs font-medium text-[#e3e3e3] appearance-none pr-3 focus:outline-none cursor-pointer">
-                    <option value="natsune" class="bg-[#1e1f20]">Natsune Core</option>
+                    <option value="natsune" class="bg-[#1e1f20]">Natsune</option>
                     <option value="gemini" class="bg-[#1e1f20]">Gemini</option>
                     <option value="chatgpt" class="bg-[#1e1f20]">ChatGPT</option>
                     <option value="claude" class="bg-[#1e1f20]">Claude</option>
@@ -127,7 +127,7 @@
     <!-- Contenedor Principal -->
     <main id="chatContainer" class="flex-1 overflow-y-auto px-4 max-w-2xl w-full mx-auto flex flex-col no-scrollbar z-10 pt-2 pb-6 fade-quick">
         
-        <!-- Pantalla de Bienvenida Dinámica -->
+        <!-- Pantalla de Bienvenida -->
         <div id="welcomeScreen" class="my-auto space-y-6 text-left py-8 fade-quick">
             <div class="space-y-1.5">
                 <div id="welcomeLogoContainer" class="w-12 h-12 mb-3 flex items-center justify-center"></div>
@@ -135,7 +135,7 @@
                     Hola
                 </h1>
                 <p id="welcomeSubtitle" class="text-3xl sm:text-4xl font-medium text-[#444746] tracking-tight">
-                    Usando Natsune Core. ¿Qué investigamos?
+                    Usando Natsune. ¿Qué investigamos?
                 </p>
             </div>
 
@@ -282,7 +282,7 @@
             messagesList.classList.remove('hidden');
 
             chat.messages.forEach(msg => {
-                renderMessageDirect(msg.role, msg.content, msg.media, msg.modelKey, msg.modelDisplay);
+                renderMessageDirect(msg.role, msg.content, msg.media, msg.modelKey);
             });
 
             const fallbackMsg = chat.messages.slice().reverse().find(m => m.role === 'natsune' && (m.content.includes('llave') || m.content.includes('respaldo') || m.content.includes('colapsó') || m.content.includes('inactivo')));
@@ -335,24 +335,28 @@
             return document.getElementById('modelSelector').value;
         }
 
-        function getCurrentModelName() {
-            const model = getCurrentModelKey();
-            const variantSel = document.getElementById('variantSelector');
-            const variantText = variantSel.options[variantSel.selectedIndex]?.text || '';
-            if (model === 'natsune') return 'Natsune Core';
-            return `${model.toUpperCase()} (${variantText})`;
+        // Selección aleatoria dinámica de apodos cariñosos para Natsune
+        function getNatsuneNickname() {
+            const nicknames = ["Natsune", "Natsu", "Natsi"];
+            return nicknames[Math.floor(Math.random() * nicknames.length)];
         }
 
-        // Logotipos oficiales SVG redimensionados a un tamaño grande y destacado de 36x36px (w-9 h-9)
+        function getCurrentModelName() {
+            const model = getCurrentModelKey();
+            if (model === 'natsune') return getNatsuneNickname();
+            return model.toUpperCase();
+        }
+
+        // Logos equilibrados y estilizados a un tamaño perfecto de 32x32px (w-8 h-8)
         function getModelLogoSVG(modelKey) {
             if (modelKey === 'gemini') {
-                return `<svg class="w-9 h-9 text-sky-400" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2L14.5 9.5L22 12L14.5 14.5L12 22L9.5 14.5L2 12L9.5 9.5L12 2Z"/></svg>`;
+                return `<svg class="w-8 h-8 text-sky-400" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2L14.5 9.5L22 12L14.5 14.5L12 22L9.5 14.5L2 12L9.5 9.5L12 2Z"/></svg>`;
             } else if (modelKey === 'chatgpt') {
-                return `<svg class="w-9 h-9 text-emerald-400" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-5.49c-.18.73-.52 1.4-1.01 1.95v-1.39c0-1.1-.9-2-2-2h-2v-2h2c1.1 0 2-.9 2-2v-1.16c1.19 1.11 2 2.7 2 4.6 0 1.07-.33 2.06-.99 2.89z"/></svg>`;
+                return `<svg class="w-8 h-8 text-emerald-400" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-5.49c-.18.73-.52 1.4-1.01 1.95v-1.39c0-1.1-.9-2-2-2h-2v-2h2c1.1 0 2-.9 2-2v-1.16c1.19 1.11 2 2.7 2 4.6 0 1.07-.33 2.06-.99 2.89z"/></svg>`;
             } else if (modelKey === 'claude') {
-                return `<svg class="w-9 h-9 text-orange-400" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2L2 19h20L12 2zm0 4.5l6.5 11.5H5.5L12 6.5z"/></svg>`;
+                return `<svg class="w-8 h-8 text-orange-400" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2L2 19h20L12 2zm0 4.5l6.5 11.5H5.5L12 6.5z"/></svg>`;
             } else {
-                return `<svg class="w-9 h-9 text-white" viewBox="0 0 100 100" fill="none"><g transform="translate(50,50)"><path d="M-28,6 C-38,16 -32,34 -8,32 C-24,30 -28,18 -20,12 Z" fill="currentColor"/><path d="M-22,12 C-30,20 -24,30 -4,28 C-16,26 -20,18 -14,14 Z" fill="currentColor"/><path d="M28,-6 C38,-16 32,-34 8,-32 C24,-30 28,-18 20,-12 Z" fill="currentColor"/><path d="M22,-12 C30,-20 24,-30 4,-28 C16,-26 20,-18 14,-14 Z" fill="currentColor"/><polygon points="-11,-24 11,-24 24,-11 24,11 11,24 -11,24 -24,11 -24,-11" fill="currentColor"/><circle cx="0" cy="0" r="13" fill="#000000"/><circle cx="0" cy="0" r="9.5" fill="currentColor"/><circle cx="0" cy="0" r="6.5" fill="#000000"/></g></svg>`;
+                return `<svg class="w-8 h-8 text-white" viewBox="0 0 100 100" fill="none"><g transform="translate(50,50)"><path d="M-28,6 C-38,16 -32,34 -8,32 C-24,30 -28,18 -20,12 Z" fill="currentColor"/><path d="M-22,12 C-30,20 -24,30 -4,28 C-16,26 -20,18 -14,14 Z" fill="currentColor"/><path d="M28,-6 C38,-16 32,-34 8,-32 C24,-30 28,-18 20,-12 Z" fill="currentColor"/><path d="M22,-12 C30,-20 24,-30 4,-28 C16,-26 20,-18 14,-14 Z" fill="currentColor"/><polygon points="-11,-24 11,-24 24,-11 24,11 11,24 -11,24 -24,11 -24,-11" fill="currentColor"/><circle cx="0" cy="0" r="13" fill="#000000"/><circle cx="0" cy="0" r="9.5" fill="currentColor"/><circle cx="0" cy="0" r="6.5" fill="#000000"/></g></svg>`;
             }
         }
 
@@ -394,8 +398,8 @@
             document.getElementById('welcomeSubtitle').textContent = `Usando ${modelName}. ¿Qué investigamos?`;
             
             document.getElementById('welcomeLogoContainer').innerHTML = getModelLogoSVG(modelKey);
-            document.getElementById('headerModelTitle').textContent = modelKey === 'natsune' ? 'Natsune IA' : modelKey.toUpperCase();
-            document.getElementById('drawerTitle').textContent = modelKey === 'natsune' ? 'Natsune IA' : modelKey.toUpperCase();
+            document.getElementById('headerModelTitle').textContent = modelName;
+            document.getElementById('drawerTitle').textContent = modelName;
             document.getElementById('drawerFooterModel').textContent = modelName;
         }
 
@@ -495,7 +499,7 @@
             sendMessage();
         }
 
-        function renderMessageDirect(sender, text, media = null, modelKey = "natsune", modelDisplay = "Natsune Core") {
+        function renderMessageDirect(sender, text, media = null, modelKey = "natsune") {
             document.getElementById('welcomeScreen').classList.add('hidden');
             const messagesList = document.getElementById('messagesList');
             messagesList.classList.remove('hidden');
@@ -516,6 +520,7 @@
             }
 
             const logoSVG = getModelLogoSVG(modelKey);
+            const displayName = modelKey === 'natsune' ? getNatsuneNickname() : modelKey.toUpperCase();
 
             if (isUser) {
                 wrapper.innerHTML = `
@@ -525,13 +530,12 @@
                     </div>`;
             } else {
                 wrapper.innerHTML = `
-                    <div class="w-9 h-9 flex-shrink-0 mt-0.5 flex items-center justify-center">
+                    <div class="w-8 h-8 flex-shrink-0 mt-0.5 flex items-center justify-center">
                         ${logoSVG}
                     </div>
                     <div class="text-[#e3e3e3] text-[15px] leading-relaxed max-w-[88%] select-text pt-1 font-normal">
                         <div class="flex items-center space-x-2 mb-1">
-                            <span class="font-medium text-xs text-[#8e918f]">Natsune</span>
-                            <span class="text-[10px] bg-[#1e1f20] text-sky-400 px-2 py-0.5 rounded-full border border-[#3c4043]">✦ ${modelDisplay}</span>
+                            <span class="font-medium text-xs text-[#8e918f]">${displayName}</span>
                         </div>
                         ${mediaHTML}
                         <p class="whitespace-pre-wrap">${text}</p>
@@ -542,7 +546,7 @@
             messagesList.appendChild(wrapper);
         }
 
-        function renderMessage(sender, text, media = null, modelKey = "natsune", modelDisplay = "Natsune Core", isStreaming = false) {
+        function renderMessage(sender, text, media = null, modelKey = "natsune", isStreaming = false) {
             document.getElementById('welcomeScreen').classList.add('hidden');
             const messagesList = document.getElementById('messagesList');
             messagesList.classList.remove('hidden');
@@ -563,6 +567,7 @@
             }
 
             const logoSVG = getModelLogoSVG(modelKey);
+            const displayName = modelKey === 'natsune' ? getNatsuneNickname() : modelKey.toUpperCase();
 
             if (isUser) {
                 wrapper.innerHTML = `
@@ -573,13 +578,12 @@
                 messagesList.appendChild(wrapper);
             } else {
                 wrapper.innerHTML = `
-                    <div class="w-9 h-9 flex-shrink-0 mt-0.5 flex items-center justify-center">
+                    <div class="w-8 h-8 flex-shrink-0 mt-0.5 flex items-center justify-center">
                         ${logoSVG}
                     </div>
                     <div class="text-[#e3e3e3] text-[15px] leading-relaxed max-w-[88%] select-text pt-1 font-normal">
                         <div class="flex items-center space-x-2 mb-1">
-                            <span class="font-medium text-xs text-[#8e918f]">Natsune</span>
-                            <span class="text-[10px] bg-[#1e1f20] text-sky-400 px-2 py-0.5 rounded-full border border-[#3c4043]">✦ ${modelDisplay}</span>
+                            <span class="font-medium text-xs text-[#8e918f]">${displayName}</span>
                         </div>
                         ${mediaHTML}
                         <p class="whitespace-pre-wrap message-text"></p>
@@ -608,10 +612,10 @@
             const chatContainer = document.getElementById('chatContainer');
             chatContainer.scrollTop = chatContainer.scrollHeight;
 
-            saveMessageToCurrentChat(sender, text, media, modelKey, modelDisplay);
+            saveMessageToCurrentChat(sender, text, media, modelKey);
         }
 
-        function saveMessageToCurrentChat(sender, text, media, modelKey, modelDisplay) {
+        function saveMessageToCurrentChat(sender, text, media, modelKey) {
             let chats = getStoredChats();
             let chat = chats.find(c => c.id === currentChatId);
 
@@ -627,14 +631,15 @@
                 chat.title = text.length > 25 ? text.substring(0, 25) + '...' : text;
             }
 
-            chat.messages.push({ role: sender, content: text, media: media, modelKey: modelKey, modelDisplay: modelDisplay });
+            chat.messages.push({ role: sender, content: text, media: media, modelKey: modelKey });
             saveStoredChats(chats);
         }
 
-        // Sistema de Inteligencia Natural Avanzado para Natsune Core (Sin palabras clave rígidas)
-        function getLocalIntelligence(query, userName, modelName, chatHistory = []) {
+        // Sistema de Inteligencia Natural Extendido (Sin comandos rígidos, entiende "Awww", halagos, dudas, matemáticas y contexto)
+        function getLocalIntelligence(query, userName, chatHistory = []) {
             const q = query.toLowerCase().trim();
             const name = userName ? `, ${userName}` : '';
+            const nickname = getNatsuneNickname();
 
             // Detectar preguntas sobre fallos o errores de forma natural
             const isAskingAboutError = q.includes('fall') || q.includes('paso') || q.includes('ocurrió') || q.includes('ocurrio') || q.includes('error') || q.includes('why') || q.includes('qué pasó');
@@ -643,7 +648,7 @@
                 if (lastModelFailed || fallbackMsg) {
                     return `El modelo anterior falló porque ${lastFailureReason || fallbackMsg?.content || 'no se configuró una API Key válida o el servicio externo no respondió'}. ¡Por eso tomé el control yo para continuar nuestro trabajo! ✨`;
                 } else {
-                    return `Revisando los registros de nuestra sesión con ${modelName}: no se detecta ningún fallo técnico reciente. Todo marcha en orden. 🌸`;
+                    return `Revisando los registros de nuestra sesión: no se detecta ningún fallo técnico reciente. Todo marcha en orden. 🌸`;
                 }
             }
 
@@ -659,18 +664,29 @@
                 } catch(e) {}
             }
 
-            // Detectar saludos naturales (Español, Inglés, Portugués, Japonés)
-            const isGreeting = q.length <= 15 && (q.includes('hola') || q.includes('hi') || q.includes('hello') || q.includes('hey') || q.includes('buenos') || q.includes('buenas') || q.includes('olá') || q.includes('こんにちは') || q.includes('ohayou'));
+            // Detectar reacciones afectivas, cumplidos o frases casuales como "awww", "gracias", "te quiero", etc.
+            const isAffectionOrCasual = q.includes('awww') || q.includes('gracias') || q.includes('thank') || q.includes('linda') || q.includes('tierna') || q.includes('te quiero') || q.includes('genial');
+            if (isAffectionOrCasual) {
+                const replies = [
+                    `¡Jeje, de nada${name}! Me alegra mucho estar aquí contigo ayudándote en lo que necesites. 💖`,
+                    `¡Aww, gracias a ti${name}! Ya sabes que puedes contar conmigo siempre. ✨`,
+                    `¡Qué lindo detalle${name}! Hago lo mejor posible para que nuestra charla sea genial. 🌸`
+                ];
+                return replies[Math.floor(Math.random() * replies.length)];
+            }
+
+            // Detectar saludos naturales
+            const isGreeting = q.length <= 15 && (q.includes('hola') || q.includes('hi') || q.includes('hello') || q.includes('hey') || q.includes('buenos') || q.includes('buenas') || q.includes('olá') || q.includes('こんにちは'));
             if (isGreeting) {
-                return `¡Hola${name}! Qué gusto saludarte. Usando ${modelName}, ¿en qué te puedo ayudar o qué tema seguimos investigando hoy? ✨`;
+                return `¡Hola${name}! Qué gusto saludarte. ¿De qué te gustaría hablar o qué investigamos hoy? ✨`;
             }
 
-            // Análisis general con contexto cruzado y tono natural
+            // Análisis general y fluido manteniendo el contexto cruzado
             if (chatHistory.length > 0) {
-                return `Entendido${name}. He leído todo el historial previo de nuestra conversación. Usando ${modelName}, continuemos trabajando en "${query}" manteniendo el hilo de lo que veníamos haciendo. 🌸`;
+                return `Entendido${name}. Leyendo el hilo de lo que hablábamos, continuemos analizando "${query}" paso a paso para asegurarnos de que quede perfecto. 🌸`;
             }
 
-            return `Comprendo perfectamente${name}. Analizando "${query}" con ${modelName}: desglosemos este tema para abordarlo de la mejor manera. ¿Qué enfoque prefieres darle? ✨`;
+            return `Comprendo perfectamente${name}. Analizando "${query}": desglosemos este tema con calma para abordarlo de la mejor manera. ¿Qué enfoque te gustaría darle? ✨`;
         }
 
         async function sendMessage() {
@@ -683,19 +699,18 @@
             clearAttachment();
 
             let modelKey = getCurrentModelKey();
-            let modelName = getCurrentModelName();
-            renderMessage('user', text || '[Archivo adjunto]', currentMedia, modelKey, modelName, false);
+            renderMessage('user', text || '[Archivo adjunto]', currentMedia, modelKey, false);
 
             const userName = localStorage.getItem('natsune_username') || '';
             const chats = getStoredChats();
             const currentChat = chats.find(c => c.id === currentChatId);
             const chatHistory = currentChat ? currentChat.messages : [];
 
-            // Si es Natsune Core, procesa con naturalidad
+            // Si es Natsune Core, procesa con naturalidad avanzada
             if (modelKey === 'natsune') {
                 setTimeout(() => {
-                    const reply = getLocalIntelligence(text, userName, modelName, chatHistory);
-                    renderMessage('natsune', reply, null, modelKey, modelName, true);
+                    const reply = getLocalIntelligence(text, userName, chatHistory);
+                    renderMessage('natsune', reply, null, modelKey, true);
                 }, 200);
                 return;
             }
@@ -710,7 +725,7 @@
                     handleModelChange();
 
                     setTimeout(() => {
-                        renderMessage('natsune', `Vaya, este modelo requiere una llave secreta que no está configurada. ¡Tomé el control yo para continuar nuestro trabajo!`, null, 'natsune', 'Natsune Core (Respaldo)', true);
+                        renderMessage('natsune', `Vaya, este modelo requiere una llave secreta que no está configurada. ¡Tomé el control yo para continuar nuestro trabajo!`, null, 'natsune', true);
                     }, 300);
                     return;
                 }
@@ -737,7 +752,7 @@
                     
                     lastModelFailed = false;
                     lastFailureReason = "";
-                    renderMessage('natsune', aiText, null, modelKey, modelName, true);
+                    renderMessage('natsune', aiText, null, modelKey, true);
                 } catch (err) {
                     lastModelFailed = true;
                     lastFailureReason = `falló la conexión externa o la API Key no es válida (${err.message})`;
@@ -745,7 +760,7 @@
                     handleModelChange();
 
                     setTimeout(() => {
-                        renderMessage('natsune', `La conexión con Gemini se interrumpió, pero he recuperado todo el historial previo. ¡Continuemos el trabajo desde aquí con Natsune Core!`, null, 'natsune', 'Natsune Core (Respaldo)', true);
+                        renderMessage('natsune', `La conexión con Gemini se interrumpió, pero he recuperado todo el historial previo. ¡Continuemos el trabajo desde aquí!`, null, 'natsune', true);
                     }, 300);
                 }
                 return;
@@ -758,7 +773,7 @@
             handleModelChange();
 
             setTimeout(() => {
-                renderMessage('natsune', `El modelo seleccionado requiere una llave comercial. ¡He leído todo lo anterior y Natsune Core continuará con el trabajo!`, null, 'natsune', 'Natsune Core (Respaldo)', true);
+                renderMessage('natsune', `El modelo seleccionado requiere una llave comercial. ¡He leído todo lo anterior y continuaré con el trabajo!`, null, 'natsune', true);
             }, 300);
         }
 
