@@ -282,7 +282,7 @@
             messagesList.classList.remove('hidden');
 
             chat.messages.forEach(msg => {
-                renderMessageDirect(msg.role, msg.content, msg.media, msg.modelKey);
+                renderMessageDirect(msg.role, msg.content, msg.media, msg.modelKey, msg.customName || "Natsune");
             });
 
             const fallbackMsg = chat.messages.slice().reverse().find(m => m.role === 'natsune' && (m.content.includes('llave') || m.content.includes('respaldo') || m.content.includes('colapsó') || m.content.includes('inactivo')));
@@ -383,7 +383,7 @@
         }
 
         function updateDynamicGreeting() {
-            const name = localStorage.getItem('natsune_username'] || '';
+            const name = localStorage.getItem('natsune_username') || '';
             const modelKey = getCurrentModelKey();
             const modelName = getCurrentModelName();
 
@@ -492,7 +492,6 @@
             sendMessage();
         }
 
-        // Determinar el nombre a mostrar en el mensaje: si es natsune, detecta si preguntaron por su nombre para usar apodo, sino Natsune
         function resolveDisplayName(modelKey, query = "") {
             if (modelKey !== 'natsune') return modelKey.toUpperCase();
             const q = query.toLowerCase();
@@ -639,23 +638,17 @@
             saveStoredChats(chats);
         }
 
-        // ==========================================
-        // SISTEMA DE INTELIGENCIA LOCAL AUTÓNOMA (Natsune Core)
-        // Capaz de razonar, calcular y responder a cualquier consulta
-        // ==========================================
         function getLocalIntelligence(query, userName, chatHistory = []) {
             const q = query.trim();
             const qLower = q.toLowerCase();
             const name = userName ? `, ${userName}` : '';
 
-            // 1. Preguntas sobre su nombre o apodos
             if (qLower.includes('cómo te llamas') || qLower.includes('como te llamas') || qLower.includes('tu nombre') || qLower.includes('te llamas') || qLower.includes('como te llaman') || qLower.includes('apodo')) {
                 const nicknames = ["Natsune", "Natsu", "Natsi"];
                 const chosen = nicknames[Math.floor(Math.random() * nicknames.length)];
                 return `Me llamo **Natsune**, aunque algunos me dicen cariñosamente **${chosen}**. ¿Cómo estás hoy${name}? 🌸`;
             }
 
-            // 2. Evaluador matemático avanzado (soporta decimales, puntos de miles y operaciones múltiples)
             const mathClean = q.replace(/\./g, '').replace(/,/g, '.').replace(/x/g, '*');
             const mathMatch = mathClean.match(/[\d\.]+\s*[\+\-\*\/\%]\s*[\d\.]+/);
             if (mathMatch || qLower.includes('cuanto es') || qLower.includes('quanto é') || qLower.includes('how much is') || qLower.includes('calcula')) {
@@ -669,7 +662,6 @@
                 } catch(e) {}
             }
 
-            // 3. Preguntas sobre fallos o errores técnicos previos
             const isAskingAboutError = qLower.includes('fall') || qLower.includes('paso') || qLower.includes('ocurrió') || qLower.includes('ocurrio') || qLower.includes('error') || qLower.includes('why') || qLower.includes('qué pasó');
             if (isAskingAboutError) {
                 const fallbackMsg = chatHistory.slice().reverse().find(m => m.role === 'natsune' && (m.content.includes('llave') || m.content.includes('respaldo') || m.content.includes('colapsó') || m.content.includes('inactivo')));
@@ -680,13 +672,11 @@
                 }
             }
 
-            // 4. Saludos y cortesías cotidianas
             const isGreeting = qLower.length <= 20 && (qLower.includes('hola') || qLower.includes('hi') || qLower.includes('hello') || qLower.includes('hey') || qLower.includes('buenos') || qLower.includes('buenas') || qLower.includes('olá') || qLower.includes('こんにちは') || qLower.includes('saludos'));
             if (isGreeting) {
                 return `¡Hola${name}! Qué gusto saludarte. ¿De qué tema te gustaría hablar o qué proyecto investigamos hoy? ✨`;
             }
 
-            // 5. Reacciones afectivas y agradecimientos
             const isAffection = qLower.includes('awww') || qLower.includes('gracias') || qLower.includes('thank') || qLower.includes('linda') || qLower.includes('tierna') || qLower.includes('te quiero') || qLower.includes('genial') || qLower.includes('excelente');
             if (isAffection) {
                 const replies = [
@@ -697,24 +687,20 @@
                 return replies[Math.floor(Math.random() * replies.length)];
             }
 
-            // 6. MOTOR DE RESPUESTA AUTÓNOMA GENERAL (Para responder a cualquier pregunta elevada o compleja)
-            // Analiza el contexto previo y genera una respuesta analítica, informativa y natural.
             let contextSummary = "";
             if (chatHistory.length > 0) {
                 const lastUserMsgs = chatHistory.filter(m => m.role === 'user').slice(-3).map(m => m.content).join(" / ");
                 contextSummary = ` Teniendo en cuenta nuestro hilo de conversación (${lastUserMsgs}),`;
             }
 
-            // Generar respuesta inteligente basada en palabras clave temáticas o análisis general
             if (qLower.includes('por qué') || qLower.includes('porque') || qLower.includes('explícame') || qLower.includes('como funciona') || qLower.includes('qué es')) {
                 return `Analizando tu consulta sobre "${q}"${name}:${contextSummary} para comprenderlo a fondo debemos examinar sus principios fundamentales, el contexto en el que se aplica y los factores clave que lo componen. ¿Te gustaría que lo desglosásemos por puntos o prefieres un enfoque más directo? ✨`;
             }
 
-            if (qLower.includes('idea') || qlower?.includes('proyecto') || qLower.includes('organizar') || qLower.includes('plan')) {
+            if (qLower.includes('idea') || qLower.includes('proyecto') || qLower.includes('organizar') || qLower.includes('plan')) {
                 return `Para organizar "${q}"${name}:${contextSummary} lo ideal es estructurarlo en fases: primero definir el objetivo principal, segundo establecer los recursos necesarios y tercero trazar un cronograma de ejecución. ¿Empezamos detallando el primer punto? 📋`;
             }
 
-            // Respuesta autónoma general abierta y altamente natural
             return `Comprendo perfectamente tu planteamiento sobre "${q}"${name}.${contextSummary} Es un tema interesante que vale la pena analizar con detalle. Dime qué perspectiva o profundidad te gustaría darle para desarrollarlo juntos paso a paso. 🌸`;
         }
 
@@ -731,12 +717,11 @@
             let customName = resolveDisplayName(modelKey, text);
             renderMessage('user', text || '[Archivo adjunto]', currentMedia, modelKey, customName, false);
 
-            const userName = localStorage.getItem('natsune_username'] || '';
+            const userName = localStorage.getItem('natsune_username') || '';
             const chats = getStoredChats();
             const currentChat = chats.find(c => c.id === currentChatId);
             const chatHistory = currentChat ? currentChat.messages : [];
 
-            // Si es Natsune Core, procesa con inteligencia autónoma local
             if (modelKey === 'natsune') {
                 setTimeout(() => {
                     const reply = getLocalIntelligence(text, userName, chatHistory);
@@ -745,7 +730,6 @@
                 return;
             }
 
-            // Si es Gemini, construimos el historial cruzado
             if (modelKey === 'gemini') {
                 const apiKey = localStorage.getItem('key_gemini');
                 if (!apiKey) {
@@ -798,7 +782,6 @@
                 return;
             }
 
-            // Para ChatGPT o Claude sin API Key configurada
             lastModelFailed = true;
             lastFailureReason = `el modelo ${modelKey.toUpperCase()} requiere una llave comercial activa`;
             document.getElementById('modelSelector').value = 'natsune';
