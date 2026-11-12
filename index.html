@@ -484,7 +484,9 @@
         function resolveDisplayName(modelKey, query = "") {
             if (modelKey !== 'natsune') return modelKey.toUpperCase();
             const q = query.toLowerCase();
-            if ((q.includes('cómo te llamas') || q.includes('como te llamas') || q.includes('tu nombre') || q.includes('te llamas') || q.includes('como te llaman') || q.includes('apodo')) && !q.includes('don quijote')) {
+            // Restringido estrictamente para que solo responda identidad si pregunta por SU PROPIO NOMBRE
+            const isAskingAboutHerName = (q.includes('cómo te llamas') || q.includes('como te llamas') || q.includes('tu nombre') || q.includes('te llamas') || q.includes('como te llaman') || q.includes('quién eres') || q.includes('quien eres')) && !q.includes('quien es') && !q.includes('quienes') && !q.includes('don quijote');
+            if (isAskingAboutHerName) {
                 const nicknames = ["Natsune", "Natsu", "Natsi"];
                 return nicknames[Math.floor(Math.random() * nicknames.length)];
             }
@@ -632,14 +634,14 @@
             saveStoredChats(chats);
         }
 
-        // Base de datos de conocimiento masiva corregida y depurada
+        // Base de datos de conocimiento masiva
         const natsuneMassiveDatabase = [
             { keywords: ["hola", "hi", "hello", "hey", "buenos dias", "buenas tardes", "buenas noches"], reply: (nick) => `¡Hola, ${nick}! Qué gusto saludarte. ¿De qué tema te gustaría hablar o qué proyecto investigamos hoy? ✨` },
             { keywords: ["como estas", "que tal", "como te va"], reply: (nick) => `¡Todo excelente por aquí, lista y operando al 100% para ayudarte, ${nick}! 🌸` },
             { keywords: ["gracias", "thank you", "te agradezco"], reply: (nick) => `¡De nada, ${nick}! Ya sabes que cuentas conmigo para lo que necesites. 💖` },
             { keywords: ["adios", "chao", "hasta luego", "nos vemos"], reply: (nick) => `¡Hasta pronto, ${nick}! Aquí estaré cuando me necesites de nuevo. 👋` },
             { keywords: ["matematicas", "calcula", "cuanto es", "suma", "resta", "multiplica", "divide"], math: true },
-            { keywords: ["como te llamas", "tu nombre", "te llamas", "quien eres", "apodo"], identity: true },
+            { keywords: ["como te llamas", "tu nombre", "te llamas", "quien eres", "cual es tu nombre"], identity: true },
             { keywords: ["don quijote", "quijote", "miguel de cervantes"], reply: (nick) => `Don Quijote de la Mancha es el protagonista de la famosa novela de Miguel de Cervantes. Es un hidalgo ingenioso que, enloquecido por leer tantas novelas de caballería, decide convertirse en caballero andante para entablar batallas imaginarias y defender la justicia, acompañado de su fiel escudero Sancho Panza. 📚✨` },
             { keywords: ["libro diario", "contabilidad", "asiento contable"], reply: () => "El Libro Diario es un registro contable cronológico donde se anotan todas las transacciones comerciales de una empresa mediante asientos de débito y crédito. 📊" },
             { keywords: ["libro mayor", "cuentas t"], reply: () => "El Libro Mayor agrupa y resume los movimientos de cada cuenta contable específica provenientes del Libro Diario, permitiendo conocer el saldo actual de cada una. 📚" },
@@ -667,7 +669,7 @@
                         } catch(e) {}
                     }
                 }
-                if (item.identity) {
+                if (item.identity && !qLower.includes('don quijote') && !qLower.includes('quien es')) {
                     const nicknames = ["Natsu", "Natsi", "Natsune"];
                     const chosen = nicknames[Math.floor(Math.random() * nicknames.length)];
                     return `Me llamo **Natsune**, aunque algunos me dicen cariñosamente **${chosen}**. ¿En qué te ayudo hoy, ${nick}? 🌸`;
