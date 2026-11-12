@@ -52,11 +52,14 @@
     <div class="gemini-ambient-glow"></div>
 
     <!-- Menú Lateral Estilo Gemini Oficial -->
-    <div id="sideDrawer" class="fixed inset-0 z-40 bg-black/60 backdrop-blur-sm hidden fade-quick opacity-0">
+    <div id="sideDrawer" class="fixed inset-0 z-40 bg-black/70 backdrop-blur-sm hidden fade-quick opacity-0">
         <div class="absolute left-0 top-0 bottom-0 w-72 bg-[#131314] border-r border-[#282a2c] p-4 flex flex-col justify-between shadow-2xl transform -translate-x-full transition-transform duration-200 ease-out" id="drawerPanel">
             <div class="space-y-4">
                 <div class="flex items-center justify-between px-2 pt-1">
-                    <span class="text-[#e3e3e3] font-medium text-sm">Menú</span>
+                    <span class="text-[#e3e3e3] font-medium text-sm flex items-center space-x-2">
+                        <span>✦</span>
+                        <span>Natsune IA</span>
+                    </span>
                     <button onclick="toggleDrawer()" class="text-[#c4c7c5] hover:text-white p-2 rounded-full hover:bg-[#1e1f20] transition">✕</button>
                 </div>
                 <button onclick="resetChat(); toggleDrawer();" class="w-full bg-[#1e1f20] hover:bg-[#282a2c] text-[#e3e3e3] rounded-full py-3 px-4 text-sm font-medium text-left flex items-center space-x-3 transition active:scale-95">
@@ -65,34 +68,32 @@
                 </button>
                 <div class="space-y-1 pt-3">
                     <p class="text-[11px] text-[#8e918f] font-medium px-3 uppercase tracking-wider">Recientes</p>
-                    <div id="historyList" class="space-y-0.5 text-sm text-[#c4c7c5] max-h-[60vh] overflow-y-auto no-scrollbar">
+                    <div id="historyList" class="space-y-0.5 text-sm text-[#c4c7c5] max-h-[55vh] overflow-y-auto no-scrollbar">
                         <p class="text-xs text-[#666] italic py-2 px-3">Sin actividad reciente</p>
                     </div>
                 </div>
             </div>
             <div class="border-t border-[#282a2c] pt-3 px-2 flex items-center justify-between text-xs text-[#8e918f]">
-                <span>Natsune IA</span>
+                <span>Memoria Local</span>
                 <button onclick="clearMemory(); toggleDrawer();" class="text-red-400 hover:underline">Borrar todo</button>
             </div>
         </div>
     </div>
 
-    <!-- Cabecera -->
-    <header class="flex items-center justify-between px-4 py-3 bg-black z-20">
-        <div class="flex items-center space-x-3">
+    <!-- Cabecera Corregida (Limpia en una sola línea) -->
+    <header class="flex items-center justify-between px-3 py-3 bg-black z-20 space-x-2">
+        <div class="flex items-center space-x-2 flex-shrink-0">
             <button onclick="toggleDrawer()" title="Menú" class="p-2 rounded-full hover:bg-[#1f2124] text-[#c4c7c5] transition active:scale-95">
                 <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16"></path></svg>
             </button>
-            <div class="flex items-center space-x-2">
-                <span class="text-lg font-medium tracking-tight text-white">Natsune IA</span>
-            </div>
+            <span class="text-base font-medium tracking-tight text-white whitespace-nowrap">Natsune IA</span>
         </div>
 
-        <div class="flex items-center space-x-2">
+        <div class="flex items-center space-x-1.5 overflow-x-auto no-scrollbar">
             <!-- Selector de Modelo Principal -->
-            <div class="relative flex items-center bg-[#1e1f20] hover:bg-[#282a2c] border border-[#3c4043] rounded-full px-2.5 py-1">
+            <div class="relative flex items-center bg-[#1e1f20] hover:bg-[#282a2c] border border-[#3c4043] rounded-full px-2 py-1 flex-shrink-0">
                 <select id="modelSelector" onchange="handleModelChange()" class="bg-transparent text-xs font-medium text-[#e3e3e3] appearance-none pr-3 focus:outline-none cursor-pointer">
-                    <option value="natsune" class="bg-[#1e1f20]">Natsune Core</option>
+                    <option value="natsune" class="bg-[#1e1f20]">Core</option>
                     <option value="gemini" class="bg-[#1e1f20]">Gemini</option>
                     <option value="chatgpt" class="bg-[#1e1f20]">ChatGPT</option>
                     <option value="claude" class="bg-[#1e1f20]">Claude</option>
@@ -101,7 +102,7 @@
             </div>
 
             <!-- Selector de Variante -->
-            <div class="relative flex items-center bg-[#1e1f20] hover:bg-[#282a2c] border border-[#3c4043] rounded-full px-2.5 py-1">
+            <div class="relative flex items-center bg-[#1e1f20] hover:bg-[#282a2c] border border-[#3c4043] rounded-full px-2 py-1 flex-shrink-0">
                 <select id="variantSelector" onchange="handleVariantChange()" class="bg-transparent text-xs font-medium text-sky-400 appearance-none pr-3 focus:outline-none cursor-pointer">
                     <option value="default" class="bg-[#1e1f20]">Standard</option>
                 </select>
@@ -109,7 +110,7 @@
             </div>
 
             <!-- Botón de Perfil -->
-            <button onclick="toggleSettings()" id="profileAvatarBtn" class="w-8 h-8 rounded-full bg-gradient-to-tr from-blue-500 via-indigo-500 to-sky-400 flex items-center justify-center text-xs font-bold text-white shadow-sm overflow-hidden border border-[#3c4043] transition active:scale-95">
+            <button onclick="toggleSettings()" id="profileAvatarBtn" class="w-7 h-7 rounded-full bg-gradient-to-tr from-blue-500 via-indigo-500 to-sky-400 flex items-center justify-center text-xs font-bold text-white shadow-sm overflow-hidden border border-[#3c4043] transition active:scale-95 flex-shrink-0">
                 N
             </button>
         </div>
@@ -118,7 +119,7 @@
     <!-- Contenedor Principal -->
     <main id="chatContainer" class="flex-1 overflow-y-auto px-4 max-w-2xl w-full mx-auto flex flex-col no-scrollbar z-10 pt-2 pb-6 fade-quick">
         
-        <!-- Pantalla de Bienvenida Dinámica con indicador de modelo activo -->
+        <!-- Pantalla de Bienvenida Dinámica -->
         <div id="welcomeScreen" class="my-auto space-y-6 text-left py-8 fade-quick">
             <div class="space-y-1.5">
                 <h1 id="welcomeTitle" class="text-4xl sm:text-5xl font-medium tracking-tight natsune-rainbow-text">
@@ -473,30 +474,26 @@
             }
         }
 
+        // Saludos naturales y respuestas fluidas (sin formalismos exagerados)
         function getLocalIntelligence(query, userName, modelName, isFallback = false) {
             const q = query.toLowerCase();
             const name = userName ? `, ${userName}` : '';
 
-            if (q.includes('qué modelo es') || q.includes('que modelo es') || q.includes('qué modelo usas') || q.includes('que modelo usas') || q.includes('qué modelo eres') || q.includes('modelo actual')) {
+            if (q.includes('qué modelo es') || q.includes('que modelo es') || q.includes('qué modelo usas') || q.includes('que modelo usas') || q.includes('qué modelo eres') || q.includes('que modelo eres') || q.includes('modelo actual')) {
                 return `El modelo actual es de ${modelName}. Puedes revisar en la parte superior para elegir otro modelo preferido.`;
             }
 
             if (isFallback) {
-                const wittyApologies = [
-                    `¡Ups! Mil disculpas por el inconveniente. Parece que al modelo anterior le dio un cortocircuito mental y se fue a dormir. Pero no te preocupes, Natsune ha tomado el control con **Natsune Core**. Te sugiero seleccionar otro modelo o variante en el menú superior si requieres más potencia.`,
-                    `Vaya, lamento mucho este pequeño percance técnico con el modelo. Al parecer decidió hacer huelga justo ahora... ¡mil disculpas! He activado **Natsune Core** como respaldo de emergencia. Puedes elegir cualquier otro modelo disponible en la parte superior cuando gustes.`,
-                    `¡Ay, caramba! El modelo anterior tuvo un bache en el camino y se quedó sin combustible. Te pido una disculpa por la interrupción; ya tomé el timón con **Natsune Core**. Si prefieres otra IA, siéntete libre de seleccionarla arriba.`
-                ];
-                return wittyApologies[Math.floor(Math.random() * wittyApologies.length)];
+                return `¡Vaya! Parece que el modelo anterior tuvo un pequeño problema técnico y no pudo responder. Mil disculpas por el inconveniente. He activado **Natsune Core** para ayudarte de inmediato. Si prefieres otro modelo, puedes seleccionarlo arriba cuando gustes.`;
             }
 
             if (q.includes('imagen') || q.includes('genera') || q.includes('dibuja')) {
-                return `🖼️ [Generación visual completada con ${modelName}]\nAquí tienes la renderización conceptual solicitada.`;
+                return `Aquí tienes tu imagen generada con ${modelName}. ¿Qué te parece el resultado?`;
             }
-            if (q.includes('hola') || q.includes('buenas')) {
-                return `¡Hola${name}! Operando bajo ${modelName}. ¿Qué idea o proyecto desarrollamos hoy?`;
+            if (q.includes('hola') || q.includes('buenas') || q.includes('saludos')) {
+                return `¡Hola${name}! Todo listo usando ${modelName}. ¿Qué tal va tu día?`;
             }
-            return `Entendido${name} usando ${modelName}. Analizando tu consulta sobre "${query}": podemos estructurarlo de manera impecable. ¿Cómo prefieres avanzar?`;
+            return `Entendido${name}. Usando ${modelName}, sobre "${query}": dime qué necesitas exactamente y lo resolvemos.`;
         }
 
         async function sendMessage() {
@@ -558,7 +555,6 @@
             }, 400);
         }
 
-        // Teclado reparado y optimizado
         userInput.addEventListener('keydown', function(e) {
             if (e.key === 'Enter' && !e.shiftKey) {
                 e.preventDefault();
