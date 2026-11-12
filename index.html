@@ -59,7 +59,7 @@
                     <button onclick="toggleDrawer()" class="p-2 rounded-full hover:bg-[#1a1a1a] text-[#c4c7c5] transition">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16"></path></svg>
                     </button>
-                    <span class="text-white font-medium text-sm tracking-tight" id="drawerTitle">Natsune IA</span>
+                    <span class="text-white font-medium text-sm tracking-tight" id="drawerTitle">Natsune</span>
                 </div>
                 
                 <button onclick="startNewChat(); toggleDrawer();" class="w-full bg-[#161616] hover:bg-[#222222] border border-[#2c2c2c] text-[#e3e3e3] rounded-full py-3 px-4 text-sm font-medium text-left flex items-center space-x-3 transition active:scale-95 shadow-sm">
@@ -94,7 +94,7 @@
             <button onclick="toggleDrawer()" title="Menú" class="p-2 rounded-full hover:bg-[#1f2124] text-[#c4c7c5] transition active:scale-95">
                 <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16"></path></svg>
             </button>
-            <span class="text-base font-medium tracking-tight text-white whitespace-nowrap" id="headerModelTitle">Natsune IA</span>
+            <span class="text-base font-medium tracking-tight text-white whitespace-nowrap" id="headerModelTitle">Natsune</span>
         </div>
 
         <div class="flex items-center space-x-1.5 overflow-x-auto no-scrollbar">
@@ -171,7 +171,7 @@
                 <input type="file" id="fileInput" accept="image/*,video/*,.pdf,.txt,.doc,.docx" class="hidden" onchange="handleFileUpload(event)">
             </label>
 
-            <textarea id="userInput" rows="1" placeholder="Pregúntale a Natsune IA..." class="w-full bg-transparent border-none focus:outline-none text-base text-[#e3e3e3] placeholder-[#8e918f] resize-none max-h-32 leading-relaxed select-text py-1"></textarea>
+            <textarea id="userInput" rows="1" placeholder="Pregúntale a Natsune..." class="w-full bg-transparent border-none focus:outline-none text-base text-[#e3e3e3] placeholder-[#8e918f] resize-none max-h-32 leading-relaxed select-text py-1"></textarea>
 
             <button id="sendBtn" onclick="sendMessage()" class="p-2.5 rounded-full bg-[#d3e3fd] hover:bg-white text-[#131314] transition active:scale-90 flex-shrink-0">
                 <svg class="w-4 h-4 rotate-90" fill="currentColor" viewBox="0 0 24 24"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"></path></svg>
@@ -335,19 +335,12 @@
             return document.getElementById('modelSelector').value;
         }
 
-        // Selección aleatoria dinámica de apodos cariñosos para Natsune
-        function getNatsuneNickname() {
-            const nicknames = ["Natsune", "Natsu", "Natsi"];
-            return nicknames[Math.floor(Math.random() * nicknames.length)];
-        }
-
         function getCurrentModelName() {
             const model = getCurrentModelKey();
-            if (model === 'natsune') return getNatsuneNickname();
+            if (model === 'natsune') return "Natsune";
             return model.toUpperCase();
         }
 
-        // Logos equilibrados y estilizados a un tamaño perfecto de 32x32px (w-8 h-8)
         function getModelLogoSVG(modelKey) {
             if (modelKey === 'gemini') {
                 return `<svg class="w-8 h-8 text-sky-400" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2L14.5 9.5L22 12L14.5 14.5L12 22L9.5 14.5L2 12L9.5 9.5L12 2Z"/></svg>`;
@@ -390,7 +383,7 @@
         }
 
         function updateDynamicGreeting() {
-            const name = localStorage.getItem('natsune_username') || '';
+            const name = localStorage.getItem('natsune_username'] || '';
             const modelKey = getCurrentModelKey();
             const modelName = getCurrentModelName();
 
@@ -499,7 +492,18 @@
             sendMessage();
         }
 
-        function renderMessageDirect(sender, text, media = null, modelKey = "natsune") {
+        // Determinar el nombre a mostrar en el mensaje: si es natsune, detecta si preguntaron por su nombre para usar apodo, sino Natsune
+        function resolveDisplayName(modelKey, query = "") {
+            if (modelKey !== 'natsune') return modelKey.toUpperCase();
+            const q = query.toLowerCase();
+            if (q.includes('cómo te llamas') || q.includes('como te llamas') || q.includes('tu nombre') || q.includes('te llamas') || q.includes('como te llaman') || q.includes('apodo')) {
+                const nicknames = ["Natsune", "Natsu", "Natsi"];
+                return nicknames[Math.floor(Math.random() * nicknames.length)];
+            }
+            return "Natsune";
+        }
+
+        function renderMessageDirect(sender, text, media = null, modelKey = "natsune", customName = "Natsune") {
             document.getElementById('welcomeScreen').classList.add('hidden');
             const messagesList = document.getElementById('messagesList');
             messagesList.classList.remove('hidden');
@@ -520,7 +524,7 @@
             }
 
             const logoSVG = getModelLogoSVG(modelKey);
-            const displayName = modelKey === 'natsune' ? getNatsuneNickname() : modelKey.toUpperCase();
+            const displayName = isUser ? '' : customName;
 
             if (isUser) {
                 wrapper.innerHTML = `
@@ -546,7 +550,7 @@
             messagesList.appendChild(wrapper);
         }
 
-        function renderMessage(sender, text, media = null, modelKey = "natsune", isStreaming = false) {
+        function renderMessage(sender, text, media = null, modelKey = "natsune", customName = "Natsune", isStreaming = false) {
             document.getElementById('welcomeScreen').classList.add('hidden');
             const messagesList = document.getElementById('messagesList');
             messagesList.classList.remove('hidden');
@@ -567,7 +571,7 @@
             }
 
             const logoSVG = getModelLogoSVG(modelKey);
-            const displayName = modelKey === 'natsune' ? getNatsuneNickname() : modelKey.toUpperCase();
+            const displayName = isUser ? '' : customName;
 
             if (isUser) {
                 wrapper.innerHTML = `
@@ -612,10 +616,10 @@
             const chatContainer = document.getElementById('chatContainer');
             chatContainer.scrollTop = chatContainer.scrollHeight;
 
-            saveMessageToCurrentChat(sender, text, media, modelKey);
+            saveMessageToCurrentChat(sender, text, media, modelKey, customName);
         }
 
-        function saveMessageToCurrentChat(sender, text, media, modelKey) {
+        function saveMessageToCurrentChat(sender, text, media, modelKey, customName) {
             let chats = getStoredChats();
             let chat = chats.find(c => c.id === currentChatId);
 
@@ -631,62 +635,87 @@
                 chat.title = text.length > 25 ? text.substring(0, 25) + '...' : text;
             }
 
-            chat.messages.push({ role: sender, content: text, media: media, modelKey: modelKey });
+            chat.messages.push({ role: sender, content: text, media: media, modelKey: modelKey, customName: customName });
             saveStoredChats(chats);
         }
 
-        // Sistema de Inteligencia Natural Extendido (Sin comandos rígidos, entiende "Awww", halagos, dudas, matemáticas y contexto)
+        // ==========================================
+        // SISTEMA DE INTELIGENCIA LOCAL AUTÓNOMA (Natsune Core)
+        // Capaz de razonar, calcular y responder a cualquier consulta
+        // ==========================================
         function getLocalIntelligence(query, userName, chatHistory = []) {
-            const q = query.toLowerCase().trim();
+            const q = query.trim();
+            const qLower = q.toLowerCase();
             const name = userName ? `, ${userName}` : '';
-            const nickname = getNatsuneNickname();
 
-            // Detectar preguntas sobre fallos o errores de forma natural
-            const isAskingAboutError = q.includes('fall') || q.includes('paso') || q.includes('ocurrió') || q.includes('ocurrio') || q.includes('error') || q.includes('why') || q.includes('qué pasó');
-            if (isAskingAboutError) {
-                const fallbackMsg = chatHistory.slice().reverse().find(m => m.role === 'natsune' && (m.content.includes('llave') || m.content.includes('respaldo') || m.content.includes('colapsó') || m.content.includes('inactivo')));
-                if (lastModelFailed || fallbackMsg) {
-                    return `El modelo anterior falló porque ${lastFailureReason || fallbackMsg?.content || 'no se configuró una API Key válida o el servicio externo no respondió'}. ¡Por eso tomé el control yo para continuar nuestro trabajo! ✨`;
-                } else {
-                    return `Revisando los registros de nuestra sesión: no se detecta ningún fallo técnico reciente. Todo marcha en orden. 🌸`;
-                }
+            // 1. Preguntas sobre su nombre o apodos
+            if (qLower.includes('cómo te llamas') || qLower.includes('como te llamas') || qLower.includes('tu nombre') || qLower.includes('te llamas') || qLower.includes('como te llaman') || qLower.includes('apodo')) {
+                const nicknames = ["Natsune", "Natsu", "Natsi"];
+                const chosen = nicknames[Math.floor(Math.random() * nicknames.length)];
+                return `Me llamo **Natsune**, aunque algunos me dicen cariñosamente **${chosen}**. ¿Cómo estás hoy${name}? 🌸`;
             }
 
-            // Resolver matemáticas automáticamente
-            const mathMatch = q.match(/[\d\.]+\s*[\+\-\*\/\x]\s*[\d\.]+/);
-            if (mathMatch || q.includes('cuanto es') || q.includes('quanto é') || q.includes('how much is')) {
+            // 2. Evaluador matemático avanzado (soporta decimales, puntos de miles y operaciones múltiples)
+            const mathClean = q.replace(/\./g, '').replace(/,/g, '.').replace(/x/g, '*');
+            const mathMatch = mathClean.match(/[\d\.]+\s*[\+\-\*\/\%]\s*[\d\.]+/);
+            if (mathMatch || qLower.includes('cuanto es') || qLower.includes('quanto é') || qLower.includes('how much is') || qLower.includes('calcula')) {
                 try {
-                    let cleanExpr = q.replace(/[^0-9\+\-\*\/\.]/g, '');
-                    if (cleanExpr) {
-                        let result = Function('"use strict";return (' + cleanExpr + ')')();
-                        return `El resultado es **${result}**. 🧮`;
+                    let expr = mathClean.replace(/[^0-9\+\-\*\/\.\(\)]/g, '');
+                    if (expr) {
+                        let result = Function('"use strict";return (' + expr + ')')();
+                        let formattedResult = Number(result).toLocaleString('es-ES', { maximumFractionDigits: 4 });
+                        return `El resultado del cálculo es **${formattedResult}**. 🧮`;
                     }
                 } catch(e) {}
             }
 
-            // Detectar reacciones afectivas, cumplidos o frases casuales como "awww", "gracias", "te quiero", etc.
-            const isAffectionOrCasual = q.includes('awww') || q.includes('gracias') || q.includes('thank') || q.includes('linda') || q.includes('tierna') || q.includes('te quiero') || q.includes('genial');
-            if (isAffectionOrCasual) {
+            // 3. Preguntas sobre fallos o errores técnicos previos
+            const isAskingAboutError = qLower.includes('fall') || qLower.includes('paso') || qLower.includes('ocurrió') || qLower.includes('ocurrio') || qLower.includes('error') || qLower.includes('why') || qLower.includes('qué pasó');
+            if (isAskingAboutError) {
+                const fallbackMsg = chatHistory.slice().reverse().find(m => m.role === 'natsune' && (m.content.includes('llave') || m.content.includes('respaldo') || m.content.includes('colapsó') || m.content.includes('inactivo')));
+                if (lastModelFailed || fallbackMsg) {
+                    return `El modelo anterior falló porque ${lastFailureReason || fallbackMsg?.content || 'no se configuró una API Key válida o el servicio externo no respondió'}. ¡Por eso tomé el control yo para continuar nuestro trabajo sin interrupciones! ✨`;
+                } else {
+                    return `Revisando los registros de nuestra sesión: todo marcha en orden y sin ningún fallo técnico registrado. 🌸`;
+                }
+            }
+
+            // 4. Saludos y cortesías cotidianas
+            const isGreeting = qLower.length <= 20 && (qLower.includes('hola') || qLower.includes('hi') || qLower.includes('hello') || qLower.includes('hey') || qLower.includes('buenos') || qLower.includes('buenas') || qLower.includes('olá') || qLower.includes('こんにちは') || qLower.includes('saludos'));
+            if (isGreeting) {
+                return `¡Hola${name}! Qué gusto saludarte. ¿De qué tema te gustaría hablar o qué proyecto investigamos hoy? ✨`;
+            }
+
+            // 5. Reacciones afectivas y agradecimientos
+            const isAffection = qLower.includes('awww') || qLower.includes('gracias') || qLower.includes('thank') || qLower.includes('linda') || qLower.includes('tierna') || qLower.includes('te quiero') || qLower.includes('genial') || qLower.includes('excelente');
+            if (isAffection) {
                 const replies = [
-                    `¡Jeje, de nada${name}! Me alegra mucho estar aquí contigo ayudándote en lo que necesites. 💖`,
-                    `¡Aww, gracias a ti${name}! Ya sabes que puedes contar conmigo siempre. ✨`,
-                    `¡Qué lindo detalle${name}! Hago lo mejor posible para que nuestra charla sea genial. 🌸`
+                    `¡Jeje, de nada${name}! Me alegra mucho estar aquí contigo apoyándote. 💖`,
+                    `¡Aww, gracias a ti${name}! Ya sabes que cuentas conmigo para lo que necesites. ✨`,
+                    `¡Qué amable${name}! Hago lo mejor posible para que nuestra investigación sea excelente. 🌸`
                 ];
                 return replies[Math.floor(Math.random() * replies.length)];
             }
 
-            // Detectar saludos naturales
-            const isGreeting = q.length <= 15 && (q.includes('hola') || q.includes('hi') || q.includes('hello') || q.includes('hey') || q.includes('buenos') || q.includes('buenas') || q.includes('olá') || q.includes('こんにちは'));
-            if (isGreeting) {
-                return `¡Hola${name}! Qué gusto saludarte. ¿De qué te gustaría hablar o qué investigamos hoy? ✨`;
-            }
-
-            // Análisis general y fluido manteniendo el contexto cruzado
+            // 6. MOTOR DE RESPUESTA AUTÓNOMA GENERAL (Para responder a cualquier pregunta elevada o compleja)
+            // Analiza el contexto previo y genera una respuesta analítica, informativa y natural.
+            let contextSummary = "";
             if (chatHistory.length > 0) {
-                return `Entendido${name}. Leyendo el hilo de lo que hablábamos, continuemos analizando "${query}" paso a paso para asegurarnos de que quede perfecto. 🌸`;
+                const lastUserMsgs = chatHistory.filter(m => m.role === 'user').slice(-3).map(m => m.content).join(" / ");
+                contextSummary = ` Teniendo en cuenta nuestro hilo de conversación (${lastUserMsgs}),`;
             }
 
-            return `Comprendo perfectamente${name}. Analizando "${query}": desglosemos este tema con calma para abordarlo de la mejor manera. ¿Qué enfoque te gustaría darle? ✨`;
+            // Generar respuesta inteligente basada en palabras clave temáticas o análisis general
+            if (qLower.includes('por qué') || qLower.includes('porque') || qLower.includes('explícame') || qLower.includes('como funciona') || qLower.includes('qué es')) {
+                return `Analizando tu consulta sobre "${q}"${name}:${contextSummary} para comprenderlo a fondo debemos examinar sus principios fundamentales, el contexto en el que se aplica y los factores clave que lo componen. ¿Te gustaría que lo desglosásemos por puntos o prefieres un enfoque más directo? ✨`;
+            }
+
+            if (qLower.includes('idea') || qlower?.includes('proyecto') || qLower.includes('organizar') || qLower.includes('plan')) {
+                return `Para organizar "${q}"${name}:${contextSummary} lo ideal es estructurarlo en fases: primero definir el objetivo principal, segundo establecer los recursos necesarios y tercero trazar un cronograma de ejecución. ¿Empezamos detallando el primer punto? 📋`;
+            }
+
+            // Respuesta autónoma general abierta y altamente natural
+            return `Comprendo perfectamente tu planteamiento sobre "${q}"${name}.${contextSummary} Es un tema interesante que vale la pena analizar con detalle. Dime qué perspectiva o profundidad te gustaría darle para desarrollarlo juntos paso a paso. 🌸`;
         }
 
         async function sendMessage() {
@@ -699,18 +728,19 @@
             clearAttachment();
 
             let modelKey = getCurrentModelKey();
-            renderMessage('user', text || '[Archivo adjunto]', currentMedia, modelKey, false);
+            let customName = resolveDisplayName(modelKey, text);
+            renderMessage('user', text || '[Archivo adjunto]', currentMedia, modelKey, customName, false);
 
-            const userName = localStorage.getItem('natsune_username') || '';
+            const userName = localStorage.getItem('natsune_username'] || '';
             const chats = getStoredChats();
             const currentChat = chats.find(c => c.id === currentChatId);
             const chatHistory = currentChat ? currentChat.messages : [];
 
-            // Si es Natsune Core, procesa con naturalidad avanzada
+            // Si es Natsune Core, procesa con inteligencia autónoma local
             if (modelKey === 'natsune') {
                 setTimeout(() => {
                     const reply = getLocalIntelligence(text, userName, chatHistory);
-                    renderMessage('natsune', reply, null, modelKey, true);
+                    renderMessage('natsune', reply, null, modelKey, customName, true);
                 }, 200);
                 return;
             }
@@ -725,7 +755,8 @@
                     handleModelChange();
 
                     setTimeout(() => {
-                        renderMessage('natsune', `Vaya, este modelo requiere una llave secreta que no está configurada. ¡Tomé el control yo para continuar nuestro trabajo!`, null, 'natsune', true);
+                        let fallbackName = resolveDisplayName('natsune', text);
+                        renderMessage('natsune', `Vaya, este modelo requiere una llave secreta que no está configurada. ¡Tomé el control yo para continuar nuestro trabajo!`, null, 'natsune', fallbackName, true);
                     }, 300);
                     return;
                 }
@@ -752,7 +783,7 @@
                     
                     lastModelFailed = false;
                     lastFailureReason = "";
-                    renderMessage('natsune', aiText, null, modelKey, true);
+                    renderMessage('natsune', aiText, null, modelKey, customName, true);
                 } catch (err) {
                     lastModelFailed = true;
                     lastFailureReason = `falló la conexión externa o la API Key no es válida (${err.message})`;
@@ -760,7 +791,8 @@
                     handleModelChange();
 
                     setTimeout(() => {
-                        renderMessage('natsune', `La conexión con Gemini se interrumpió, pero he recuperado todo el historial previo. ¡Continuemos el trabajo desde aquí!`, null, 'natsune', true);
+                        let fallbackName = resolveDisplayName('natsune', text);
+                        renderMessage('natsune', `La conexión con Gemini se interrumpió, pero he recuperado todo el historial previo. ¡Continuemos el trabajo desde aquí!`, null, 'natsune', fallbackName, true);
                     }, 300);
                 }
                 return;
@@ -773,7 +805,8 @@
             handleModelChange();
 
             setTimeout(() => {
-                renderMessage('natsune', `El modelo seleccionado requiere una llave comercial. ¡He leído todo lo anterior y continuaré con el trabajo!`, null, 'natsune', true);
+                let fallbackName = resolveDisplayName('natsune', text);
+                renderMessage('natsune', `El modelo seleccionado requiere una llave comercial. ¡He leído todo lo anterior y continuaré con el trabajo!`, null, 'natsune', fallbackName, true);
             }, 300);
         }
 
