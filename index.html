@@ -285,10 +285,10 @@
                 renderMessageDirect(msg.role, msg.content, msg.media, msg.modelKey, msg.modelDisplay);
             });
 
-            const lastAssistantMsg = chat.messages.slice().reverse().find(m => m.role === 'natsune' && (m.content.includes('llave') || m.content.includes('respaldo') || m.content.includes('falló')));
-            if (lastAssistantMsg) {
+            const fallbackMsg = chat.messages.slice().reverse().find(m => m.role === 'natsune' && (m.content.includes('llave') || m.content.includes('respaldo') || m.content.includes('colapsó') || m.content.includes('inactivo')));
+            if (fallbackMsg) {
                 lastModelFailed = true;
-                lastFailureReason = lastAssistantMsg.content;
+                lastFailureReason = fallbackMsg.content;
             }
         }
 
@@ -378,12 +378,10 @@
         function handleModelChange() {
             updateVariants();
             updateDynamicGreeting();
-            lastModelFailed = false;
         }
 
         function handleVariantChange() {
             updateDynamicGreeting();
-            lastModelFailed = false;
         }
 
         function updateDynamicGreeting() {
@@ -632,28 +630,27 @@
             saveStoredChats(chats);
         }
 
-        // Sistema Offline Inteligente (Mate básica, app guide, etc.)
-        function getLocalIntelligence(query, userName, modelName) {
+        // Sistema Offline Inteligente y de Contexto Cruzado
+        function getLocalIntelligence(query, userName, modelName, chatHistory = []) {
             const q = query.toLowerCase().trim();
             const name = userName ? `, ${userName}` : '';
 
-            // Preguntas sobre errores previos
             const errorQueries = [
-                'que fallo', 'qué fallo', 'que paso', 'qué pasó', 'porque fallo', 'por qué falló', 'error', 'why did it fail', 'what happened', 'o que falhou', 'o que aconteceu', 'なにが失敗した', 'エラー', 'どうして'
+                'que fallo', 'qué fallo', 'que paso', 'qué pasó', 'porque fallo', 'por qué falló', 'error', 'why did it fail', 'what happened', 'o que falhou', 'o que aconteceu', 'なにが失敗した', 'エラー', 'どうして', 'ocurrio'
             ];
+            
             if (errorQueries.some(eq => q.includes(eq))) {
-                if (lastModelFailed) {
-                    return `El modelo anterior falló porque ${lastFailureReason || 'no se configuró una API Key válida o el servicio externo no respondió'}. ¡Por eso entré yo a rescatarte!`;
+                const fallbackMsg = chatHistory.slice().reverse().find(m => m.role === 'natsune' && (m.content.includes('llave') || m.content.includes('respaldo') || m.content.includes('colapsó') || m.content.includes('inactivo')));
+                if (lastModelFailed || fallbackMsg) {
+                    return `El modelo anterior falló porque ${lastFailureReason || fallbackMsg?.content || 'no se configuró una API Key válida o el servicio externo no respondió'}. ¡Por eso entré yo a rescatarte! ✨`;
                 } else {
-                    return `Analizando los registros con ${modelName}: no se ha registrado ningún fallo técnico en esta sesión. Todo marcha en orden.`;
+                    return `Analizando los registros de esta sesión con ${modelName}: no se ha registrado ningún fallo técnico previo. Todo marcha perfectamente. 🌸`;
                 }
             }
 
-            // Operaciones matemáticas básicas (Sumas, restas, multiplicación, división)
             const mathMatch = q.match(/[\d\.]+\s*[\+\-\*\/\x]\s*[\d\.]+/);
             if (mathMatch || q.includes('cuanto es') || q.includes('quanto é') || q.includes('how much is')) {
                 try {
-                    // Limpiar expresión segura
                     let cleanExpr = q.replace(/[^0-9\+\-\*\/\.]/g, '');
                     if (cleanExpr) {
                         let result = Function('"use strict";return (' + cleanExpr + ')')();
@@ -662,7 +659,6 @@
                 } catch(e) {}
             }
 
-            // Uso de la app / guía básica
             const appGuide = ['como se usa esta app', 'como usar', 'que es natsune', 'quien eres', 'quien es natsune', 'what is this app', 'how to use'];
             if (appGuide.some(ag => q.includes(ag))) {
                 return `**Natsune IA** es tu interfaz multifunción diseñada para alternar entre diferentes modelos (Gemini, ChatGPT, Claude) o usar mi núcleo integrado (Natsune Core) con soporte offline. Puedes configurar tus API Keys en el botón de perfil superior derecho, adjuntar archivos y organizar tus chats desde el menú lateral. 🌸`;
@@ -673,47 +669,22 @@
                 return `Actualmente estoy usando ${modelName}.`;
             }
 
-            // Saludos en varios idiomas
             const greetingsES = ['hola', 'saludos', 'qué tal', 'que tal', 'buenas', 'hey', 'buen día', 'buenos días'];
             if (greetingsES.some(g => q.includes(g)) || q.length <= 4) {
-                const responsesES = [
-                    `¡Hola${name}! Qué gusto verte por aquí usando ${modelName}. ¿En qué te puedo ayudar hoy?`,
-                    `¡Hey${name}! Todo listo y operativo con ${modelName}. ¿Qué investigamos o creamos hoy?`,
-                    `¡Buenas${name}! Es un placer atenderte mediante ${modelName}. Dime, ¿qué tienes en mente?`
-                ];
-                return responsesES[Math.floor(Math.random() * responsesES.length)];
+                return `¡Hola${name}! He tomado el relevo de la conversación anterior usando ${modelName}. Continuemos con el trabajo que llevaban. ¿Qué necesitas?`;
             }
 
             const greetingsEN = ['hi', 'hello', 'hey', 'greetings', "what's up", 'good morning', 'good afternoon', 'sup'];
             if (greetingsEN.some(g => q.includes(g))) {
-                const responsesEN = [
-                    `Hello${name}! Great to see you using ${modelName}. How can I help you today?`,
-                    `Hi there${name}! All set up with ${modelName}. What are we working on?`,
-                    `Hey${name}! Powered by ${modelName} and ready. What's on your mind?`
-                ];
-                return responsesEN[Math.floor(Math.random() * responsesEN.length)];
+                return `Hello${name}! Switched over to ${modelName} while keeping our previous context. Let's continue working on it!`;
             }
 
-            const greetingsPT = ['olá', 'oi', 'tudo bem', 'bom dia', 'boa tarde', 'como vai'];
-            if (greetingsPT.some(g => q.includes(g))) {
-                const responsesPT = [
-                    `Olá${name}! Que bom ver você usando ${modelName}. Como posso ajudar hoje?`,
-                    `Oi${name}! Tudo pronto com ${modelName}. O que vamos fazer agora?`
-                ];
-                return responsesPT[Math.floor(Math.random() * responsesPT.length)];
+            // Si hay historial previo, el modelo (incluso Natsune Core) asume y continúa el contexto
+            if (chatHistory.length > 0) {
+                return `Entendido${name}. He leído el hilo anterior de nuestra conversación. Usando ${modelName}, sigamos trabajando en "${query}" manteniendo todo el contexto previo. ✨`;
             }
 
-            const greetingsJP = ['konnichiwa', 'ohayou', 'ohayo', 'konbanwa', 'こんにちは', 'おはよう', 'こんばんは', 'ossu', 'yaa'];
-            if (greetingsJP.some(g => q.includes(g))) {
-                const responsesJP = [
-                    `こんにちは${name}! ${modelName}へようこそ。今日はどうお手伝いしましょうか？`,
-                    `やあ${name}! ${modelName}の準備ができました。何かお手伝いすることはありますか？`
-                ];
-                return responsesJP[Math.floor(Math.random() * responsesJP.length)];
-            }
-
-            // Respuesta por defecto con inteligencia offline
-            return `Entendido${name}. Trabajando con ${modelName} en "${query}": aunque opero en modo local/básico, estoy aquí para ayudarte paso a paso. ✨`;
+            return `Entendido${name}. Trabajando con ${modelName} en "${query}": estoy listo para ayudarte paso a paso. ✨`;
         }
 
         async function sendMessage() {
@@ -730,17 +701,20 @@
             renderMessage('user', text || '[Archivo adjunto]', currentMedia, modelKey, modelName, false);
 
             const userName = localStorage.getItem('natsune_username') || '';
+            const chats = getStoredChats();
+            const currentChat = chats.find(c => c.id === currentChatId);
+            const chatHistory = currentChat ? currentChat.messages : [];
 
-            // Si es Natsune Core, responde localmente sin internet
+            // Si es Natsune Core, procesa con contexto completo del chat
             if (modelKey === 'natsune') {
                 setTimeout(() => {
-                    const reply = getLocalIntelligence(text, userName, modelName);
+                    const reply = getLocalIntelligence(text, userName, modelName, chatHistory);
                     renderMessage('natsune', reply, null, modelKey, modelName, true);
                 }, 200);
                 return;
             }
 
-            // Si es Gemini con API Key
+            // Si es Gemini, construimos el historial (prompt con contexto previo) para que continúe el trabajo
             if (modelKey === 'gemini') {
                 const apiKey = localStorage.getItem('key_gemini');
                 if (!apiKey) {
@@ -750,40 +724,44 @@
                     handleModelChange();
 
                     setTimeout(() => {
-                        renderMessage('natsune', `Vaya, parece que este modelo requiere una llave secreta que no tenemos configurada. ¡Ya tomé el control yo de respaldo!`, null, 'natsune', 'Natsune Core (Respaldo)', true);
+                        renderMessage('natsune', `Vaya, este modelo requiere una llave secreta que no está configurada. ¡Tomé el control yo para continuar nuestro trabajo!`, null, 'natsune', 'Natsune Core (Respaldo)', true);
                     }, 300);
                     return;
                 }
                 
-                // Verificar si hay conexión a internet buscando respaldo de otra IA si falla
                 try {
                     const variant = document.getElementById('variantSelector').value;
                     const apiModelName = variant === 'pro' ? 'gemini-1.5-pro' : 'gemini-1.5-flash';
+
+                    // Formatear todo el historial previo para enviárselo a la API de Gemini y que mantenga el contexto cruzado
+                    let contentsPayload = chatHistory.map(msg => ({
+                        role: msg.role === 'user' ? 'user' : 'model',
+                        parts: [{ text: msg.content }]
+                    }));
+                    
+                    // Añadir el mensaje actual si no está ya en el historial guardado
+                    contentsPayload.push({ role: 'user', parts: [{ text: text }] });
+
                     const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${apiModelName}:generateContent?key=${apiKey}`, {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ contents: [{ parts: [{ text: text }] }] })
+                        body: JSON.stringify({ contents: contentsPayload })
                     });
                     const data = await res.json();
                     const aiText = data.candidates?.[0]?.content?.parts?.[0]?.text;
                     if (!aiText) throw new Error(data.error?.message || "Respuesta vacía del servidor");
+                    
                     lastModelFailed = false;
                     lastFailureReason = "";
                     renderMessage('natsune', aiText, null, modelKey, modelName, true);
                 } catch (err) {
                     lastModelFailed = true;
-                    lastFailureReason = `falló la conexión externa o el servidor no respondió (${err.message})`;
+                    lastFailureReason = `falló la conexión externa o la API Key no es válida (${err.message})`;
                     document.getElementById('modelSelector').value = 'natsune';
                     handleModelChange();
 
                     setTimeout(() => {
-                        // Buscar una forma de responder usando otra IA interna o respaldo offline
-                        const fallbackReplies = [
-                            `La conexión con Gemini colapsó en el aire. He recurrido a mis protocolos locales de respaldo para mantenernos en marcha.`,
-                            `Parece que el servicio externo no está disponible en este momento. ¡No te preocupes, tomé el mando yo para cubrir el puesto!`
-                        ];
-                        const randomReply = fallbackReplies[Math.floor(Math.random() * fallbackReplies.length)];
-                        renderMessage('natsune', randomReply, null, 'natsune', 'Natsune Core (Respaldo)', true);
+                        renderMessage('natsune', `La conexión con Gemini se interrumpió, pero he recuperado todo el historial previo. ¡Continuemos el trabajo desde aquí con Natsune Core!`, null, 'natsune', 'Natsune Core (Respaldo)', true);
                     }, 300);
                 }
                 return;
@@ -796,11 +774,7 @@
             handleModelChange();
 
             setTimeout(() => {
-                const errorsChatGPT = [
-                    `El modelo seleccionado está inactivo por falta de credenciales. ¡Menos mal que Natsune Core está aquí al rescate!`,
-                    `Ups, esa IA decidió tomarse un descanso porque no hay llave de acceso. Ya tomé el control yo.`
-                ];
-                renderMessage('natsune', errorsChatGPT[Math.floor(Math.random() * errorsChatGPT.length)], null, 'natsune', 'Natsune Core (Respaldo)', true);
+                renderMessage('natsune', `El modelo seleccionado requiere una llave comercial. ¡He leído todo lo anterior y Natsune Core continuará con el trabajo!`, null, 'natsune', 'Natsune Core (Respaldo)', true);
             }, 300);
         }
 
