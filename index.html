@@ -9,20 +9,13 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Outfit:wght@400;500;600&display=swap" rel="stylesheet">
   <style>
     :root {
-      --bg-main: #131314;
+      --bg-main: #0b0f19;
       --bg-sidebar: #1e1f20;
-      --bg-hover: #282a2c;
-      --bg-input: #1e1f20;
       --bg-card: #1e1f20;
-      --bg-card-hover: #282a2c;
+      --bg-input: #1a1c23;
       --text-primary: #e3e3e3;
       --text-secondary: #9aa0a6;
-      --border-subtle: #333537;
       --accent-blue: #a8c7fa;
-      --accent-purple: #d3b3ff;
-      --accent-pink: #f48fb1;
-      --sidebar-width: 280px;
-      --sidebar-collapsed: 72px;
     }
 
     * {
@@ -34,255 +27,93 @@
     body {
       font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
       background-color: var(--bg-main);
+      background-image: radial-gradient(circle at bottom, rgba(30, 58, 138, 0.25) 0%, transparent 60%);
       color: var(--text-primary);
       display: flex;
+      flex-direction: column;
       height: 100vh;
       overflow: hidden;
       -webkit-font-smoothing: antialiased;
     }
 
-    /* Sidebar */
-    .sidebar {
-      width: var(--sidebar-width);
-      background-color: var(--bg-sidebar);
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
-      padding: 16px 12px;
-      transition: width 0.25s cubic-bezier(0.2, 0, 0, 1);
-      flex-shrink: 0;
-      z-index: 20;
-    }
-
-    .sidebar.collapsed {
-      width: var(--sidebar-collapsed);
-    }
-
-    .sidebar-top {
-      display: flex;
-      flex-direction: column;
-      gap: 20px;
-    }
-
-    .icon-btn {
-      width: 44px;
-      height: 44px;
-      border-radius: 50%;
-      border: none;
-      background: transparent;
-      color: var(--text-secondary);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      cursor: pointer;
-      transition: background-color 0.2s, color 0.2s;
-      flex-shrink: 0;
-    }
-
-    .icon-btn:hover {
-      background-color: var(--bg-hover);
-      color: var(--text-primary);
-    }
-
-    .new-chat-btn {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      background-color: #131314;
-      color: var(--text-secondary);
-      border: none;
-      border-radius: 24px;
-      padding: 10px 16px;
-      height: 44px;
-      width: fit-content;
-      cursor: pointer;
-      font-family: inherit;
-      font-size: 14px;
-      font-weight: 500;
-      transition: background-color 0.2s, color 0.2s, width 0.2s;
-      overflow: hidden;
-      white-space: nowrap;
-    }
-
-    .new-chat-btn:hover {
-      background-color: #282a2c;
-      color: var(--text-primary);
-    }
-
-    .sidebar.collapsed .new-chat-btn {
-      width: 44px;
-      padding: 10px;
-      justify-content: center;
-    }
-
-    .sidebar.collapsed .hide-collapsed {
-      display: none;
-    }
-
-    .recent-section {
-      display: flex;
-      flex-direction: column;
-      gap: 4px;
-      margin-top: 8px;
-      overflow-y: auto;
-      max-height: calc(100vh - 280px);
-    }
-
-    .recent-title {
-      font-size: 13px;
-      font-weight: 500;
-      color: var(--text-primary);
-      padding: 8px 14px;
-    }
-
-    .recent-item {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      padding: 10px 14px;
-      border-radius: 20px;
-      color: var(--text-secondary);
-      font-size: 14px;
-      cursor: pointer;
-      transition: background-color 0.15s, color 0.15s;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-
-    .recent-item:hover, .recent-item.active {
-      background-color: var(--bg-hover);
-      color: var(--text-primary);
-    }
-
-    .sidebar-bottom {
-      display: flex;
-      flex-direction: column;
-      gap: 4px;
-    }
-
-    .nav-item {
-      display: flex;
-      align-items: center;
-      gap: 14px;
-      padding: 10px 14px;
-      border-radius: 20px;
-      color: var(--text-secondary);
-      font-size: 14px;
-      cursor: pointer;
-      transition: background-color 0.15s, color 0.15s;
-      white-space: nowrap;
-    }
-
-    .nav-item:hover {
-      background-color: var(--bg-hover);
-      color: var(--text-primary);
-    }
-
-    .sidebar.collapsed .nav-item {
-      justify-content: center;
-      padding: 10px;
-    }
-
-    .location-info {
-      padding: 12px 14px 4px;
-      font-size: 11px;
-      color: var(--text-secondary);
-      display: flex;
-      align-items: center;
-      gap: 6px;
-    }
-
-    .dot {
-      width: 6px;
-      height: 6px;
-      border-radius: 50%;
-      background-color: var(--text-secondary);
-      flex-shrink: 0;
-    }
-
-    /* Main Content */
-    .main-container {
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-      height: 100%;
-      position: relative;
-      overflow: hidden;
-    }
-
-    /* Top Header */
+    /* Top Bar */
     .top-bar {
       display: flex;
       align-items: center;
       justify-content: space-between;
-      padding: 14px 24px;
+      padding: 16px 20px;
       height: 64px;
       flex-shrink: 0;
-    }
-
-    .brand-selector {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      padding: 6px 12px;
-      border-radius: 12px;
-      cursor: pointer;
-      transition: background-color 0.2s;
-      position: relative;
-    }
-
-    .brand-selector:hover {
-      background-color: var(--bg-hover);
-    }
-
-    .brand-title {
-      font-family: 'Outfit', sans-serif;
-      font-size: 20px;
-      font-weight: 500;
-      color: var(--text-primary);
-      letter-spacing: -0.2px;
-    }
-
-    .model-badge {
-      font-size: 12px;
-      color: var(--text-secondary);
-      background: var(--bg-sidebar);
-      padding: 2px 8px;
-      border-radius: 8px;
-      margin-left: 2px;
-    }
-
-    .top-actions {
-      display: flex;
-      align-items: center;
       gap: 12px;
     }
 
-    .pro-pill {
+    .top-left, .top-right {
       display: flex;
       align-items: center;
-      gap: 8px;
-      background-color: var(--bg-sidebar);
-      border: 1px solid var(--border-subtle);
+      gap: 10px;
+    }
+
+    .icon-btn {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      border: none;
+      background: rgba(255, 255, 255, 0.06);
       color: var(--text-primary);
-      padding: 7px 14px;
-      border-radius: 10px;
-      font-size: 13px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: background-color 0.2s;
+    }
+
+    .icon-btn:hover {
+      background: rgba(255, 255, 255, 0.12);
+    }
+
+    .pill-dropdown {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(255, 255, 255, 0.06);
+      border: none;
+      color: var(--text-primary);
+      padding: 8px 14px;
+      border-radius: 20px;
+      font-size: 14px;
       font-weight: 500;
       cursor: pointer;
       transition: background-color 0.2s;
     }
 
-    .pro-pill:hover {
-      background-color: var(--bg-hover);
+    .pill-dropdown:hover {
+      background: rgba(255, 255, 255, 0.12);
     }
 
-    .avatar {
-      width: 34px;
-      height: 34px;
+    .action-pill {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(255, 255, 255, 0.06);
+      border: none;
+      color: var(--text-primary);
+      padding: 8px 14px;
+      border-radius: 20px;
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: background-color 0.2s;
+    }
+
+    .action-pill:hover {
+      background: rgba(255, 255, 255, 0.12);
+    }
+
+    .user-avatar {
+      width: 38px;
+      height: 38px;
       border-radius: 50%;
-      background: linear-gradient(135deg, #4285f4, #9b72cb, #d96570);
+      background: linear-gradient(135deg, #ff416c, #ff4b2b);
       display: flex;
       align-items: center;
       justify-content: center;
@@ -290,254 +121,83 @@
       font-size: 14px;
       color: #fff;
       cursor: pointer;
+      overflow: hidden;
     }
 
-    /* Chat Area */
-    .chat-viewport {
+    .user-avatar img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    /* Center Main Area */
+    .main-center {
       flex: 1;
-      overflow-y: auto;
       display: flex;
       flex-direction: column;
       align-items: center;
-      padding: 0 24px 24px;
-      scroll-behavior: smooth;
+      justify-content: center;
+      text-align: center;
+      padding: 0 24px;
+      gap: 24px;
     }
 
-    .chat-viewport::-webkit-scrollbar {
-      width: 8px;
-    }
-
-    .chat-viewport::-webkit-scrollbar-thumb {
-      background-color: #333537;
-      border-radius: 4px;
-    }
-
-    /* Welcome Screen */
-    .welcome-screen {
-      max-width: 820px;
-      width: 100%;
-      margin: auto 0;
+    .center-logo-glow {
+      width: 64px;
+      height: 64px;
+      border-radius: 50%;
       display: flex;
-      flex-direction: column;
-      gap: 36px;
-      padding: 20px 0 40px;
+      align-items: center;
+      justify-content: center;
+      color: #ffffff;
+      filter: drop-shadow(0 0 16px rgba(168, 199, 250, 0.4));
+      animation: pulseGlow 3s ease-in-out infinite;
     }
 
-    .greeting-box h1 {
+    @keyframes pulseGlow {
+      0%, 100% { transform: scale(1); filter: drop-shadow(0 0 12px rgba(168, 199, 250, 0.3)); }
+      50% { transform: scale(1.05); filter: drop-shadow(0 0 22px rgba(168, 199, 250, 0.6)); }
+    }
+
+    .center-greeting {
       font-family: 'Outfit', sans-serif;
-      font-size: 52px;
+      font-size: 38px;
       font-weight: 500;
-      line-height: 1.15;
-      letter-spacing: -1px;
-      background: linear-gradient(90deg, #4285f4 0%, #9b72cb 45%, #d96570 85%);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-    }
-
-    .greeting-box p {
-      font-family: 'Outfit', sans-serif;
-      font-size: 48px;
-      font-weight: 500;
-      line-height: 1.15;
-      letter-spacing: -1px;
-      color: #444746;
-      margin-top: 4px;
-    }
-
-    .suggestions-grid {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 14px;
-    }
-
-    .suggestion-card {
-      background-color: var(--bg-card);
-      border-radius: 16px;
-      padding: 18px;
-      height: 180px;
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
-      cursor: pointer;
-      transition: background-color 0.2s, transform 0.15s;
-      border: 1px solid transparent;
-    }
-
-    .suggestion-card:hover {
-      background-color: var(--bg-card-hover);
-      border-color: var(--border-subtle);
-    }
-
-    .suggestion-card p {
-      font-size: 15px;
-      line-height: 1.45;
+      line-height: 1.25;
+      letter-spacing: -0.5px;
       color: var(--text-primary);
+      max-width: 500px;
     }
 
-    .card-icon {
-      width: 38px;
-      height: 38px;
-      border-radius: 50%;
-      background-color: #131314;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      align-self: flex-end;
-      color: var(--text-primary);
-    }
-
-    /* Messages Stream */
-    .messages-container {
-      max-width: 820px;
+    /* Bottom Floating Input Bar */
+    .bottom-input-container {
       width: 100%;
-      display: none;
-      flex-direction: column;
-      gap: 28px;
-      padding: 16px 0 32px;
-    }
-
-    .message-row {
-      display: flex;
-      gap: 18px;
-      width: 100%;
-      animation: fadeIn 0.25s ease;
-    }
-
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(6px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-
-    .message-row.user {
-      justify-content: flex-end;
-    }
-
-    .user-bubble {
-      background-color: #282a2c;
-      color: var(--text-primary);
-      padding: 14px 20px;
-      border-radius: 22px 22px 4px 22px;
-      max-width: 75%;
-      font-size: 15px;
-      line-height: 1.55;
-      white-space: pre-wrap;
-    }
-
-    .ai-avatar-wrap {
-      width: 34px;
-      height: 34px;
-      border-radius: 50%;
-      background-color: #000000;
-      border: 1px solid #2c2e30;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      flex-shrink: 0;
-      margin-top: 2px;
-    }
-
-    .ai-avatar-wrap.spinning svg {
-      animation: spinLogo 2.5s linear infinite;
-    }
-
-    @keyframes spinLogo {
-      from { transform: rotate(0deg); }
-      to { transform: rotate(360deg); }
-    }
-
-    .ai-content {
-      flex: 1;
-      font-size: 15.5px;
-      line-height: 1.65;
-      color: var(--text-primary);
-      padding-top: 4px;
-    }
-
-    .ai-actions {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      margin-top: 12px;
-    }
-
-    .ai-action-btn {
-      width: 32px;
-      height: 32px;
-      border-radius: 50%;
-      border: none;
-      background: transparent;
-      color: var(--text-secondary);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      cursor: pointer;
-      transition: background-color 0.15s, color 0.15s;
-    }
-
-    .ai-action-btn:hover {
-      background-color: var(--bg-hover);
-      color: var(--text-primary);
-    }
-
-    /* Bottom Prompt Input */
-    .input-section {
-      width: 100%;
-      max-width: 820px;
-      margin: 0 auto;
-      padding: 0 24px 14px;
+      max-width: 680px;
+      margin: 0 auto 24px;
+      padding: 0 20px;
       flex-shrink: 0;
     }
 
-    .prompt-box {
-      background-color: var(--bg-input);
-      border-radius: 28px;
-      padding: 12px 18px;
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-      border: 1px solid transparent;
-      transition: background-color 0.2s, border-color 0.2s;
-    }
-
-    .prompt-box:focus-within {
-      background-color: #242628;
-      border-color: #3c4043;
-    }
-
-    .prompt-textarea {
-      width: 100%;
-      background: transparent;
-      border: none;
-      outline: none;
-      color: var(--text-primary);
-      font-family: inherit;
-      font-size: 16px;
-      line-height: 1.5;
-      resize: none;
-      max-height: 180px;
-      min-height: 26px;
-      padding: 4px 6px;
-    }
-
-    .prompt-textarea::placeholder {
-      color: var(--text-secondary);
-    }
-
-    .prompt-toolbar {
+    .floating-prompt-box {
+      background-color: #1c1f26;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 32px;
+      padding: 8px 12px 8px 16px;
       display: flex;
       align-items: center;
-      justify-content: space-between;
+      gap: 12px;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+      transition: border-color 0.2s, background-color 0.2s;
     }
 
-    .toolbar-left, .toolbar-right {
-      display: flex;
-      align-items: center;
-      gap: 6px;
+    .floating-prompt-box:focus-within {
+      background-color: #232630;
+      border-color: rgba(168, 199, 250, 0.3);
     }
 
-    .tool-btn {
-      width: 38px;
-      height: 38px;
+    .tool-icon-btn {
+      width: 36px;
+      height: 36px;
       border-radius: 50%;
       border: none;
       background: transparent;
@@ -547,105 +207,104 @@
       justify-content: center;
       cursor: pointer;
       transition: background-color 0.2s, color 0.2s;
+      flex-shrink: 0;
     }
 
-    .tool-btn:hover {
-      background-color: #333537;
+    .tool-icon-btn:hover {
+      background: rgba(255, 255, 255, 0.08);
       color: var(--text-primary);
     }
 
-    .send-btn {
-      background-color: var(--accent-blue);
-      color: #062e6f;
-      display: none;
+    .prompt-input {
+      flex: 1;
+      background: transparent;
+      border: none;
+      outline: none;
+      color: var(--text-primary);
+      font-family: inherit;
+      font-size: 16px;
+      padding: 4px 0;
     }
 
-    .send-btn.visible {
-      display: flex;
-    }
-
-    .send-btn:hover {
-      background-color: #c2d7fb;
-      color: #062e6f;
-    }
-
-    .disclaimer {
-      text-align: center;
-      font-size: 12px;
+    .prompt-input::placeholder {
       color: var(--text-secondary);
-      margin-top: 10px;
     }
 
-    /* Dropdown Menu for Models */
-    .model-dropdown {
-      position: absolute;
-      top: 48px;
-      left: 0;
-      background-color: #282a2c;
-      border: 1px solid var(--border-subtle);
-      border-radius: 16px;
-      padding: 8px;
-      width: 260px;
-      display: none;
-      flex-direction: column;
-      gap: 4px;
-      box-shadow: 0 8px 24px rgba(0,0,0,0.45);
-      z-index: 50;
-    }
-
-    .model-dropdown.open {
+    .audio-btn {
+      background: #2b3142;
+      color: var(--accent-blue);
+      border-radius: 50%;
+      width: 38px;
+      height: 38px;
       display: flex;
+      align-items: center;
+      justify-content: center;
+      border: none;
+      cursor: pointer;
+      transition: background-color 0.2s;
+      flex-shrink: 0;
     }
 
-    .model-option {
+    .audio-btn:hover {
+      background: #353c52;
+    }
+
+    /* Sidebar Drawer */
+    .sidebar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 280px;
+      height: 100%;
+      background-color: var(--bg-sidebar);
+      z-index: 100;
+      transform: translateX(-100%);
+      transition: transform 0.3s cubic-bezier(0.2, 0, 0, 1);
+      display: flex;
+      flex-direction: column;
+      padding: 20px;
+      box-shadow: 4px 0 24px rgba(0,0,0,0.5);
+    }
+
+    .sidebar.open {
+      transform: translateX(0);
+    }
+
+    .sidebar-header {
       display: flex;
       align-items: center;
       justify-content: space-between;
-      padding: 10px 12px;
-      border-radius: 10px;
-      cursor: pointer;
-      transition: background-color 0.15s;
+      margin-bottom: 24px;
     }
 
-    .model-option:hover {
-      background-color: #333537;
-    }
-
-    .model-option-info h4 {
-      font-size: 14px;
-      font-weight: 500;
+    .sidebar-title {
+      font-family: 'Outfit', sans-serif;
+      font-size: 18px;
+      font-weight: 650;
       color: var(--text-primary);
     }
 
-    .model-option-info span {
-      font-size: 12px;
-      color: var(--text-secondary);
+    .overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.6);
+      z-index: 90;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s;
     }
 
-    @media (max-width: 850px) {
-      .suggestions-grid {
-        grid-template-columns: repeat(2, 1fr);
-      }
-      .greeting-box h1, .greeting-box p {
-        font-size: 36px;
-      }
+    .overlay.open {
+      opacity: 1;
+      pointer-events: auto;
     }
 
     @media (max-width: 600px) {
-      .sidebar {
-        position: fixed;
-        height: 100%;
-        transform: translateX(-100%);
-      }
-      .sidebar.mobile-open {
-        transform: translateX(0);
-      }
-      .suggestions-grid {
-        grid-template-columns: 1fr;
-      }
-      .suggestion-card {
-        height: auto;
-        gap: 12px;
+      .center-greeting {
+        font-size: 30px;
       }
     }
   </style>
@@ -672,449 +331,131 @@
     </defs>
   </svg>
 
-  <!-- Left Sidebar -->
+  <!-- Overlay -->
+  <div class="overlay" id="overlay"></div>
+
+  <!-- Sidebar Drawer -->
   <aside class="sidebar" id="sidebar">
-    <div class="sidebar-top">
-      <button class="icon-btn" id="menuToggle" title="Expandir menú">
-        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+    <div class="sidebar-header">
+      <span class="sidebar-title">Natsune IA</span>
+      <button class="icon-btn" id="closeSidebar">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <line x1="18" y1="6" x2="6" y2="18"></line>
+          <line x1="6" y1="6" x2="18" y2="18"></line>
+        </svg>
+      </button>
+    </div>
+    <div style="color: var(--text-secondary); font-size: 14px;">Historial y ajustes próximamente.</div>
+  </aside>
+
+  <!-- Top Header -->
+  <header class="top-bar">
+    <div class="top-left">
+      <button class="icon-btn" id="menuBtn" title="Menú">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
           <line x1="3" y1="6" x2="21" y2="6"></line>
           <line x1="3" y1="12" x2="21" y2="12"></line>
           <line x1="3" y1="18" x2="21" y2="18"></line>
         </svg>
       </button>
 
-      <button class="new-chat-btn" id="newChatBtn">
+      <button class="pill-dropdown" id="modelSelectBtn">
+        <span>Automático</span>
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+          <polyline points="6 9 12 15 18 9"></polyline>
+        </svg>
+      </button>
+    </div>
+
+    <div class="top-right">
+      <button class="icon-btn" title="Logotipo Natsune">
+        <svg width="22" height="22" viewBox="0 0 100 100">
+          <use href="#natsune-logo-shape"></use>
+        </svg>
+      </button>
+
+      <button class="action-pill" id="updateBtn">
+        <span>Actualizar</span>
+      </button>
+
+      <div class="user-avatar" title="Perfil">
+        <span>S</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- Center Assistant Screen -->
+  <main class="main-center">
+    <div class="center-logo-glow">
+      <svg width="52" height="52" viewBox="0 0 100 100">
+        <use href="#natsune-logo-shape"></use>
+      </svg>
+    </div>
+
+    <h1 class="center-greeting" id="greetingText">¿Cómo puedo ayudarte, Sally?</h1>
+  </main>
+
+  <!-- Bottom Input Bar -->
+  <div class="bottom-input-container">
+    <div class="floating-prompt-box">
+      <button class="tool-icon-btn" title="Adjuntar elemento">
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
           <line x1="12" y1="5" x2="12" y2="19"></line>
           <line x1="5" y1="12" x2="19" y2="12"></line>
         </svg>
-        <span class="hide-collapsed">Nuevo chat</span>
       </button>
 
-      <div class="recent-section hide-collapsed" id="recentList">
-        <div class="recent-title">Recientes</div>
-        <div class="recent-item active" onclick="loadSampleChat('Arquitectura de sistemas en la nube')">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
-          </svg>
-          <span>Arquitectura de sistemas en la nube</span>
-        </div>
-        <div class="recent-item" onclick="loadSampleChat('Ideas para interfaz minimalista')">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
-          </svg>
-          <span>Ideas para interfaz minimalista</span>
-        </div>
-        <div class="recent-item" onclick="loadSampleChat('Optimización de algoritmos en Python')">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
-          </svg>
-          <span>Optimización de algoritmos en Python</span>
-        </div>
-      </div>
-    </div>
+      <input 
+        type="text" 
+        class="prompt-input" 
+        id="promptInput" 
+        placeholder="Pedir a Natsune IA"
+      />
 
-    <div class="sidebar-bottom">
-      <div class="nav-item">
+      <button class="tool-icon-btn" title="Micrófono">
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <circle cx="12" cy="12" r="10"></circle>
-          <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path>
-          <line x1="12" y1="17" x2="12.01" y2="17"></line>
+          <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path>
+          <path d="M19 10v2a7 7 0 0 1-14 0v-2"></path>
+          <line x1="12" y1="19" x2="12" y2="23"></line>
+          <line x1="8" y1="23" x2="16" y2="23"></line>
         </svg>
-        <span class="hide-collapsed">Ayuda</span>
-      </div>
-      <div class="nav-item">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <circle cx="12" cy="12" r="10"></circle>
-          <polyline points="12 6 12 12 16 14"></polyline>
-        </svg>
-        <span class="hide-collapsed">Actividad</span>
-      </div>
-      <div class="nav-item">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <circle cx="12" cy="12" r="3"></circle>
-          <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
-        </svg>
-        <span class="hide-collapsed">Configuración</span>
-      </div>
+      </button>
 
-      <div class="location-info hide-collapsed">
-        <span class="dot"></span>
-        <span>Santiago, Chile • Según tu dirección IP</span>
-      </div>
+      <button class="audio-btn" title="Entrada de voz avanzada">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+          <line x1="18" y1="20" x2="18" y2="4"></line>
+          <line x1="12" y1="16" x2="12" y2="8"></line>
+          <line x1="6" y1="13" x2="6" y2="11"></line>
+        </svg>
+      </button>
     </div>
-  </aside>
-
-  <!-- Main Workspace -->
-  <main class="main-container">
-    <!-- Top Header -->
-    <header class="top-bar">
-      <div class="brand-selector" id="brandDropdownTrigger">
-        <svg width="26" height="26" viewBox="0 0 100 100" style="color: #ffffff;">
-          <use href="#natsune-logo-shape"></use>
-        </svg>
-        <span class="brand-title">Natsune IA</span>
-        <span class="model-badge" id="currentModelTag">2.5 Flash</span>
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color: var(--text-secondary);">
-          <polyline points="6 9 12 15 18 9"></polyline>
-        </svg>
-
-        <!-- Model Switcher Dropdown -->
-        <div class="model-dropdown" id="modelDropdown">
-          <div class="model-option" onclick="selectModel('2.5 Flash', event)">
-            <div class="model-option-info">
-              <h4>Natsune IA 2.5 Flash</h4>
-              <span>Respuestas rápidas para el día a día</span>
-            </div>
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#a8c7fa" stroke-width="2.5">
-              <polyline points="20 6 9 17 4 12"></polyline>
-            </svg>
-          </div>
-          <div class="model-option" onclick="selectModel('2.5 Pro', event)">
-            <div class="model-option-info">
-              <h4>Natsune IA 2.5 Pro</h4>
-              <span>Razonamiento avanzado y código complejo</span>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div class="top-actions">
-        <button class="pro-pill">
-          <svg width="16" height="16" viewBox="0 0 100 100" style="color: #d3b3ff;">
-            <use href="#natsune-logo-shape"></use>
-          </svg>
-          <span>Probar Natsune Advanced</span>
-        </button>
-        <div class="avatar" title="Perfil de Usuario">N</div>
-      </div>
-    </header>
-
-    <!-- Scrollable Chat Viewport -->
-    <div class="chat-viewport" id="chatViewport">
-      
-      <!-- Initial Greeting Screen -->
-      <div class="welcome-screen" id="welcomeScreen">
-        <div class="greeting-box">
-          <h1>Hola, usuario</h1>
-          <p>¿En qué puedo ayudarte hoy?</p>
-        </div>
-
-        <div class="suggestions-grid">
-          <div class="suggestion-card" onclick="useSuggestion('Crea un plan de entrenamiento semanal enfocado en resistencia y fuerza')">
-            <p>Crea un plan de entrenamiento semanal enfocado en resistencia y fuerza</p>
-            <div class="card-icon">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <circle cx="12" cy="12" r="10"></circle>
-                <polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"></polygon>
-              </svg>
-            </div>
-          </div>
-
-          <div class="suggestion-card" onclick="useSuggestion('Explícame cómo funciona la computación cuántica en términos sencillos')">
-            <p>Explícame cómo funciona la computación cuántica en términos sencillos</p>
-            <div class="card-icon">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M9 18h6"></path>
-                <path d="M10 22h4"></path>
-                <path d="M12 2a7 7 0 0 1 7 7c0 2.38-1.19 4.47-3 5.74V17a1 1 0 0 1-1 1H9a1 1 0 0 1-1-1v-2.26C6.19 13.47 5 11.38 5 9a7 7 0 0 1 7-7z"></path>
-              </svg>
-            </div>
-          </div>
-
-          <div class="suggestion-card" onclick="useSuggestion('Escribe un script en Python para organizar archivos automáticamente por extensión')">
-            <p>Escribe un script en Python para organizar archivos por extensión</p>
-            <div class="card-icon">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <polyline points="16 18 22 12 16 6"></polyline>
-                <polyline points="8 6 2 12 8 18"></polyline>
-              </svg>
-            </div>
-          </div>
-
-          <div class="suggestion-card" onclick="useSuggestion('Redacta un correo profesional para presentar un nuevo proyecto tecnológico')">
-            <p>Redacta un correo profesional para presentar un nuevo proyecto tecnológico</p>
-            <div class="card-icon">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M12 20h9"></path>
-                <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path>
-              </svg>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Active Conversation Stream -->
-      <div class="messages-container" id="messagesContainer"></div>
-
-    </div>
-
-    <!-- Bottom Prompt Input Bar -->
-    <div class="input-section">
-      <div class="prompt-box">
-        <textarea 
-          id="promptInput" 
-          class="prompt-textarea" 
-          rows="1" 
-          placeholder="Pregúntale a Natsune IA..."
-        ></textarea>
-
-        <div class="prompt-toolbar">
-          <div class="toolbar-left">
-            <button class="tool-btn" title="Añadir archivos o imágenes">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <line x1="12" y1="5" x2="12" y2="19"></line>
-                <line x1="5" y1="12" x2="19" y2="12"></line>
-              </svg>
-            </button>
-            <button class="tool-btn" title="Subir imagen">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
-                <circle cx="8.5" cy="8.5" r="1.5"></circle>
-                <polyline points="21 15 16 10 5 21"></polyline>
-              </svg>
-            </button>
-          </div>
-
-          <div class="toolbar-right">
-            <button class="tool-btn" id="micBtn" title="Usar micrófono">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path>
-                <path d="M19 10v2a7 7 0 0 1-14 0v-2"></path>
-                <line x1="12" y1="19" x2="12" y2="23"></line>
-                <line x1="8" y1="23" x2="16" y2="23"></line>
-              </svg>
-            </button>
-
-            <button class="tool-btn send-btn" id="sendBtn" title="Enviar mensaje">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
-                <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"></path>
-              </svg>
-            </button>
-          </div>
-        </div>
-      </div>
-
-      <p class="disclaimer">
-        Natsune IA puede cometer errores, así que verifica sus respuestas.
-      </p>
-    </div>
-  </main>
+  </div>
 
   <script>
+    const menuBtn = document.getElementById('menuBtn');
+    const closeSidebar = document.getElementById('closeSidebar');
     const sidebar = document.getElementById('sidebar');
-    const menuToggle = document.getElementById('menuToggle');
-    const promptInput = document.getElementById('promptInput');
-    const sendBtn = document.getElementById('sendBtn');
-    const welcomeScreen = document.getElementById('welcomeScreen');
-    const messagesContainer = document.getElementById('messagesContainer');
-    const chatViewport = document.getElementById('chatViewport');
-    const newChatBtn = document.getElementById('newChatBtn');
-    const brandDropdownTrigger = document.getElementById('brandDropdownTrigger');
-    const modelDropdown = document.getElementById('modelDropdown');
-    const currentModelTag = document.getElementById('currentModelTag');
-    const recentList = document.getElementById('recentList');
+    const overlay = document.getElementById('overlay');
+    const updateBtn = document.getElementById('updateBtn');
 
-    // Toggle Sidebar Collapse
-    menuToggle.addEventListener('click', () => {
-      if (window.innerWidth <= 600) {
-        sidebar.classList.toggle('mobile-open');
-      } else {
-        sidebar.classList.toggle('collapsed');
-      }
+    menuBtn.addEventListener('click', () => {
+      sidebar.classList.add('open');
+      overlay.classList.add('open');
     });
 
-    // Model Dropdown Toggle
-    brandDropdownTrigger.addEventListener('click', (e) => {
-      e.stopPropagation();
-      modelDropdown.classList.toggle('open');
+    closeSidebar.addEventListener('click', () => {
+      sidebar.classList.remove('open');
+      overlay.classList.remove('open');
     });
 
-    document.addEventListener('click', () => {
-      modelDropdown.classList.remove('open');
+    overlay.addEventListener('click', () => {
+      sidebar.classList.remove('open');
+      overlay.classList.remove('open');
     });
 
-    function selectModel(modelName, event) {
-      event.stopPropagation();
-      currentModelTag.textContent = modelName;
-      modelDropdown.classList.remove('open');
-    }
-
-    // Auto-resize textarea & show/hide send button
-    promptInput.addEventListener('input', () => {
-      promptInput.style.height = 'auto';
-      promptInput.style.height = promptInput.scrollHeight + 'px';
-
-      if (promptInput.value.trim().length > 0) {
-        sendBtn.classList.add('visible');
-      } else {
-        sendBtn.classList.remove('visible');
-      }
+    updateBtn.addEventListener('click', () => {
+      location.reload();
     });
-
-    // Send on Enter (Shift+Enter for newline)
-    promptInput.addEventListener('keydown', (e) => {
-      if (e.key === 'Enter' && !e.shiftKey) {
-        e.preventDefault();
-        handleSendMessage();
-      }
-    });
-
-    sendBtn.addEventListener('click', handleSendMessage);
-
-    // New Chat Reset
-    newChatBtn.addEventListener('click', () => {
-      messagesContainer.innerHTML = '';
-      messagesContainer.style.display = 'none';
-      welcomeScreen.style.display = 'flex';
-      promptInput.value = '';
-      promptInput.style.height = 'auto';
-      sendBtn.classList.remove('visible');
-    });
-
-    function useSuggestion(text) {
-      promptInput.value = text;
-      promptInput.dispatchEvent(new Event('input'));
-      handleSendMessage();
-    }
-
-    function loadSampleChat(title) {
-      welcomeScreen.style.display = 'none';
-      messagesContainer.style.display = 'flex';
-      messagesContainer.innerHTML = '';
-      appendUserMessage(title);
-      appendAIResponse(`Aquí tienes un análisis detallado sobre **${title}** preparado por **Natsune IA**.\n\n1. **Estructura base:** Definición de objetivos y requerimientos técnicos.\n2. **Escalabilidad:** Implementación modular para mantener un alto rendimiento.\n3. **Siguiente paso:** ¿Te gustaría profundizar en algún punto específico o ver ejemplos prácticos?`);
-    }
-
-    function handleSendMessage() {
-      const text = promptInput.value.trim();
-      if (!text) return;
-
-      // Hide welcome screen and show stream
-      if (welcomeScreen.style.display !== 'none') {
-        welcomeScreen.style.display = 'none';
-        messagesContainer.style.display = 'flex';
-        addRecentItem(text);
-      }
-
-      appendUserMessage(text);
-
-      // Reset input
-      promptInput.value = '';
-      promptInput.style.height = 'auto';
-      sendBtn.classList.remove('visible');
-
-      // Simulate Natsune IA thinking & responding
-      const loaderId = appendLoadingIndicator();
-
-      setTimeout(() => {
-        removeElement(loaderId);
-        const reply = generateSimulatedReply(text);
-        appendAIResponse(reply);
-      }, 900);
-    }
-
-    function appendUserMessage(text) {
-      const row = document.createElement('div');
-      row.className = 'message-row user';
-      row.innerHTML = `<div class="user-bubble">${escapeHTML(text)}</div>`;
-      messagesContainer.appendChild(row);
-      scrollToBottom();
-    }
-
-    function appendLoadingIndicator() {
-      const id = 'loader-' + Date.now();
-      const row = document.createElement('div');
-      row.className = 'message-row';
-      row.id = id;
-      row.innerHTML = `
-        <div class="ai-avatar-wrap spinning">
-          <svg width="20" height="20" viewBox="0 0 100 100" style="color: #ffffff;">
-            <use href="#natsune-logo-shape"></use>
-          </svg>
-        </div>
-        <div class="ai-content" style="color: var(--text-secondary);">Procesando con Natsune IA...</div>
-      `;
-      messagesContainer.appendChild(row);
-      scrollToBottom();
-      return id;
-    }
-
-    function appendAIResponse(text) {
-      const row = document.createElement('div');
-      row.className = 'message-row';
-
-      const formattedText = escapeHTML(text)
-        .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
-        .replace(/\n/g, '<br>');
-
-      row.innerHTML = `
-        <div class="ai-avatar-wrap">
-          <svg width="20" height="20" viewBox="0 0 100 100" style="color: #ffffff;">
-            <use href="#natsune-logo-shape"></use>
-          </svg>
-        </div>
-        <div class="ai-content">
-          <div>${formattedText}</div>
-          <div class="ai-actions">
-            <button class="ai-action-btn" title="Me gusta">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3zM7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3"></path>
-              </svg>
-            </button>
-            <button class="ai-action-btn" title="No me gusta">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M10 15v4a3 3 0 0 0 3 3l4-9V2H5.72a2 2 0 0 0-2 1.7l-1.38 9a2 2 0 0 0 2 2.3zm7-13h2.67A2.31 2.31 0 0 1 22 4v7a2.31 2.31 0 0 1-2.33 2H17"></path>
-              </svg>
-            </button>
-            <button class="ai-action-btn" title="Copiar respuesta" onclick="navigator.clipboard.writeText(this.parentElement.previousElementSibling.innerText)">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
-                <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
-              </svg>
-            </button>
-          </div>
-        </div>
-      `;
-      messagesContainer.appendChild(row);
-      scrollToBottom();
-    }
-
-    function addRecentItem(title) {
-      const item = document.createElement('div');
-      item.className = 'recent-item active';
-      item.innerHTML = `
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
-        </svg>
-        <span>${escapeHTML(title)}</span>
-      `;
-      const titleEl = recentList.querySelector('.recent-title');
-      titleEl.insertAdjacentElement('afterend', item);
-    }
-
-    function generateSimulatedReply(prompt) {
-      return `¡Hola! Soy **Natsune IA**.\n\nHe recibido tu consulta sobre: *"${prompt}"*.\n\nEsta interfaz está lista para conectarse a tu backend o API de inteligencia artificial favorita. Puedes enviar más mensajes, cambiar entre los modelos **2.5 Flash** y **2.5 Pro** en la parte superior, o iniciar nuevas conversaciones desde el menú lateral.`;
-    }
-
-    function removeElement(id) {
-      const el = document.getElementById(id);
-      if (el) el.remove();
-    }
-
-    function scrollToBottom() {
-      chatViewport.scrollTop = chatViewport.scrollHeight;
-    }
-
-    function escapeHTML(str) {
-      return str.replace(/[&<>'"]/g, tag => ({
-        '&': '&amp;',
-        '<': '&lt;',
-        '>': '&gt;',
-        "'": '&#39;',
-        '"': '&quot;'
-      }[tag]));
-    }
   </script>
 </body>
 </html>
