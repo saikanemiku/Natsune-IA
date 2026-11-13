@@ -190,7 +190,6 @@
       margin-top: 2px;
     }
 
-    /* Profile Card Inside Dropdown */
     .profile-header {
       display: flex;
       align-items: center;
@@ -258,7 +257,6 @@
       margin-top: 4px;
     }
 
-    /* Main Viewport */
     .chat-viewport {
       flex: 1;
       overflow-y: auto;
@@ -277,7 +275,6 @@
       border-radius: 4px;
     }
 
-    /* Center Welcome Screen */
     .main-center {
       flex: 1;
       display: flex;
@@ -324,7 +321,6 @@
       max-width: 460px;
     }
 
-    /* Messages Stream */
     .messages-container {
       width: 100%;
       max-width: 720px;
@@ -437,7 +433,6 @@
       overflow-y: auto;
     }
 
-    /* Attached preview in input container */
     .attachment-preview {
       display: none;
       align-items: center;
@@ -484,7 +479,6 @@
       color: var(--danger);
     }
 
-    /* Bottom Floating Input Bar */
     .bottom-input-container {
       width: 100%;
       max-width: 720px;
@@ -579,7 +573,6 @@
       transform: scale(0.93);
     }
 
-    /* Attach Menu */
     .attach-popover {
       position: absolute;
       bottom: 78px;
@@ -601,7 +594,6 @@
       animation: popIn 0.15s ease-out;
     }
 
-    /* Sidebar Drawer */
     .sidebar {
       position: fixed;
       top: 0;
@@ -661,7 +653,6 @@
       background: rgba(0, 242, 254, 0.2);
     }
 
-    /* History Header with Multi-Select Controls */
     .history-header-bar {
       display: flex;
       align-items: center;
@@ -899,8 +890,8 @@
     </div>
 
     <div class="top-right">
-      <!-- Natsune IA Avatar Button (Also allows changing Natsune's profile picture) -->
-      <button type="button" class="icon-btn" id="aiProfileBtn" title="Cambiar foto de Natsune IA">
+      <!-- Natsune IA Official Logo Button (Fixed branding) -->
+      <button type="button" class="icon-btn" id="aiProfileBtn" title="Natsune IA Oficial" style="cursor: default;">
         <svg width="22" height="22" viewBox="0 0 100 100">
           <use href="#natsune-logo-shape"></use>
         </svg>
@@ -925,9 +916,8 @@
           <input type="text" id="userNameInput" class="profile-input" value="Sally" maxlength="24" />
         </div>
         <div class="profile-input-group">
-          <label>Fotos de perfil</label>
+          <label>Foto de perfil personal</label>
           <button type="button" class="btn-secondary" id="changeUserPhotoBtn">Cambiar tu foto de perfil</button>
-          <button type="button" class="btn-secondary" id="changeAiPhotoBtn">Cambiar foto de Natsune IA</button>
         </div>
         <button type="button" class="save-profile-btn" id="saveProfileBtn">Guardar cambios</button>
       </div>
@@ -967,9 +957,6 @@
       </div>
       <div class="dropdown-item" id="optUploadFile">
         <span>Subir archivo para leer</span>
-      </div>
-      <div class="dropdown-item" id="optUploadAiAvatar">
-        <span>Cambiar foto de Natsune IA</span>
       </div>
     </div>
 
@@ -1012,19 +999,11 @@
     </div>
   </div>
 
+  <!-- CONEXIÓN CON EL CEREBRO SEPARADO (brain.js) -->
+  <script src="brain.js"></script>
   <script>
     document.addEventListener('DOMContentLoaded', () => {
-      // State
-      let userName = localStorage.getItem('natsune_user_name') || 'Sally';
-      let userAvatarData = localStorage.getItem('natsune_user_avatar') || null;
-      let aiAvatarData = localStorage.getItem('natsune_ai_avatar') || null;
-      let chats = JSON.parse(localStorage.getItem('natsune_chats') || 'null') || [
-        { id: 'c1', title: 'Análisis de documentos', messages: [] },
-        { id: 'c2', title: 'Ideas creativas con Natsune', messages: [] }
-      ];
-      let activeChatId = null;
-      let currentAttachment = null; // { name, type, isImage, dataUrl, textContent, imageDimensions }
-      let selectMode = false;
+      const brain = window.natsuneBrain;
 
       // DOM Elements
       const sidebar = document.getElementById('sidebar');
@@ -1041,27 +1020,21 @@
       const modelDropdown = document.getElementById('modelDropdown');
       const currentModelName = document.getElementById('currentModelName');
 
-      const aiProfileBtn = document.getElementById('aiProfileBtn');
       const profileBtn = document.getElementById('profileBtn');
       const profileDropdown = document.getElementById('profileDropdown');
       const userNameInput = document.getElementById('userNameInput');
       const profileDisplayName = document.getElementById('profileDisplayName');
       const popoverAvatar = document.getElementById('popoverAvatar');
       const greetingText = document.getElementById('greetingText');
-      const centerAiAvatar = document.getElementById('centerAiAvatar');
-      const sidebarBrandLogo = document.getElementById('sidebarBrandLogo');
 
       const changeUserPhotoBtn = document.getElementById('changeUserPhotoBtn');
-      const changeAiPhotoBtn = document.getElementById('changeAiPhotoBtn');
       const saveProfileBtn = document.getElementById('saveProfileBtn');
       const userAvatarSelector = document.getElementById('userAvatarSelector');
-      const aiAvatarSelector = document.getElementById('aiAvatarSelector');
 
       const attachBtn = document.getElementById('attachBtn');
       const attachPopover = document.getElementById('attachPopover');
       const optUploadImage = document.getElementById('optUploadImage');
       const optUploadFile = document.getElementById('optUploadFile');
-      const optUploadAiAvatar = document.getElementById('optUploadAiAvatar');
       const fileInputSelector = document.getElementById('fileInputSelector');
 
       const attachmentPreview = document.getElementById('attachmentPreview');
@@ -1080,56 +1053,37 @@
       const messagesContainer = document.getElementById('messagesContainer');
       const chatViewport = document.getElementById('chatViewport');
 
-      // Initialize UI
-      function renderUserIdentity() {
-        userNameInput.value = userName;
-        profileDisplayName.textContent = userName;
-        greetingText.textContent = `¿Cómo puedo ayudarte, ${userName}?`;
-        const initial = userName.charAt(0).toUpperCase();
+      let currentAttachment = null;
+      let selectMode = false;
 
-        if (userAvatarData) {
-          profileBtn.innerHTML = `<img src="${userAvatarData}" alt="Usuario" />`;
-          popoverAvatar.innerHTML = `<img src="${userAvatarData}" alt="Usuario" />`;
+      function renderUserIdentity() {
+        userNameInput.value = brain.userName;
+        profileDisplayName.textContent = brain.userName;
+        greetingText.textContent = `¿Cómo puedo ayudarte, ${brain.userName}?`;
+        const initial = brain.userName.charAt(0).toUpperCase();
+
+        if (brain.userAvatar) {
+          profileBtn.innerHTML = `<img src="${brain.userAvatar}" alt="Usuario" />`;
+          popoverAvatar.innerHTML = `<img src="${brain.userAvatar}" alt="Usuario" />`;
         } else {
           profileBtn.innerHTML = `<span>${initial}</span>`;
           popoverAvatar.innerHTML = `<span>${initial}</span>`;
         }
       }
 
-      function renderAiIdentity() {
-        if (aiAvatarData) {
-          aiProfileBtn.innerHTML = `<img src="${aiAvatarData}" alt="Natsune IA" />`;
-          centerAiAvatar.innerHTML = `<img src="${aiAvatarData}" alt="Natsune IA" />`;
-          sidebarBrandLogo.innerHTML = `<img src="${aiAvatarData}" style="width:24px;height:24px;border-radius:50%;object-fit:cover;" alt="Natsune IA" />`;
-        } else {
-          const svgMarkup = `<svg width="22" height="22" viewBox="0 0 100 100"><use href="#natsune-logo-shape"></use></svg>`;
-          aiProfileBtn.innerHTML = svgMarkup;
-          centerAiAvatar.innerHTML = `<svg width="56" height="56" viewBox="0 0 100 100"><use href="#natsune-logo-shape"></use></svg>`;
-          sidebarBrandLogo.innerHTML = `<svg width="24" height="24" viewBox="0 0 100 100"><use href="#natsune-logo-shape"></use></svg>`;
-        }
-      }
-
       function getAiAvatarSmallHTML(spinning = false) {
         const cls = spinning ? 'ai-avatar spinning' : 'ai-avatar';
-        if (aiAvatarData) {
-          return `<div class="${cls}"><img src="${aiAvatarData}" alt="Natsune" /></div>`;
-        }
         return `<div class="${cls}"><svg width="18" height="18" viewBox="0 0 100 100" style="color: ${spinning ? 'var(--cyan-neon)' : '#fff'};"><use href="#natsune-logo-shape"></use></svg></div>`;
-      }
-
-      // Sidebar & Chat History Management
-      function saveChats() {
-        localStorage.setItem('natsune_chats', JSON.stringify(chats));
       }
 
       function renderHistory() {
         historyList.innerHTML = '';
-        if (chats.length === 0) {
+        if (brain.chats.length === 0) {
           historyList.innerHTML = `<div style="color:var(--text-secondary); font-size:13px; padding:10px 6px;">No hay chats guardados.</div>`;
           return;
         }
 
-        chats.forEach(chat => {
+        brain.chats.forEach(chat => {
           const item = document.createElement('div');
           item.className = 'history-item';
 
@@ -1158,7 +1112,9 @@
           `;
           delBtn.addEventListener('click', (e) => {
             e.stopPropagation();
-            deleteSingleChat(chat.id);
+            brain.deleteChat(chat.id);
+            if (brain.activeChatId === chat.id) resetToNewChat();
+            renderHistory();
           });
 
           item.addEventListener('click', () => {
@@ -1178,13 +1134,14 @@
         updateBulkDeleteCounter();
       }
 
-      function deleteSingleChat(id) {
-        chats = chats.filter(c => c.id !== id);
-        saveChats();
-        if (activeChatId === id) {
-          resetToNewChat();
+      function updateBulkDeleteCounter() {
+        const checked = historyList.querySelectorAll('.chat-checkbox:checked');
+        selectedCountSpan.textContent = checked.length;
+        if (selectMode && checked.length > 0) {
+          deleteSelectedBtn.classList.add('visible');
+        } else {
+          deleteSelectedBtn.classList.remove('visible');
         }
-        renderHistory();
       }
 
       toggleSelectModeBtn.addEventListener('click', (e) => {
@@ -1198,25 +1155,12 @@
         updateBulkDeleteCounter();
       });
 
-      function updateBulkDeleteCounter() {
-        const checked = historyList.querySelectorAll('.chat-checkbox:checked');
-        selectedCountSpan.textContent = checked.length;
-        if (selectMode && checked.length > 0) {
-          deleteSelectedBtn.classList.add('visible');
-        } else {
-          deleteSelectedBtn.classList.remove('visible');
-        }
-      }
-
       deleteSelectedBtn.addEventListener('click', (e) => {
         e.stopPropagation();
         const checkedIds = Array.from(historyList.querySelectorAll('.chat-checkbox:checked')).map(cb => cb.dataset.chatId);
         if (checkedIds.length === 0) return;
-        chats = chats.filter(c => !checkedIds.includes(c.id));
-        saveChats();
-        if (checkedIds.includes(activeChatId)) {
-          resetToNewChat();
-        }
+        brain.deleteMultipleChats(checkedIds);
+        if (!brain.activeChatId) resetToNewChat();
         selectMode = false;
         historyList.classList.remove('select-mode');
         toggleSelectModeBtn.textContent = 'Seleccionar';
@@ -1224,9 +1168,9 @@
       });
 
       function openChat(id) {
-        const chat = chats.find(c => c.id === id);
+        const chat = brain.chats.find(c => c.id === id);
         if (!chat) return;
-        activeChatId = id;
+        brain.activeChatId = id;
         closeSidebarDrawer();
         welcomeScreen.style.display = 'none';
         messagesContainer.style.display = 'flex';
@@ -1234,7 +1178,7 @@
 
         if (chat.messages.length === 0) {
           appendUserBubble(chat.title, null);
-          appendAiBubble(`Hola ${userName}, hemos retomado "${chat.title}" en **${currentModelName.textContent}**. ¿Qué deseas hacer ahora?`, null);
+          appendAiBubble(`Hola ${brain.userName}, hemos retomado "${chat.title}" en **${currentModelName.textContent}**. ¿Qué deseas hacer ahora?`, null);
         } else {
           chat.messages.forEach(msg => {
             if (msg.role === 'user') {
@@ -1247,7 +1191,7 @@
       }
 
       function resetToNewChat() {
-        activeChatId = null;
+        brain.activeChatId = null;
         messagesContainer.innerHTML = '';
         messagesContainer.style.display = 'none';
         welcomeScreen.style.display = 'flex';
@@ -1278,16 +1222,13 @@
         closeSidebarDrawer();
       });
 
-      // Popovers Management
       function closeAllPopovers() {
         modelDropdown.classList.remove('open');
         profileDropdown.classList.remove('open');
         attachPopover.classList.remove('open');
       }
 
-      document.addEventListener('click', () => {
-        closeAllPopovers();
-      });
+      document.addEventListener('click', closeAllPopovers);
 
       modelSelectBtn.addEventListener('click', (e) => {
         e.stopPropagation();
@@ -1304,7 +1245,6 @@
         });
       });
 
-      // Profile & Avatars Management
       profileBtn.addEventListener('click', (e) => {
         e.stopPropagation();
         const wasOpen = profileDropdown.classList.contains('open');
@@ -1313,35 +1253,15 @@
       });
 
       profileDropdown.addEventListener('click', (e) => e.stopPropagation());
-
-      aiProfileBtn.addEventListener('click', (e) => {
-        e.stopPropagation();
-        aiAvatarSelector.click();
-      });
-
       changeUserPhotoBtn.addEventListener('click', () => userAvatarSelector.click());
-      changeAiPhotoBtn.addEventListener('click', () => aiAvatarSelector.click());
 
       userAvatarSelector.addEventListener('change', (e) => {
         const file = e.target.files[0];
         if (!file) return;
         const reader = new FileReader();
         reader.onload = (evt) => {
-          userAvatarData = evt.target.result;
-          localStorage.setItem('natsune_user_avatar', userAvatarData);
+          brain.setUserAvatar(evt.target.result);
           renderUserIdentity();
-        };
-        reader.readAsDataURL(file);
-      });
-
-      aiAvatarSelector.addEventListener('change', (e) => {
-        const file = e.target.files[0];
-        if (!file) return;
-        const reader = new FileReader();
-        reader.onload = (evt) => {
-          aiAvatarData = evt.target.result;
-          localStorage.setItem('natsune_ai_avatar', aiAvatarData);
-          renderAiIdentity();
         };
         reader.readAsDataURL(file);
       });
@@ -1349,14 +1269,12 @@
       saveProfileBtn.addEventListener('click', () => {
         const val = userNameInput.value.trim();
         if (val) {
-          userName = val;
-          localStorage.setItem('natsune_user_name', userName);
+          brain.setUserName(val);
           renderUserIdentity();
         }
         closeAllPopovers();
       });
 
-      // Attachments & Real File/Image Reading
       attachBtn.addEventListener('click', (e) => {
         e.stopPropagation();
         const wasOpen = attachPopover.classList.contains('open');
@@ -1376,11 +1294,6 @@
         closeAllPopovers();
         fileInputSelector.accept = '.txt,.md,.json,.csv,.js,.html,.css,.py,.xml,.log,*/*';
         fileInputSelector.click();
-      });
-
-      optUploadAiAvatar.addEventListener('click', () => {
-        closeAllPopovers();
-        aiAvatarSelector.click();
       });
 
       fileInputSelector.addEventListener('change', (e) => {
@@ -1412,7 +1325,6 @@
           };
           reader.readAsDataURL(file);
         } else {
-          // Read actual text content of file
           const reader = new FileReader();
           reader.onload = (evt) => {
             currentAttachment = {
@@ -1420,17 +1332,6 @@
               type: file.type || 'Archivo de texto/datos',
               isImage: false,
               textContent: evt.target.result || ''
-            };
-            previewThumb.style.display = 'none';
-            attachmentPreview.style.display = 'flex';
-            updateInputButtonState();
-          };
-          reader.onerror = () => {
-            currentAttachment = {
-              name: file.name,
-              type: file.type || 'Archivo binario',
-              isImage: false,
-              textContent: null
             };
             previewThumb.style.display = 'none';
             attachmentPreview.style.display = 'flex';
@@ -1449,7 +1350,6 @@
 
       removeAttachBtn.addEventListener('click', clearAttachment);
 
-      // Input & Messaging
       promptBox.addEventListener('click', (e) => {
         if (e.target === promptBox) promptInput.focus();
       });
@@ -1482,18 +1382,14 @@
         } else {
           promptInput.placeholder = 'Escuchando tu voz...';
           promptInput.focus();
-          setTimeout(() => {
-            promptInput.placeholder = 'Pedir a Natsune IA';
-          }, 2000);
+          setTimeout(() => { promptInput.placeholder = 'Pedir a Natsune IA'; }, 2000);
         }
       });
 
       micBtn.addEventListener('click', () => {
         promptInput.placeholder = 'Habla ahora...';
         promptInput.focus();
-        setTimeout(() => {
-          promptInput.placeholder = 'Pedir a Natsune IA';
-        }, 2000);
+        setTimeout(() => { promptInput.placeholder = 'Pedir a Natsune IA'; }, 2000);
       });
 
       function sendMessage() {
@@ -1501,25 +1397,13 @@
         const att = currentAttachment;
         if (!text && !att) return;
 
-        // Create chat if none active
-        if (!activeChatId) {
-          activeChatId = 'chat-' + Date.now();
-          const title = text || `Archivo: ${att.name}`;
-          chats.unshift({ id: activeChatId, title: title, messages: [] });
-          saveChats();
-          renderHistory();
-        }
-
         if (welcomeScreen.style.display !== 'none') {
           welcomeScreen.style.display = 'none';
           messagesContainer.style.display = 'flex';
         }
 
-        const currentChat = chats.find(c => c.id === activeChatId);
-        if (currentChat) {
-          currentChat.messages.push({ role: 'user', text: text, attachment: att });
-          saveChats();
-        }
+        brain.addMessageToActive('user', text, att);
+        renderHistory();
 
         appendUserBubble(text, att);
         promptInput.value = '';
@@ -1530,45 +1414,10 @@
           const loader = document.getElementById(loaderId);
           if (loader) loader.remove();
 
-          const analysis = generateSmartResponse(text, att);
-          if (currentChat) {
-            currentChat.messages.push({ role: 'ai', text: analysis.reply, codePreview: analysis.snippet });
-            saveChats();
-          }
-          appendAiBubble(analysis.reply, analysis.snippet);
+          const result = brain.processResponse(text, att, currentModelName.textContent);
+          brain.addMessageToActive('ai', result.reply, null, result.snippet);
+          appendAiBubble(result.reply, result.snippet);
         }, 700);
-      }
-
-      function generateSmartResponse(text, att) {
-        const model = currentModelName.textContent;
-        if (att && att.isImage) {
-          return {
-            reply: `He recibido y analizado tu imagen **${att.name}** (${att.dimensions}) usando **${model}**.\n\n${text ? `Respecto a tu indicación *"${text}"*: ` : ''}La imagen se ha cargado correctamente en la sesión. Puedo ayudarte a describirla, extraer ideas de diseño o trabajar sobre ella.`,
-            snippet: null
-          };
-        }
-
-        if (att && !att.isImage) {
-          if (att.textContent && att.textContent.trim().length > 0) {
-            const lines = att.textContent.split('\n').length;
-            const chars = att.textContent.length;
-            const preview = att.textContent.slice(0, 450) + (att.textContent.length > 450 ? '\n... [contenido truncado]' : '');
-            return {
-              reply: `He leído el archivo **${att.name}** (${lines} líneas, ${chars} caracteres) con **${model}**.\n\n${text ? `Sobre tu consulta *"${text}"*: ` : ''}Aquí tienes un extracto de lo que contiene el documento:`,
-              snippet: preview
-            };
-          } else {
-            return {
-              reply: `He recibido el archivo **${att.name}** en **${model}**. ¿Qué operación específica deseas realizar con él?`,
-              snippet: null
-            };
-          }
-        }
-
-        return {
-          reply: `¡Hola ${userName}! Soy **Natsune IA** (${model}). He recibido: "${text}". ¿En qué más puedo ayudarte?`,
-          snippet: null
-        };
       }
 
       function appendUserBubble(text, att) {
@@ -1637,9 +1486,8 @@
         }[tag]));
       }
 
-      // Boot
+      // Initial render
       renderUserIdentity();
-      renderAiIdentity();
       renderHistory();
     });
   </script>
