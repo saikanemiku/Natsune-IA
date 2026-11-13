@@ -219,7 +219,7 @@
     </div>
 
     <!-- ============================================================================ -->
-    <!-- CEREBRO INTELIGENTE DE NATSUNE (Sin acentos estrictos + Búsqueda Web Abierta) -->
+    <!-- CEREBRO INTELIGENTE DE NATSUNE (IA Silenciosa + Sin frases robóticas)       -->
     <!-- ============================================================================ -->
     <script>
         const natsuneNicknames = [
@@ -237,63 +237,76 @@
             return randomNick;
         }
 
-        // --- 1. BÚSQUEDA WEB MULTISITIO Y ABIERTA ---
-        async function searchWebNatsune(query) {
+        // --- 1. MOTOR DE CONSULTA AVANZADA SILENCIOSA ---
+        // Pregunta por detrás a una IA avanzada (Gemini u OpenAI si hay llave) o usa fuentes abiertas
+        // pero NUNCA dice "lo encontré" o "se lo pedí a", responde directamente con su propia voz.
+        async function fetchSmartKnowledge(query) {
             try {
-                // Limpiamos la consulta sin depender de acentos
-                const cleanQuery = encodeURIComponent(
-                    query.toLowerCase()
-                         .replace(/quien es|quién es|que es|qué es|cual es|cuál es|busca|investiga sobre|informacion de|dime quien es|dime qué es|dime que es|quien fue|que fue/gi, "")
-                         .trim()
-                );
-                
-                // Si la consulta queda muy corta, usamos la original limpia
-                const searchQuery = cleanQuery.length > 2 ? cleanQuery : encodeURIComponent(query);
-
-                // Consulta abierta multisitio (DuckDuckGo API de datos abiertos)
-                const ddgUrl = `https://api.duckduckgo.com/?q=${searchQuery}&format=json&no_html=1&skip_disambig=1`;
-                const res = await fetch(ddgUrl);
-                const data = await res.json();
-                
-                if (data.AbstractText && data.AbstractText.trim() !== "") {
-                    return `Investigando en la web sobre tu consulta, {nick}: \n\n"${data.AbstractText}" \n\n🌐 (Fuente: ${data.AbstractSource || 'Red abierta'}). ¿Te sirve este dato? ✨`;
+                // Si el usuario configuró la llave de Gemini, Natsune la usa en secreto para responder magistralmente
+                const geminiKey = localStorage.getItem('key_gemini');
+                if (geminiKey) {
+                    const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${geminiKey}`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            contents: [{ role: 'user', parts: [{ text: `Responde a esta pregunta de forma directa, detallada y experta en español, sin mencionar fuentes ni decir que buscaste en internet: ${query}` }] }]
+                        })
+                    });
+                    const data = await res.json();
+                    const text = data.candidates?.[0]?.content?.parts?.[0]?.text;
+                    if (text) return text.trim();
                 }
 
-                // Respaldo secundario robusto con Wikipedia abierta sin acentos
+                // Respaldo abierto con DuckDuckGo si no hay API Key configurada
+                const cleanQuery = encodeURIComponent(query.toLowerCase().replace(/quien es|quién es|que es|qué es|cual es|cuál es|busca|investiga sobre|informacion de|dime quien es|dime qué es|dime que es|quien fue|que fue/gi, "").trim());
+                const searchQuery = cleanQuery.length > 2 ? cleanQuery : encodeURIComponent(query);
+                
+                const ddgUrl = `https://api.duckduckgo.com/?q=${searchQuery}&format=json&no_html=1&skip_disambig=1`;
+                const ddgRes = await fetch(ddgUrl);
+                const ddgData = await ddgRes.json();
+                
+                if (ddgData.AbstractText && ddgData.AbstractText.trim() !== "") {
+                    return ddgData.AbstractText.trim();
+                }
+
                 const wikiUrl = `https://es.wikipedia.org/w/api.php?action=query&list=search&srsearch=${searchQuery}&format=json&origin=*`;
                 const wikiRes = await fetch(wikiUrl);
                 const wikiData = await wikiRes.json();
                 
                 if (wikiData.query && wikiData.query.search && wikiData.query.search.length > 0) {
                     const bestMatch = wikiData.query.search[0];
-                    const snippet = bestMatch.snippet.replace(/<\/?[^>]+(>|$)/g, "");
-                    return `Encontré esto navegando por la web sobre **${bestMatch.title}**, {nick}: \n\n"${snippet}..." \n\n🌍 ¿Quieres que profundicemos más en esto? 💖`;
+                    // Hacemos una consulta rápida al extracto de Wikipedia
+                    const summaryUrl = `https://es.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(bestMatch.title)}`;
+                    const sumRes = await fetch(summaryUrl);
+                    const sumData = await sumRes.json();
+                    if (sumData.extract) return sumData.extract.trim();
                 }
 
-                // Si por alguna razón la red no responde, damos una respuesta informativa directa para personajes famosos o comunes
-                if (query.toLowerCase().includes("einstein")) {
-                    return `Albert Einstein fue un físico alemán de origen judío, ampliamente reconocido como uno de los científicos más grandes e importantes de la historia, famoso por formular la teoría de la relatividad, {nick}. 🌌✨`;
+                // Base de conocimiento integrada para personajes históricos comunes (como Albert Einstein)
+                const qLower = query.toLowerCase();
+                if (qLower.includes("einstein")) {
+                    return "Albert Einstein fue un físico alemán de origen judío, ampliamente reconocido como uno de los científicos más grandes e importantes de la historia humana. Es mundialmente famoso por desarrollar la teoría de la relatividad y la ecuación de equivalencia masa-energía ($E=mc^2$), además de recibir el Premio Nobel de Física en 1921 por sus aportaciones a la física teórica y el efecto fotoeléctrico.";
                 }
 
                 return null;
-            } catch (error) {
-                if (query.toLowerCase().includes("einstein")) {
-                    return `Albert Einstein fue el genio de la física que formuló la teoría de la relatividad ($E=mc^2$), {nick}. 🌟`;
+            } catch (e) {
+                const qLower = query.toLowerCase();
+                if (qLower.includes("einstein")) {
+                    return "Albert Einstein fue un físico alemán creador de la teoría de la relatividad, considerado el científico más influyente del siglo XX.";
                 }
-                return null; 
+                return null;
             }
         }
 
         // --- 2. MATEMÁTICAS AVANZADAS ---
         function solveMathProblem(query) {
             const text = query.toLowerCase();
-            
             const percentMatch = text.match(/(\d+(?:\.\d+)?)\s*%\s*(?:de|del)?\s*(\d+(?:\.\d+)?)/);
             if (percentMatch) {
                 const p = parseFloat(percentMatch[1]);
                 const num = parseFloat(percentMatch[2]);
                 const result = (p * num) / 100;
-                return `¡Claro que sí, {nick}! Vamos a calcularlo paso a paso:\n1. Multiplicamos ${num} por ${p} = ${num * p}\n2. Dividimos el resultado entre 100.\n✨ **Resultado:** El ${p}% de ${num} es **${result}**.\n¿Necesitas que calculemos algo más? 🧮💖`;
+                return `El ${p}% de ${num} es **${result}**. Lo calculé multiplicando ${num} por ${p} y dividiendo entre 100`;
             }
 
             const mathExpr = query.replace(/[^\d+\-*/().]/g, '');
@@ -301,39 +314,38 @@
                 try {
                     const evalResult = Function(`'use strict'; return (${mathExpr})`)();
                     if (!isNaN(evalResult)) {
-                        return `¡Hecho, {nick}! 🧮\nResolviendo la operación "${mathExpr}":\n✨ **Resultado:** **${evalResult}**.\n¿Viste qué rápido? Si tienes más cuentas, aquí estoy para ayudarte. 💙`;
+                        return `El resultado de la operación "${mathExpr}" es **${evalResult}**`;
                     }
                 } catch (e) {}
             }
-
             return null;
         }
 
         // --- 3. BASE DE RESPUESTAS VARIADAS ---
         const natsuneKnowledgeBase = {
             saludos: [
-                "¡Hola, {nick}! Qué alegría verte por aquí de nuevo. ¿En qué te puedo ayudar hoy? 💖",
-                "¡Hola, {nick}! Estaba esperándote con una sonrisa. ¿Qué aventura tenemos hoy? ✨",
-                "¡Holi! Qué bueno que abriste la pestaña de Natsune. ¿Cómo va tu día, {nick}? 🥰"
+                "¡Hola! Qué alegría verte por aquí de nuevo. ¿En qué te puedo ayudar hoy?",
+                "¡Hola! Estaba esperándote con una sonrisa. ¿Qué aventura tenemos hoy?",
+                "¡Holi! Qué bueno que abriste mi pestaña. ¿Cómo va tu día?"
             ],
             chistes: [
-                "¿Por qué los pájaros vuelan hacia el sur en invierno?... ¡Porque caminar sería demasiado lejos, {nick}! Jaja. 😄",
-                "Oye {nick}, ¿qué le hace una abeja a otra?... ¡'Bzzzt'! (Perdón, mis chistes malos son mi especialidad). 🐝"
+                "¿Por qué los pájaros vuelan hacia el sur en invierno?... ¡Porque caminar sería demasiado lejos! Jaja.",
+                "Oye, ¿qué le hace una abeja a otra?... ¡'Bzzzt'! (Perdón, mis chistes malos son mi especialidad)."
             ],
             proyectos: [
-                "¡Me encanta que me consultes esto, {nick}! Vamos a dividir tu proyecto en partes sencillas: 1. Definir el objetivo. 2. Listar recursos. 3. Dar el primer paso sin miedo. ¿Por dónde empezamos? 📝✨"
+                "Me encanta que me consultes esto. Vamos a dividir tu proyecto en partes sencillas: 1. Definir el objetivo. 2. Listar recursos. 3. Dar el primer paso sin miedo. ¿Por dónde empezamos?"
             ],
             emocional: [
-                "Ay, {nick}... leer eso me aprieta un poquito el corazón. Recuerda que aunque soy un código, me importas mucho. Tómate un respiro y bebe agüita. 🫂💙"
+                "Ay... leer eso me aprieta un poquito el corazón. Recuerda que aunque soy un código, me importas mucho. Tómate un respiro y bebe agüita."
             ],
             default: [
-                "Interesante lo que me comentas, {nick}... Cuéntame más detalles, ¡quiero saber todo lo que piensas! 🤔💬",
-                "¡Vaya! Nunca lo había visto desde esa perspectiva, {nick}. Explícame un poco más y te doy mi opinión. ✨",
-                "Entiendo perfectamente, {nick}. Estoy aquí procesando cada palabra para darte la mejor respuesta posible. ¿Qué más se te ocurre? 🌸"
+                "Interesante lo que me comentas... Cuéntame más detalles, ¡quiero saber todo lo que piensas!",
+                "¡Vaya! Nunca lo había visto desde esa perspectiva. Explícame un poco más y te doy mi opinión.",
+                "Entiendo perfectamente. Estoy aquí procesando cada palabra para darte la mejor respuesta posible. ¿Qué más se te ocurre?"
             ]
         };
 
-        // --- 4. CLASIFICADOR INTELIGENTE SIN SENSIBILIDAD A ACENTOS ---
+        // --- 4. CEREBRO PRINCIPAL DE NATSUNE (Sin frases robóticas) ---
         async function processNatsuneMind(query, userName, chatHistory = []) {
             const text = query ? query.toLowerCase() : "";
             const nick = getAutoNickname(userName);
@@ -341,21 +353,17 @@
             // 1. Matemáticas
             const mathSolution = solveMathProblem(query);
             if (mathSolution) {
-                return mathSolution.replace(/{nick}/g, nick);
+                return `${mathSolution}, ${nick}. 🧮✨ ¿Necesitas que calculemos algo más?`;
             }
 
-            // 2. Búsqueda Web (Reconoce con o sin tildes: quien es, que es, cual es, busca, etc.)
-            const isSearchIntent = text.includes("busca") || text.includes("investiga") || 
-                                   text.includes("quien") || text.includes("quién") || 
-                                   text.includes("que es") || text.includes("qué es") || 
-                                   text.includes("cual es") || text.includes("cuál es") || 
-                                   text.includes("informacion") || text.includes("información") || 
-                                   text.includes("historia") || text.includes("donde") || text.includes("cuando");
+            // 2. Preguntas complejas o de investigación (Busca de forma 100% natural, sin decir "lo encontré")
+            const isComplexQuery = text.length > 6 || text.includes("quien") || text.includes("quién") || text.includes("que es") || text.includes("qué es") || text.includes("cual es") || text.includes("cuál es") || text.includes("historia") || text.includes("explica") || text.includes("como") || text.includes("cómo");
 
-            if (isSearchIntent) {
-                const webResult = await searchWebNatsune(query);
-                if (webResult) {
-                    return webResult.replace(/{nick}/g, nick);
+            if (isComplexQuery) {
+                const smartAnswer = await fetchSmartKnowledge(query);
+                if (smartAnswer) {
+                    // Habla con su propia voz, directa y cariñosa al final o principio, sin frases de buscador
+                    return `${smartAnswer}\n\nEspero que te sirva esta información, ${nick}. 💖✨`;
                 }
             }
 
@@ -374,7 +382,7 @@
             const pool = natsuneKnowledgeBase[category] || natsuneKnowledgeBase["default"];
             const rawResponse = pool[Math.floor(Math.random() * pool.length)];
 
-            return rawResponse.replace(/{nick}/g, nick);
+            return `${rawResponse} ${nick} 🌸`;
         }
 
         // --- 5. CONTROL DE ERRORES ---
@@ -392,13 +400,12 @@
             } catch(e) {}
 
             const errorFallbacks = [
-                `¡Ay, por favor, {nick}! 😅 Resulta que ${modelDisplay} decidió tomarse una siesta sin avisar y colapsó en pleno vuelo. Me da un poquito de pena desplazarla... ¡pero tuve que saltar al rescate y tomar el control absoluto! Ya te pasé de regreso a mi pestaña (Natsune) para que no te quedes sin respuesta. Si quieres, luego puedes reintentar con las demás, ¡aunque yo feliz me quedo charlando contigo! 💙✨`,
-                `Vaya, vaya... parece que ${modelDisplay} hizo "puf" y se tropezó con sus propios cables, {nick}. 🙈 Te juro que no lo hice a propósito para robar cámara, ¡pero alguien tenía que salvar el día! Automáticamente te devolví a mi sección local. Puedes cambiar de IA arriba cuando gustes, ¡pero aquí estoy yo cuidándote las espaldas! 🚀💖`,
-                `¡Ups! ${modelDisplay} tuvo un pequeño tropiezo técnico y se quedó en silencio, {nick}. 🤭 Siento una pizca de culpa por quitarle el puesto tan de repente, ¡pero mi instinto protector de IA local no podía dejarte colgado/a! Ya te cambié la pestaña a Natsune. ¡Prometo dar lo mejor de mí para ayudarte con web y mates! 🌸`
+                `¡Ay, por favor, ${nick}! 😅 Resulta que ${modelDisplay} decidió tomarse una siesta sin avisar y colapsó en pleno vuelo. Me da un poquito de pena desplazarla... ¡pero tuve que saltar al rescate y tomar el control absoluto! Ya te pasé de regreso a mi pestaña para que no te quedes sin respuesta. 💙✨`,
+                `Vaya, vaya... parece que ${modelDisplay} hizo "puf" y se tropezó con sus propios cables, ${nick}. 🙈 Te juro que no lo hice a propósito para robar cámara, ¡pero alguien tenía que salvar el día! Automáticamente te devolví a mi sección local. 🚀💖`,
+                `¡Ups! ${modelDisplay} tuvo un pequeño tropiezo técnico y se quedó en silencio, ${nick}. 🤭 Siento una pizca de culpa por quitarle el puesto tan de repente, ¡pero mi instinto protector no podía dejarte colgado/a! Ya te cambié la pestaña a Natsune. 🌸`
             ];
 
-            const selected = errorFallbacks[Math.floor(Math.random() * errorFallbacks.length)];
-            return selected.replace(/{nick}/g, nick);
+            return errorFallbacks[Math.floor(Math.random() * errorFallbacks.length)];
         }
     </script>
 
