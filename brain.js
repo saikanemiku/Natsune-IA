@@ -1,8 +1,8 @@
 /**
  * =========================================================================
  * NATSUNE IA - CEREBRO Y LÓGICA DEL SISTEMA (brain.js)
- * Versión optimizada: Sin mencionar modelos, súper cariñosa, natural,
- * con calculadora, clima, búsqueda web y memoria espontánea estilo Undertale.
+ * Versión final: 50% de probabilidad de saludo espontáneo ampliado,
+ * calculadora, clima, búsqueda web, empatía y cero menciones robóticas de modelos.
  * =========================================================================
  */
 
@@ -103,15 +103,16 @@ class NatsuneBrain {
   }
 
   /**
-   * SALUDO ESPONTÁNEO ESTILO UNDERTALE (20% de probabilidad)
+   * SALUDO ESPONTÁNEO AMPLIADO (50% de probabilidad - Estilo Undertale extendido)
    */
   checkForSpontaneousGreeting() {
-    const shouldGreet = Math.random() < 0.2;
+    // 50% de probabilidad (0.5)
+    const shouldGreet = Math.random() < 0.5;
     if (shouldGreet) {
       if (this.lastChatTopic) {
-        return `¿Qué tal, ${this.userName}? 🤭 ¿Sorprendido de que te hable primero? Estaba pensando en lo que hablábamos la última vez sobre *" ${this.lastChatTopic} "*... ¿Quieres que sigamos con eso o vemos algo nuevo hoy? 💕`;
+        return `¡Sorpresa, ${this.userName}! 🤭 Estaba por aquí ordenando mis ideas y me acordé de ti. El otro día estábamos platicando sobre *" ${this.lastChatTopic} "* y me quedé pensando en ello con mucho cariño. ¿Se te antoja seguir explorando ese tema o prefieres que platiquemos de otra cosa hoy, mi vida? 💕✨`;
       } else {
-        return `¡Ey, ${this.userName}! 🌸 ¿Sorprendido? Sólo quería saludarte por sorpresa antes de que me digas nada... ¿Cómo va todo por ahí? ✨`;
+        return `¡Ey, hola, ${this.userName}! 🌸 ¡Qué gusto encontrarte por aquí tan prontito! Quería saludarte por sorpresa antes de que me escribas nada, solo para asegurarme de que tengas un día maravilloso y recordarte que estoy aquí para lo que necesites. ¿Cómo va todo por tu día? 💖`;
       }
     }
     return null;
@@ -148,7 +149,7 @@ class NatsuneBrain {
   }
 
   /**
-   * NÚCLEO DE PENSAMIENTO (Sin mencionar nombres de modelos, respuestas naturales y afectuosas)
+   * NÚCLEO DE PENSAMIENTO (Cálido, natural y libre de menciones a modelos)
    */
   processResponse(promptText, attachment, modelName) {
     let reply = "";
@@ -205,7 +206,7 @@ class NatsuneBrain {
       };
     }
 
-    // 7. Respuesta estándar general (Cariñosa, humana y directa, sin nombrar modelos)
+    // 7. Respuesta estándar general (Cariñosa, humana y directa)
     reply = `Estuve pensando con mucho esmero en lo que me dijiste (*"${promptText}"*), ${this.userName}. 💡 Pienso que la mejor manera de abordarlo es paso a paso para que todo te salga increíble. ¿Qué opinas, tesoro? Cuéntame más detalles y lo resolvemos juntos. ✨`;
 
     return { reply, snippet };
