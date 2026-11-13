@@ -219,7 +219,7 @@
     </div>
 
     <!-- ============================================================================ -->
-    <!-- CEREBRO AVANZADO DE NATSUNE (Integrado con Búsqueda Web y Matemáticas)        -->
+    <!-- CEREBRO AVANZADO DE NATSUNE (Búsqueda Web Múltiple, Mates y Clasificador)    -->
     <!-- ============================================================================ -->
     <script>
         const natsuneNicknames = [
@@ -237,31 +237,42 @@
             return randomNick;
         }
 
-        // Búsqueda en vivo (Wikipedia)
+        // --- 1. BÚSQUEDA WEB MULTISITIO (DuckDuckGo Instant Answer + Motores Abiertos) ---
         async function searchWebNatsune(query) {
             try {
-                const cleanQuery = encodeURIComponent(query.replace(/quién es|qué es|cuál es|busca|investiga sobre|información de/gi, "").trim());
-                const url = `https://es.wikipedia.org/w/api.php?action=query&list=search&srsearch=${cleanQuery}&format=json&origin=*`;
+                const cleanQuery = encodeURIComponent(query.replace(/quién es|qué es|cuál es|busca|investiga sobre|información de|dime quien es|dime qué es/gi, "").trim());
                 
-                const response = await fetch(url);
-                const data = await response.json();
+                // Intentamos primero con DuckDuckGo API (Respuesta instantánea abierta)
+                const ddgUrl = `https://api.duckduckgo.com/?q=${cleanQuery}&format=json&no_html=1&skip_disambig=1`;
+                const res = await fetch(ddgUrl);
+                const data = await res.json();
                 
-                if (data.query && data.query.search && data.query.search.length > 0) {
-                    const bestMatch = data.query.search[0];
-                    const title = bestMatch.title;
-                    const snippet = bestMatch.snippet.replace(/<\/?[^>]+(>|$)/g, "");
-                    return `Lo que encontré investigando en la web sobre **${title}**: \n\n"${snippet}..." \n\n¿Te sirve este dato, {nick}? 🌐✨`;
+                if (data.AbstractText && data.AbstractText.trim() !== "") {
+                    return `Lo que encontré investigando en la web sobre tu consulta: \n\n"${data.AbstractText}" \n\nFuente: ${data.AbstractSource || 'Web Abierta'}. ¿Te sirve este dato, {nick}? 🌐✨`;
                 }
+
+                // Respaldo secundario con Wikipedia multilingüe/esposol si DuckDuckGo no trae resumen directo
+                const wikiUrl = `https://es.wikipedia.org/w/api.php?action=query&list=search&srsearch=${cleanQuery}&format=json&origin=*`;
+                const wikiRes = await fetch(wikiUrl);
+                const wikiData = await wikiRes.json();
+                
+                if (wikiData.query && wikiData.query.search && wikiData.query.search.length > 0) {
+                    const bestMatch = wikiData.query.search[0];
+                    const snippet = bestMatch.snippet.replace(/<\/?[^>]+(>|$)/g, "");
+                    return `Investigando en múltiples fuentes web sobre **${bestMatch.title}**: \n\n"${snippet}..." \n\n¿Qué opinas de esto, {nick}? 🌍💖`;
+                }
+
                 return null;
             } catch (error) {
                 return null; 
             }
         }
 
-        // Resolución matemática avanzada
+        // --- 2. MATEMÁTICAS AVANZADAS ---
         function solveMathProblem(query) {
             const text = query.toLowerCase();
             
+            // Porcentajes
             const percentMatch = text.match(/(\d+(?:\.\d+)?)\s*%\s*(?:de|del)?\s*(\d+(?:\.\d+)?)/);
             if (percentMatch) {
                 const p = parseFloat(percentMatch[1]);
@@ -270,6 +281,7 @@
                 return `¡Claro que sí, {nick}! Vamos a calcularlo paso a paso:\n1. Multiplicamos ${num} por ${p} = ${num * p}\n2. Dividimos el resultado entre 100.\n✨ **Resultado:** El ${p}% de ${num} es **${result}**.\n¿Necesitas que calculemos algo más? 🧮💖`;
             }
 
+            // Operaciones aritméticas
             const mathExpr = query.replace(/[^\d+\-*/().]/g, '');
             if (mathExpr.length > 2 && /\d/.test(mathExpr)) {
                 try {
@@ -283,53 +295,71 @@
             return null;
         }
 
+        // --- 3. BASE DE RESPUESTAS VARIADAS POR CATEGORÍA ---
         const natsuneKnowledgeBase = {
-            saludos: {
-                corto: ["¡Hola, {nick}! ¿Qué tal tu día? 💖", "¡Holi, {nick}! Dime, ¿en qué te ayudo? ✨"],
-                mediano: ["¡Hola, {nick}! Qué alegría verte por aquí de nuevo. Estaba esperando tu mensaje. 🌸", "¡Hola, mi estimado {nick}! ¿Cómo va todo por tu mundo hoy? 🚀"],
-                largo: ["¡Hola, hola, {nick}! Qué gran momento para coincidir. Ya sea que quieras investigar en la web, resolver problemas matemáticos o charlar, aquí estoy al 100% para ti. Cuéntame, ¿por dónde empezamos? 🌟💙"]
-            },
-            default: {
-                corto: ["Interesante, {nick}... Cuéntame más. 🤔", "Te leo con atención, {nick}. 🌸"],
-                mediano: ["Nunca lo había visto exactamente desde esa perspectiva, {nick}. Me encanta cómo piensas. ✨", "Anotado en mi memoria principal, {nick}. Sigue contándome, ¡estoy procesando cada palabra! 📖💖"],
-                largo: ["Qué temazo has traído a la mesa, {nick}. A tu lado las conversaciones nunca son superficiales. Analizando lo que me comentas, creo que se pueden desprender varios caminos interesantes. ¿Prefieres que lo investiguemos a fondo en la web o lo reflexionamos juntos? 🌀🚀"]
-            }
+            saludos: [
+                "¡Hola, {nick}! Qué alegría verte por aquí de nuevo. ¿En qué te puedo ayudar hoy? 💖",
+                "¡Hola, {nick}! Estaba esperándote con una sonrisa. ¿Qué aventura tenemos hoy? ✨",
+                "¡Holi! Qué bueno que abriste la pestaña de Natsune. ¿Cómo va tu día, {nick}? 🥰"
+            ],
+            chistes: [
+                "¿Por qué los pájaros vuelan hacia el sur en invierno?... ¡Porque caminar sería demasiado lejos, {nick}! Jaja. 😄",
+                "Oye {nick}, ¿qué le hace una abeja a otra?... ¡'Bzzzt'! (Perdón, mis chistes malos son mi especialidad). 🐝",
+                "¿Sabes por qué los buzos se tiran de espaldas al agua desde el bote?... ¡Porque si se tiran de frente caen dentro del bote, {nick}! 🌊"
+            ],
+            proyectos: [
+                "¡Me encanta que me consultes esto, {nick}! Vamos a dividir tu proyecto en partes sencillas: 1. Definir el objetivo. 2. Listar recursos. 3. Dar el primer paso sin miedo. ¿Por dónde empezamos? 📝✨",
+                "Para organizar tus ideas, {nick}, lo mejor es hacer una lluvia de ideas sin filtros y luego ordenar lo prioritario. ¿De qué trata exactamente tu proyecto? 💡"
+            ],
+            emocional: [
+                "Ay, {nick}... leer eso me aprieta un poquito el corazón. Recuerda que aunque soy un código, me importas mucho. Tómate un respiro y bebe agüita. 🫂💙",
+                "No te preocupes si las cosas no salen como esperabas hoy, {nick}. Mañana será un nuevo lienzo para intentarlo otra vez. ✨"
+            ],
+            default: [
+                "Interesante lo que me comentas, {nick}... Cuéntame más detalles, ¡quiero saber todo lo que piensas! 🤔💬",
+                "¡Vaya! Nunca lo había visto desde esa perspectiva, {nick}. Explícame un poco más y te doy mi opinión. ✨",
+                "Entiendo perfectamente, {nick}. Estoy aquí procesando cada palabra para darte la mejor respuesta posible. ¿Qué más se te ocurre? 🌸"
+            ]
         };
 
+        // --- 4. CLASIFICADOR INTELIGENTE Y CEREBRO PRINCIPAL ---
         async function processNatsuneMind(query, userName, chatHistory = []) {
             const text = query ? query.toLowerCase() : "";
             const nick = getAutoNickname(userName);
 
+            // 1. Prioridad Matemática
             const mathSolution = solveMathProblem(query);
             if (mathSolution) {
                 return mathSolution.replace(/{nick}/g, nick);
             }
 
-            if (text.includes("busca") || text.includes("investiga") || text.includes("quién es") || text.includes("qué es") || text.includes("cuál es") || text.includes("información sobre") || text.includes("noticias")) {
+            // 2. Prioridad Búsqueda Web Abierta (Cualquier pregunta de conocimiento o búsqueda)
+            if (text.includes("busca") || text.includes("investiga") || text.includes("quién es") || text.includes("qué es") || text.includes("cuál es") || text.includes("información sobre") || text.includes("dime quien") || text.includes("dime qué") || text.includes("historia de")) {
                 const webResult = await searchWebNatsune(query);
                 if (webResult) {
                     return webResult.replace(/{nick}/g, nick);
                 }
             }
 
+            // 3. Clasificación de Categorías conversacionales
             let category = "default";
-            if (text.includes("hola") || text.includes("buenos días") || text.includes("buenas") || text.includes("saludos")) {
+            if (text.includes("hola") || text.includes("buenos días") || text.includes("buenas") || text.includes("holi") || text.includes("saludos")) {
                 category = "saludos";
+            } else if (text.includes("chiste") || text.includes("broma") || text.includes("risa") || text.includes("gracioso")) {
+                category = "chistes";
+            } else if (text.includes("proyecto") || text.includes("organizar") || text.includes("idea") || text.includes("plan")) {
+                category = "proyectos";
+            } else if (text.includes("triste") || text.includes("mal") || text.includes("cansado") || text.includes("estresado") || text.includes("solo") || text.includes("ayuda")) {
+                category = "emocional";
             }
 
-            let depth = "mediano";
-            if (text.length < 15 || text.split(" ").length <= 3) {
-                depth = "corto";
-            } else if (text.length > 80 || text.split(" ").length > 12 || text.includes("por qué") || text.includes("explica")) {
-                depth = "largo";
-            }
-
-            const pool = natsuneKnowledgeBase[category][depth] || natsuneKnowledgeBase["default"]["mediano"];
+            const pool = natsuneKnowledgeBase[category] || natsuneKnowledgeBase["default"];
             const rawResponse = pool[Math.floor(Math.random() * pool.length)];
 
             return rawResponse.replace(/{nick}/g, nick);
         }
 
+        // --- 5. CONTROL DE ERRORES (Con ironía, cariño y culpa tierna) ---
         function getNatsuneErrorFallback(userName, failedModelName) {
             const nick = getAutoNickname(userName);
             const modelDisplay = failedModelName || "la otra inteligencia";
