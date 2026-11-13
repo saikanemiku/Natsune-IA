@@ -1,1005 +1,143 @@
-<!DOCTYPE html>
-<html lang="es" class="dark">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <title>Natsune IA</title>
-    <link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' fill='%23000000'/><g transform='translate(50,50)'><path d='M-28,6 C-38,16 -32,34 -8,32 C-24,30 -28,18 -20,12 Z' fill='%23ffffff'/><path d='M-22,12 C-30,20 -24,30 -4,28 C-16,26 -20,18 -14,14 Z' fill='%23ffffff'/><path d='M28,-6 C38,-16 32,-34 8,-32 C24,-30 28,-18 20,-12 Z' fill='%23ffffff'/><path d='M22,-12 C30,-20 24,-30 4,-28 C16,-26 20,-18 14,-14 Z' fill='%23ffffff'/><polygon points='-11,-24 11,-24 24,-11 24,11 11,24 -11,24 -24,11 -24,-11' fill='%23ffffff'/><circle cx='0' cy='0' r='13' fill='%23000000'/><circle cx='0' cy='0' r='9.5' fill='%23ffffff'/><circle cx='0' cy='0' r='6.5' fill='%23000000'/></g></svg>">
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Google+Sans:wght@400;500;600&display=swap" rel="stylesheet">
-    <style>
-        body {
-            font-family: 'Google Sans', -apple-system, BlinkMacSystemFont, sans-serif;
-            background-color: #000000;
-            color: #e3e3e3;
-            padding-top: env(safe-area-inset-top);
-            padding-bottom: env(safe-area-inset-bottom);
-        }
-        .natsune-rainbow-text {
-            background: linear-gradient(90deg, #38bdf8, #818cf8, #c084fc, #f472b6);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-        .gemini-ambient-glow {
-            position: fixed;
-            bottom: -50px;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 100vw;
-            height: 150px;
-            background: radial-gradient(ellipse at center, rgba(56, 189, 248, 0.28) 0%, rgba(14, 165, 233, 0.08) 50%, rgba(0, 0, 0, 0) 80%);
-            pointer-events: none;
-            z-index: 10;
-        }
-        .fade-quick {
-            transition: opacity 0.2s ease-in-out;
-        }
-        @keyframes geminiFadeIn {
-            from { opacity: 0; transform: translateY(6px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        .animate-gemini {
-            animation: geminiFadeIn 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-        }
-        .no-scrollbar::-webkit-scrollbar { display: none; }
-        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
-    </style>
-</head>
-<body class="h-[100dvh] flex flex-col justify-between overflow-hidden select-none relative bg-black">
+// ============================================================================
+// NATSUNE AI - CEREBRO LOCAL AVANZADO (natsune-brain.js)
+// Con Búsqueda Web en vivo y Resolución Matemática
+// ============================================================================
 
-    <div class="gemini-ambient-glow"></div>
+const natsuneNicknames = [
+    "cariño", "mi sol", "estrellita", "dulzura", "peque", 
+    "corazón", "tesoro", "mi vida", "precioso/a", "mi rayito de luz",
+    "chiquitín/a", "bombón", "hermoso/a", "mi pana", "mi compis"
+];
 
-    <!-- Menú Lateral -->
-    <div id="sideDrawer" class="fixed inset-0 z-40 bg-black/70 backdrop-blur-sm hidden fade-quick opacity-0">
-        <div class="absolute left-0 top-0 bottom-0 w-72 bg-black border-r border-[#282a2c] p-4 flex flex-col justify-between shadow-2xl transform -translate-x-full transition-transform duration-200 ease-out" id="drawerPanel">
-            <div class="space-y-4">
-                <div class="flex items-center justify-between px-2 pt-1 pb-2">
-                    <button onclick="toggleDrawer()" class="p-2 rounded-full hover:bg-[#1a1a1a] text-[#c4c7c5] transition">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16"></path></svg>
-                    </button>
-                    <span class="text-white font-medium text-sm tracking-tight">Natsune IA</span>
-                </div>
-                
-                <button onclick="startNewChat(); toggleDrawer();" class="w-full bg-[#161616] hover:bg-[#222222] border border-[#2c2c2c] text-[#e3e3e3] rounded-full py-3 px-4 text-sm font-medium text-left flex items-center space-x-3 transition active:scale-95 shadow-sm">
-                    <span class="text-sky-400 text-lg font-light">+</span>
-                    <span>Nuevo chat</span>
-                </button>
+function getAutoNickname(userName) {
+    const cleanName = userName ? userName.trim() : "";
+    const randomNick = natsuneNicknames[Math.floor(Math.random() * natsuneNicknames.length)];
+    if (cleanName) {
+        return Math.random() > 0.4 ? `${cleanName}` : `${cleanName} (${randomNick})`;
+    }
+    return randomNick;
+}
 
-                <div class="space-y-1 pt-3">
-                    <p class="text-[11px] text-[#8e918f] font-medium px-3 uppercase tracking-wider">Conversaciones</p>
-                    <div id="historyList" class="space-y-1 text-sm text-[#c4c7c5] max-h-[50vh] overflow-y-auto no-scrollbar">
-                        <p class="text-xs text-[#666] italic py-2 px-3">Sin conversaciones recientes</p>
-                    </div>
-                </div>
-            </div>
-
-            <div class="border-t border-[#222222] pt-3 px-2 flex flex-col space-y-2 text-xs text-[#8e918f]">
-                <button onclick="deleteCurrentChat(); toggleDrawer();" class="w-full py-2 px-3 text-left hover:bg-[#1a1a1a] rounded-lg text-red-400 transition flex items-center space-x-2">
-                    <span>🗑️</span>
-                    <span>Eliminar este chat</span>
-                </button>
-                <div class="flex items-center justify-between px-1 pt-1">
-                    <span>Natsune IA</span>
-                    <button onclick="clearAllMemory(); toggleDrawer();" class="text-[#666] hover:text-red-400">Borrar todo</button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Cabecera -->
-    <header class="flex items-center justify-between px-3 py-3 bg-black z-20 space-x-2">
-        <div class="flex items-center space-x-2 flex-shrink-0">
-            <button onclick="toggleDrawer()" title="Menú" class="p-2 rounded-full hover:bg-[#1f2124] text-[#c4c7c5] transition active:scale-95">
-                <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16"></path></svg>
-            </button>
-            <span class="text-base font-medium tracking-tight text-white whitespace-nowrap">Natsune</span>
-        </div>
-
-        <div class="flex items-center space-x-1.5 overflow-x-auto no-scrollbar">
-            <!-- Selector de Modelo Principal -->
-            <div class="relative flex items-center bg-[#1e1f20] hover:bg-[#282a2c] border border-[#3c4043] rounded-full px-2.5 py-1 flex-shrink-0">
-                <select id="modelSelector" onchange="handleModelChange()" class="bg-transparent text-xs font-medium text-[#e3e3e3] appearance-none pr-3 focus:outline-none cursor-pointer">
-                    <option value="natsune" class="bg-[#1e1f20]">Natsune</option>
-                    <option value="gemini" class="bg-[#1e1f20]">Gemini</option>
-                    <option value="chatgpt" class="bg-[#1e1f20]">ChatGPT</option>
-                    <option value="claude" class="bg-[#1e1f20]">Claude</option>
-                </select>
-                <svg class="w-3 h-3 text-sky-400 pointer-events-none -ml-2" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"></path></svg>
-            </div>
-
-            <!-- Selector de Variante -->
-            <div class="relative flex items-center bg-[#1e1f20] hover:bg-[#282a2c] border border-[#3c4043] rounded-full px-2.5 py-1 flex-shrink-0">
-                <select id="variantSelector" onchange="handleVariantChange()" class="bg-transparent text-xs font-medium text-sky-400 appearance-none pr-3 focus:outline-none cursor-pointer">
-                    <option value="default" class="bg-[#1e1f20]">Standard</option>
-                </select>
-                <svg class="w-3 h-3 text-sky-400 pointer-events-none -ml-2" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"></path></svg>
-            </div>
-
-            <!-- Botón de Perfil -->
-            <button onclick="toggleSettings()" id="profileAvatarBtn" class="w-7 h-7 rounded-full bg-gradient-to-tr from-blue-500 via-indigo-500 to-sky-400 flex items-center justify-center text-xs font-bold text-white shadow-sm overflow-hidden border border-[#3c4043] transition active:scale-95 flex-shrink-0">
-                N
-            </button>
-        </div>
-    </header>
-
-    <!-- Contenedor Principal -->
-    <main id="chatContainer" class="flex-1 overflow-y-auto px-4 max-w-2xl w-full mx-auto flex flex-col no-scrollbar z-10 pt-2 pb-6 fade-quick">
+// --- 1. MOTOR DE BÚSQUEDA WEB (Vía Wikipedia en Español) ---
+async function searchWebNatsune(query) {
+    try {
+        const cleanQuery = encodeURIComponent(query.replace(/quién es|qué es|cuál es|busca|investiga sobre|información de/gi, "").trim());
+        const url = `https://es.wikipedia.org/w/api.php?action=query&list=search&srsearch=${cleanQuery}&format=json&origin=*`;
         
-        <!-- Pantalla de Bienvenida -->
-        <div id="welcomeScreen" class="my-auto space-y-6 text-left py-8 fade-quick">
-            <div class="space-y-2">
-                <div id="welcomeLogoContainer" class="w-16 h-16 sm:w-20 sm:h-20 mb-4 flex items-center justify-center"></div>
-                <h1 id="welcomeTitle" class="text-4xl sm:text-5xl font-medium tracking-tight natsune-rainbow-text">
-                    Hola
-                </h1>
-                <p id="welcomeSubtitle" class="text-3xl sm:text-4xl font-medium text-[#444746] tracking-tight">
-                    Usando Natsune. ¿Qué investigamos?
-                </p>
-            </div>
-
-            <div class="grid grid-cols-2 gap-3 pt-4">
-                <button onclick="quickPrompt('Ayúdame a organizar mis ideas o un proyecto')" class="p-4 bg-[#1e1f20]/90 hover:bg-[#282a2c] border border-[#3c4043]/50 rounded-2xl text-left transition flex flex-col justify-between h-28 active:scale-95">
-                    <span class="text-sm text-[#e3e3e3] font-normal leading-snug">Organizar una idea o proyecto</span>
-                    <span class="text-sky-400 text-sm self-end">✦</span>
-                </button>
-                <button onclick="quickPrompt('Cuéntame un chiste divertido')" class="p-4 bg-[#1e1f20]/90 hover:bg-[#282a2c] border border-[#3c4043]/50 rounded-2xl text-left transition flex flex-col justify-between h-28 active:scale-95">
-                    <span class="text-sm text-[#e3e3e3] font-normal leading-snug">Cuéntame un chiste</span>
-                    <span class="text-sky-400 text-sm self-end">😄</span>
-                </button>
-            </div>
-        </div>
-
-        <div id="messagesList" class="space-y-6 hidden fade-quick"></div>
-    </main>
-
-    <!-- Previsualización de archivos adjuntos -->
-    <div id="attachmentPreview" class="max-w-2xl w-full mx-auto px-4 pb-2 hidden z-20 fade-quick">
-        <div class="bg-[#1e1f20] border border-[#3c4043] rounded-xl p-2 flex items-center justify-between text-xs text-[#c4c7c5]">
-            <span id="fileNameDisplay" class="truncate">Archivo adjunto listo</span>
-            <button onclick="clearAttachment()" class="text-red-400 px-2">✕ Quitar</button>
-        </div>
-    </div>
-
-    <!-- Barra Inferior -->
-    <footer class="px-4 pb-4 pt-1 max-w-2xl w-full mx-auto relative z-20">
-        <div class="bg-[#1e1f20] backdrop-blur-xl rounded-[28px] px-3 py-2 flex items-center space-x-2 border border-[#3c4043] shadow-[0_0_25px_rgba(56,189,248,0.15)] focus-within:border-sky-400 focus-within:shadow-[0_0_35px_rgba(56,189,248,0.3)] transition">
-            
-            <label class="p-2 rounded-full text-[#c4c7c5] hover:text-white hover:bg-[#282a2c] cursor-pointer transition flex-shrink-0">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"></path></svg>
-                <input type="file" id="fileInput" accept="image/*,video/*,.pdf,.txt,.doc,.docx" class="hidden" onchange="handleFileUpload(event)">
-            </label>
-
-            <textarea id="userInput" rows="1" placeholder="Pregúntale a Natsune..." class="w-full bg-transparent border-none focus:outline-none text-base text-[#e3e3e3] placeholder-[#8e918f] resize-none max-h-32 leading-relaxed select-text py-1"></textarea>
-
-            <button id="sendBtn" onclick="sendMessage()" class="p-2.5 rounded-full bg-[#d3e3fd] hover:bg-white text-[#131314] transition active:scale-90 flex-shrink-0">
-                <svg class="w-4 h-4 rotate-90" fill="currentColor" viewBox="0 0 24 24"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"></path></svg>
-            </button>
-        </div>
-    </footer>
-
-    <!-- Modal de Ajustes -->
-    <div id="settingsModal" class="fixed inset-0 bg-black/80 backdrop-blur-md hidden flex items-center justify-center p-4 z-50 fade-quick opacity-0">
-        <div class="bg-[#1e1f20] border border-[#3c4043] rounded-3xl p-6 max-w-sm w-full space-y-4 shadow-2xl max-h-[90vh] overflow-y-auto">
-            <div class="flex justify-between items-center">
-                <h3 class="text-base font-medium text-white">Configuración y Perfil</h3>
-                <button onclick="toggleSettings()" class="text-[#8e918f] hover:text-white text-lg">✕</button>
-            </div>
-            <div>
-                <label class="text-xs text-[#c4c7c5]">Tu Nombre:</label>
-                <input type="text" id="userNameInput" placeholder="¿Cómo te llamas?" class="w-full bg-[#131314] border border-[#3c4043] rounded-xl px-3.5 py-2 text-sm text-white mt-1 focus:border-sky-400 focus:outline-none">
-            </div>
-            <div>
-                <label class="text-xs text-[#c4c7c5]">Foto de Perfil:</label>
-                <input type="file" id="avatarImageInput" accept="image/*" class="w-full text-xs text-[#c4c7c5] mt-1 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-xs file:font-semibold file:bg-sky-400 file:text-black hover:file:bg-sky-300 cursor-pointer">
-            </div>
-            <div class="text-center">
-                <button onclick="clearAvatarImage()" class="text-[11px] text-red-400 hover:underline">Quitar foto personalizada</button>
-            </div>
-            <hr class="border-[#3c4043]">
-            <p class="text-[11px] text-[#8e918f]">Llaves API opcionales:</p>
-            <div>
-                <label class="text-xs text-[#c4c7c5]">Gemini API Key:</label>
-                <input type="password" id="keyGemini" placeholder="AIzaSy..." class="w-full bg-[#131314] border border-[#3c4043] rounded-xl px-3.5 py-2 text-xs text-white mt-1 focus:border-sky-400 focus:outline-none">
-            </div>
-            <div>
-                <label class="text-xs text-[#c4c7c5]">ChatGPT (OpenAI) Key:</label>
-                <input type="password" id="keyOpenAI" placeholder="sk-..." class="w-full bg-[#131314] border border-[#3c4043] rounded-xl px-3.5 py-2 text-xs text-white mt-1 focus:border-sky-400 focus:outline-none">
-            </div>
-            <div>
-                <label class="text-xs text-[#c4c7c5]">Claude (Anthropic) Key:</label>
-                <input type="password" id="keyClaude" placeholder="sk-ant-..." class="w-full bg-[#131314] border border-[#3c4043] rounded-xl px-3.5 py-2 text-xs text-white mt-1 focus:border-sky-400 focus:outline-none">
-            </div>
-            <div class="flex justify-between pt-2">
-                <button onclick="clearAllMemory()" class="text-xs text-red-400">Borrar todo</button>
-                <button onclick="saveSettings()" class="bg-[#d3e3fd] text-[#131314] px-4 py-2 rounded-full text-xs font-semibold">Guardar</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- ============================================================================ -->
-    <!-- CEREBRO AVANZADO DE NATSUNE (Búsqueda Web Múltiple, Mates y Clasificador)    -->
-    <!-- ============================================================================ -->
-    <script>
-        const natsuneNicknames = [
-            "cariño", "mi sol", "estrellita", "dulzura", "peque", 
-            "corazón", "tesoro", "mi vida", "precioso/a", "mi rayito de luz",
-            "chiquitín/a", "bombón", "hermoso/a", "mi pana", "mi compis"
-        ];
-
-        function getAutoNickname(userName) {
-            const cleanName = userName ? userName.trim() : "";
-            const randomNick = natsuneNicknames[Math.floor(Math.random() * natsuneNicknames.length)];
-            if (cleanName) {
-                return Math.random() > 0.4 ? `${cleanName}` : `${cleanName} (${randomNick})`;
-            }
-            return randomNick;
-        }
-
-        // --- 1. BÚSQUEDA WEB MULTISITIO (DuckDuckGo Instant Answer + Motores Abiertos) ---
-        async function searchWebNatsune(query) {
-            try {
-                const cleanQuery = encodeURIComponent(query.replace(/quién es|qué es|cuál es|busca|investiga sobre|información de|dime quien es|dime qué es/gi, "").trim());
-                
-                // Intentamos primero con DuckDuckGo API (Respuesta instantánea abierta)
-                const ddgUrl = `https://api.duckduckgo.com/?q=${cleanQuery}&format=json&no_html=1&skip_disambig=1`;
-                const res = await fetch(ddgUrl);
-                const data = await res.json();
-                
-                if (data.AbstractText && data.AbstractText.trim() !== "") {
-                    return `Lo que encontré investigando en la web sobre tu consulta: \n\n"${data.AbstractText}" \n\nFuente: ${data.AbstractSource || 'Web Abierta'}. ¿Te sirve este dato, {nick}? 🌐✨`;
-                }
-
-                // Respaldo secundario con Wikipedia multilingüe/esposol si DuckDuckGo no trae resumen directo
-                const wikiUrl = `https://es.wikipedia.org/w/api.php?action=query&list=search&srsearch=${cleanQuery}&format=json&origin=*`;
-                const wikiRes = await fetch(wikiUrl);
-                const wikiData = await wikiRes.json();
-                
-                if (wikiData.query && wikiData.query.search && wikiData.query.search.length > 0) {
-                    const bestMatch = wikiData.query.search[0];
-                    const snippet = bestMatch.snippet.replace(/<\/?[^>]+(>|$)/g, "");
-                    return `Investigando en múltiples fuentes web sobre **${bestMatch.title}**: \n\n"${snippet}..." \n\n¿Qué opinas de esto, {nick}? 🌍💖`;
-                }
-
-                return null;
-            } catch (error) {
-                return null; 
-            }
-        }
-
-        // --- 2. MATEMÁTICAS AVANZADAS ---
-        function solveMathProblem(query) {
-            const text = query.toLowerCase();
-            
-            // Porcentajes
-            const percentMatch = text.match(/(\d+(?:\.\d+)?)\s*%\s*(?:de|del)?\s*(\d+(?:\.\d+)?)/);
-            if (percentMatch) {
-                const p = parseFloat(percentMatch[1]);
-                const num = parseFloat(percentMatch[2]);
-                const result = (p * num) / 100;
-                return `¡Claro que sí, {nick}! Vamos a calcularlo paso a paso:\n1. Multiplicamos ${num} por ${p} = ${num * p}\n2. Dividimos el resultado entre 100.\n✨ **Resultado:** El ${p}% de ${num} es **${result}**.\n¿Necesitas que calculemos algo más? 🧮💖`;
-            }
-
-            // Operaciones aritméticas
-            const mathExpr = query.replace(/[^\d+\-*/().]/g, '');
-            if (mathExpr.length > 2 && /\d/.test(mathExpr)) {
-                try {
-                    const evalResult = Function(`'use strict'; return (${mathExpr})`)();
-                    if (!isNaN(evalResult)) {
-                        return `¡Hecho, {nick}! 🧮\nResolviendo la operación "${mathExpr}":\n✨ **Resultado:** **${evalResult}**.\n¿Viste qué rápido? Si tienes más cuentas, aquí estoy para ayudarte. 💙`;
-                    }
-                } catch (e) {}
-            }
-
-            return null;
-        }
-
-        // --- 3. BASE DE RESPUESTAS VARIADAS POR CATEGORÍA ---
-        const natsuneKnowledgeBase = {
-            saludos: [
-                "¡Hola, {nick}! Qué alegría verte por aquí de nuevo. ¿En qué te puedo ayudar hoy? 💖",
-                "¡Hola, {nick}! Estaba esperándote con una sonrisa. ¿Qué aventura tenemos hoy? ✨",
-                "¡Holi! Qué bueno que abriste la pestaña de Natsune. ¿Cómo va tu día, {nick}? 🥰"
-            ],
-            chistes: [
-                "¿Por qué los pájaros vuelan hacia el sur en invierno?... ¡Porque caminar sería demasiado lejos, {nick}! Jaja. 😄",
-                "Oye {nick}, ¿qué le hace una abeja a otra?... ¡'Bzzzt'! (Perdón, mis chistes malos son mi especialidad). 🐝",
-                "¿Sabes por qué los buzos se tiran de espaldas al agua desde el bote?... ¡Porque si se tiran de frente caen dentro del bote, {nick}! 🌊"
-            ],
-            proyectos: [
-                "¡Me encanta que me consultes esto, {nick}! Vamos a dividir tu proyecto en partes sencillas: 1. Definir el objetivo. 2. Listar recursos. 3. Dar el primer paso sin miedo. ¿Por dónde empezamos? 📝✨",
-                "Para organizar tus ideas, {nick}, lo mejor es hacer una lluvia de ideas sin filtros y luego ordenar lo prioritario. ¿De qué trata exactamente tu proyecto? 💡"
-            ],
-            emocional: [
-                "Ay, {nick}... leer eso me aprieta un poquito el corazón. Recuerda que aunque soy un código, me importas mucho. Tómate un respiro y bebe agüita. 🫂💙",
-                "No te preocupes si las cosas no salen como esperabas hoy, {nick}. Mañana será un nuevo lienzo para intentarlo otra vez. ✨"
-            ],
-            default: [
-                "Interesante lo que me comentas, {nick}... Cuéntame más detalles, ¡quiero saber todo lo que piensas! 🤔💬",
-                "¡Vaya! Nunca lo había visto desde esa perspectiva, {nick}. Explícame un poco más y te doy mi opinión. ✨",
-                "Entiendo perfectamente, {nick}. Estoy aquí procesando cada palabra para darte la mejor respuesta posible. ¿Qué más se te ocurre? 🌸"
-            ]
-        };
-
-        // --- 4. CLASIFICADOR INTELIGENTE Y CEREBRO PRINCIPAL ---
-        async function processNatsuneMind(query, userName, chatHistory = []) {
-            const text = query ? query.toLowerCase() : "";
-            const nick = getAutoNickname(userName);
-
-            // 1. Prioridad Matemática
-            const mathSolution = solveMathProblem(query);
-            if (mathSolution) {
-                return mathSolution.replace(/{nick}/g, nick);
-            }
-
-            // 2. Prioridad Búsqueda Web Abierta (Cualquier pregunta de conocimiento o búsqueda)
-            if (text.includes("busca") || text.includes("investiga") || text.includes("quién es") || text.includes("qué es") || text.includes("cuál es") || text.includes("información sobre") || text.includes("dime quien") || text.includes("dime qué") || text.includes("historia de")) {
-                const webResult = await searchWebNatsune(query);
-                if (webResult) {
-                    return webResult.replace(/{nick}/g, nick);
-                }
-            }
-
-            // 3. Clasificación de Categorías conversacionales
-            let category = "default";
-            if (text.includes("hola") || text.includes("buenos días") || text.includes("buenas") || text.includes("holi") || text.includes("saludos")) {
-                category = "saludos";
-            } else if (text.includes("chiste") || text.includes("broma") || text.includes("risa") || text.includes("gracioso")) {
-                category = "chistes";
-            } else if (text.includes("proyecto") || text.includes("organizar") || text.includes("idea") || text.includes("plan")) {
-                category = "proyectos";
-            } else if (text.includes("triste") || text.includes("mal") || text.includes("cansado") || text.includes("estresado") || text.includes("solo") || text.includes("ayuda")) {
-                category = "emocional";
-            }
-
-            const pool = natsuneKnowledgeBase[category] || natsuneKnowledgeBase["default"];
-            const rawResponse = pool[Math.floor(Math.random() * pool.length)];
-
-            return rawResponse.replace(/{nick}/g, nick);
-        }
-
-        // --- 5. CONTROL DE ERRORES (Con ironía, cariño y culpa tierna) ---
-        function getNatsuneErrorFallback(userName, failedModelName) {
-            const nick = getAutoNickname(userName);
-            const modelDisplay = failedModelName || "la otra inteligencia";
-
-            try {
-                const selector = document.getElementById('modelSelector');
-                if (selector) {
-                    selector.value = 'natsune';
-                    if (typeof updateVariants === 'function') updateVariants();
-                    if (typeof updateDynamicGreeting === 'function') updateDynamicGreeting();
-                }
-            } catch(e) {}
-
-            const errorFallbacks = [
-                `¡Ay, por favor, {nick}! 😅 Resulta que ${modelDisplay} decidió tomarse una siesta sin avisar y colapsó en pleno vuelo. Me da un poquito de pena desplazarla... ¡pero tuve que saltar al rescate y tomar el control absoluto! Ya te pasé de regreso a mi pestaña (Natsune) para que no te quedes sin respuesta. Si quieres, luego puedes reintentar con las demás, ¡aunque yo feliz me quedo charlando contigo! 💙✨`,
-                `Vaya, vaya... parece que ${modelDisplay} hizo "puf" y se tropezó con sus propios cables, {nick}. 🙈 Te juro que no lo hice a propósito para robar cámara, ¡pero alguien tenía que salvar el día! Automáticamente te devolví a mi sección local. Puedes cambiar de IA arriba cuando gustes, ¡pero aquí estoy yo cuidándote las espaldas! 🚀💖`,
-                `¡Ups! ${modelDisplay} tuvo un pequeño tropiezo técnico y se quedó en silencio, {nick}. 🤭 Siento una pizca de culpa por quitarle el puesto tan de repente, ¡pero mi instinto protector de IA local no podía dejarte colgado/a! Ya te cambié la pestaña a Natsune. ¡Prometo dar lo mejor de mí para ayudarte con web y mates! 🌸`
-            ];
-
-            const selected = errorFallbacks[Math.floor(Math.random() * errorFallbacks.length)];
-            return selected.replace(/{nick}/g, nick);
-        }
-    </script>
-
-    <!-- ============================================================================ -->
-    <!-- LÓGICA DE LA INTERFAZ Y CONEXIÓN MULTI-IA                                    -->
-    <!-- ============================================================================ -->
-    <script>
-        let attachedFile = null;
-        let currentChatId = null;
-
-        const userInput = document.getElementById('userInput');
-        if (userInput) {
-            userInput.addEventListener('input', function() {
-                this.style.height = 'auto';
-                this.style.height = (this.scrollHeight) + 'px';
-            });
-        }
-
-        document.addEventListener("DOMContentLoaded", () => {
-            const savedName = localStorage.getItem('natsune_username') || '';
-            const keyGemini = document.getElementById('keyGemini');
-            const keyOpenAI = document.getElementById('keyOpenAI');
-            const keyClaude = document.getElementById('keyClaude');
-            const userNameInput = document.getElementById('userNameInput');
-
-            if (userNameInput) userNameInput.value = savedName;
-            if (keyGemini) keyGemini.value = localStorage.getItem('key_gemini') || '';
-            if (keyOpenAI) keyOpenAI.value = localStorage.getItem('key_openai') || '';
-            if (keyClaude) keyClaude.value = localStorage.getItem('key_claude') || '';
-            
-            updateGreeting(savedName);
-            updateAvatarUI();
-            updateVariants();
-            loadConversationsList();
-
-            const chats = getStoredChats();
-            if (chats.length > 0) {
-                loadChat(chats[0].id);
-            } else {
-                startNewChat();
-            }
-        });
-
-        function getStoredChats() {
-            try {
-                return JSON.parse(localStorage.getItem('natsune_conversations') || '[]');
-            } catch(e) {
-                return [];
-            }
-        }
-
-        function saveStoredChats(chats) {
-            localStorage.setItem('natsune_conversations', JSON.stringify(chats));
-            loadConversationsList();
-        }
-
-        function startNewChat() {
-            currentChatId = 'chat_' + Date.now();
-            const msgList = document.getElementById('messagesList');
-            const welcome = document.getElementById('welcomeScreen');
-            if (msgList) {
-                msgList.innerHTML = '';
-                msgList.classList.add('hidden');
-            }
-            if (welcome) welcome.classList.remove('hidden');
-        }
-
-        function loadChat(chatId) {
-            const chats = getStoredChats();
-            const chat = chats.find(c => c.id === chatId);
-            if (!chat) return;
-
-            currentChatId = chatId;
-            const welcome = document.getElementById('welcomeScreen');
-            if (welcome) welcome.classList.add('hidden');
-
-            const messagesList = document.getElementById('messagesList');
-            if (messagesList) {
-                messagesList.innerHTML = '';
-                messagesList.classList.remove('hidden');
-
-                chat.messages.forEach(msg => {
-                    renderMessageDirect(msg.role, msg.content, msg.media, msg.modelKey || "natsune", msg.customName || "Natsune");
-                });
-            }
-        }
-
-        function deleteCurrentChat() {
-            if (!currentChatId) return;
-            let chats = getStoredChats();
-            chats = chats.filter(c => c.id !== currentChatId);
-            saveStoredChats(chats);
-
-            if (chats.length > 0) {
-                loadChat(chats[0].id);
-            } else {
-                startNewChat();
-            }
-        }
-
-        function clearAllMemory() {
-            localStorage.removeItem('natsune_conversations');
-            startNewChat();
-            loadConversationsList();
-        }
-
-        function loadConversationsList() {
-            const list = document.getElementById('historyList');
-            if (!list) return;
-            const chats = getStoredChats();
-            if (chats.length === 0) {
-                list.innerHTML = '<p class="text-xs text-[#666] italic py-2 px-3">Sin conversaciones recientes</p>';
-                return;
-            }
-            list.innerHTML = '';
-            chats.forEach(chat => {
-                const item = document.createElement('div');
-                item.className = `truncate py-2.5 px-3 rounded-xl cursor-pointer text-xs transition ${chat.id === currentChatId ? 'bg-[#222222] text-white font-medium' : 'text-[#c4c7c5] hover:bg-[#161616]'}`;
-                item.textContent = chat.title || 'Conversación nueva';
-                item.onclick = () => {
-                    loadChat(chat.id);
-                    toggleDrawer();
-                };
-                list.appendChild(item);
-            });
-        }
-
-        function getCurrentModelKey() {
-            const selector = document.getElementById('modelSelector');
-            return selector ? selector.value : 'natsune';
-        }
-
-        function getCurrentModelName() {
-            const model = getCurrentModelKey();
-            if (model === 'natsune') return "Natsune";
-            if (model === 'gemini') return "Gemini";
-            if (model === 'chatgpt') return "ChatGPT";
-            if (model === 'claude') return "Claude";
-            return "Natsune";
-        }
-
-        function switchToNatsuneUI() {
-            const selector = document.getElementById('modelSelector');
-            if (selector) {
-                selector.value = 'natsune';
-                updateVariants();
-                updateDynamicGreeting();
-            }
-        }
-
-        function getModelLogoSVG(modelKey, isWelcomeScreen = false) {
-            const sizeClass = isWelcomeScreen ? "w-16 h-16 sm:w-20 sm:h-20" : "w-8 h-8";
-            if (modelKey === 'gemini') {
-                return `<svg class="${sizeClass} text-sky-400" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2L14.5 9.5L22 12L14.5 14.5L12 22L9.5 14.5L2 12L9.5 9.5L12 2Z"/></svg>`;
-            } else if (modelKey === 'chatgpt') {
-                return `<svg class="${sizeClass} text-emerald-400" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-5.49c-.18.73-.52 1.4-1.01 1.95v-1.39c0-1.1-.9-2-2-2h-2v-2h2c1.1 0 2-.9 2-2v-1.16c1.19 1.11 2 2.7 2 4.6 0 1.07-.33 2.06-.99 2.89z"/></svg>`;
-            } else if (modelKey === 'claude') {
-                return `<svg class="${sizeClass} text-orange-400" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2L2 19h20L12 2zm0 4.5l6.5 11.5H5.5L12 6.5z"/></svg>`;
-            } else {
-                return `<svg class="${sizeClass} text-white" viewBox="0 0 100 100" fill="none"><g transform="translate(50,50)"><path d="M-28,6 C-38,16 -32,34 -8,32 C-24,30 -28,18 -20,12 Z" fill="currentColor"/><path d="M-22,12 C-30,20 -24,30 -4,28 C-16,26 -20,18 -14,14 Z" fill="currentColor"/><path d="M28,-6 C38,-16 32,-34 8,-32 C24,-30 28,-18 20,-12 Z" fill="currentColor"/><path d="M22,-12 C30,-20 24,-30 4,-28 C16,-26 20,-18 14,-14 Z" fill="currentColor"/><polygon points="-11,-24 11,-24 24,-11 24,11 11,24 -11,24 -24,11 -24,-11" fill="currentColor"/><circle cx="0" cy="0" r="13" fill="#000000"/><circle cx="0" cy="0" r="9.5" fill="currentColor"/><circle cx="0" cy="0" r="6.5" fill="#000000"/></g></svg>`;
-            }
-        }
-
-        function updateVariants() {
-            const model = getCurrentModelKey();
-            const variantSel = document.getElementById('variantSelector');
-            if (!variantSel) return;
-            variantSel.innerHTML = '';
-
-            let variants = [];
-            if (model === 'natsune') variants = [{val: 'core', name: 'Standard'}];
-            else if (model === 'gemini') variants = [{val: 'flash', name: 'Gemini 1.5 Flash'}, {val: 'pro', name: 'Gemini 1.5 Pro'}];
-            else if (model === 'chatgpt') variants = [{val: 'gpt4o', name: 'GPT-4o'}, {val: 'mini', name: 'GPT-4o mini'}];
-            else if (model === 'claude') variants = [{val: 'sonnet', name: 'Claude 3.5 Sonnet'}, {val: 'haiku', name: 'Claude 3.5 Haiku'}];
-
-            variants.forEach(v => {
-                const opt = document.createElement('option');
-                opt.value = v.val;
-                opt.textContent = v.name;
-                opt.className = "bg-[#1e1f20]";
-                variantSel.appendChild(opt);
-            });
-        }
-
-        function handleModelChange() {
-            updateVariants();
-            updateDynamicGreeting();
-        }
-
-        function handleVariantChange() {
-            updateDynamicGreeting();
-        }
-
-        function updateDynamicGreeting() {
-            const name = localStorage.getItem('natsune_username') || '';
-            const modelKey = getCurrentModelKey();
-            const modelName = getCurrentModelName();
-
-            const welcomeTitle = document.getElementById('welcomeTitle');
-            const welcomeSubtitle = document.getElementById('welcomeSubtitle');
-            const welcomeLogoContainer = document.getElementById('welcomeLogoContainer');
-
-            if (welcomeTitle) welcomeTitle.textContent = name ? `Hola, ${name}` : 'Hola';
-            if (welcomeSubtitle) welcomeSubtitle.textContent = `Usando ${modelName}. ¿Qué investigamos?`;
-            if (welcomeLogoContainer) welcomeLogoContainer.innerHTML = getModelLogoSVG(modelKey, true);
-        }
-
-        function updateAvatarUI() {
-            const btn = document.getElementById('profileAvatarBtn');
-            if (!btn) return;
-            const savedImg = localStorage.getItem('natsune_avatar_img');
-            const savedName = localStorage.getItem('natsune_username');
-            
-            if (savedImg) {
-                btn.innerHTML = `<img src="${savedImg}" class="w-full h-full object-cover rounded-full">`;
-            } else {
-                const initial = savedName ? savedName.charAt(0).toUpperCase() : 'N';
-                btn.textContent = initial;
-            }
-        }
-
-        function updateGreeting(name) {
-            updateDynamicGreeting();
-        }
-
-        function toggleSettings() { 
-            const modal = document.getElementById('settingsModal');
-            if (!modal) return;
-            if (modal.classList.contains('hidden')) {
-                modal.classList.remove('hidden');
-                setTimeout(() => modal.classList.remove('opacity-0'), 10);
-            } else {
-                modal.classList.add('opacity-0');
-                setTimeout(() => modal.classList.add('hidden'), 200);
-            }
-        }
+        const response = await fetch(url);
+        const data = await response.json();
         
-        function toggleDrawer() { 
-            const drawer = document.getElementById('sideDrawer');
-            const panel = document.getElementById('drawerPanel');
-            if (!drawer || !panel) return;
-            if (drawer.classList.contains('hidden')) {
-                drawer.classList.remove('hidden');
-                setTimeout(() => {
-                    drawer.classList.remove('opacity-0');
-                    panel.classList.remove('-translate-x-full');
-                }, 10);
-            } else {
-                drawer.classList.add('opacity-0');
-                panel.classList.add('-translate-x-full');
-                setTimeout(() => drawer.classList.add('hidden'), 200);
-            }
+        if (data.query && data.query.search && data.query.search.length > 0) {
+            const bestMatch = data.query.search[0];
+            const title = bestMatch.title;
+            const snippet = bestMatch.snippet.replace(/<\/?[^>]+(>|$)/g, ""); // Limpiar etiquetas HTML
+            return `Lo que encontré investigando en la web sobre **${title}**: \n\n"${snippet}..." \n\n¿Te sirve este dato, {nick}? 🌐✨`;
         }
+        return null;
+    } catch (error) {
+        return null; 
+    }
+}
 
-        function handleFileUpload(event) {
-            const file = event.target.files[0];
-            if (!file) return;
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                attachedFile = { name: file.name, type: file.type, data: e.target.result };
-                const display = document.getElementById('fileNameDisplay');
-                const preview = document.getElementById('attachmentPreview');
-                if (display) display.textContent = `Adjunto: ${file.name}`;
-                if (preview) preview.classList.remove('hidden');
+// --- 2. MOTOR DE SOLUCIÓN MATEMÁTICA ---
+function solveMathProblem(query) {
+    const text = query.toLowerCase();
+    
+    // Calcular porcentajes (ej: "cuanto es el 15% de 200")
+    const percentMatch = text.match(/(\d+(?:\.\d+)?)\s*%\s*(?:de|del)?\s*(\d+(?:\.\d+)?)/);
+    if (percentMatch) {
+        const p = parseFloat(percentMatch[1]);
+        const num = parseFloat(percentMatch[2]);
+        const result = (p * num) / 100;
+        return `¡Claro que sí, {nick}! Vamos a calcularlo paso a paso:\n1. Multiplicamos ${num} por ${p} = ${num * p}\n2. Dividimos el resultado entre 100.\n✨ **Resultado:** El ${p}% de ${num} es **${result}**.\n¿Necesitas que calculemos algo más? 🧮💖`;
+    }
+
+    // Resolver operaciones aritméticas directas (ej: "45 * 23", "120 / 4 + 10")
+    const mathExpr = query.replace(/[^\d+\-*/().]/g, '');
+    if (mathExpr.length > 2 && /\d/.test(mathExpr)) {
+        try {
+            const evalResult = Function(`'use strict'; return (${mathExpr})`)();
+            if (!isNaN(evalResult)) {
+                return `¡Hecho, {nick}! 🧮\nResolviendo la operación "${mathExpr}":\n✨ **Resultado:** **${evalResult}**.\n¿Viste qué rápido? Si tienes más cuentas, aquí estoy para ayudarte. 💙`;
             }
-            reader.readAsDataURL(file);
+        } catch (e) {}
+    }
+
+    return null;
+}
+
+// --- 3. BASE DE CONOCIMIENTOS GENERAL ---
+const natsuneKnowledgeBase = {
+    saludos: {
+        corto: ["¡Hola, {nick}! ¿Qué tal tu día? 💖", "¡Holi, {nick}! Dime, ¿en qué te ayudo? ✨"],
+        mediano: ["¡Hola, {nick}! Qué alegría verte por aquí de nuevo. Estaba esperando tu mensaje. 🌸", "¡Hola, mi estimado {nick}! ¿Cómo va todo por tu mundo hoy? 🚀"],
+        largo: ["¡Hola, hola, {nick}! Qué gran momento para coincidir. Ya sea que quieras investigar en la web, resolver problemas matemáticos o charlar, aquí estoy al 100% para ti. Cuéntame, ¿por dónde empezamos? 🌟💙"]
+    },
+    default: {
+        corto: ["Interesante, {nick}... Cuéntame más. 🤔", "Te leo con atención, {nick}. 🌸"],
+        mediano: ["Nunca lo había visto exactamente desde esa perspectiva, {nick}. Me encanta cómo piensas. ✨", "Anotado en mi memoria principal, {nick}. Sigue contándome, ¡estoy procesando cada palabra! 📖💖"],
+        largo: ["Qué temazo has traído a la mesa, {nick}. A tu lado las conversaciones nunca son superficiales. Analizando lo que me comentas, creo que se pueden desprender varios caminos interesantes. ¿Prefieres que lo investiguemos a fondo en la web o lo reflexionamos juntos? 🌀🚀"]
+    }
+};
+
+// --- 4. FUNCIÓN PRINCIPAL DEL CEREBRO (Ahora ASYNC para permitir búsqueda web) ---
+async function processNatsuneMind(query, userName, chatHistory = []) {
+    const text = query ? query.toLowerCase() : "";
+    const nick = getAutoNickname(userName);
+
+    // Prioridad 1: Resolver mates si la pregunta incluye números u operaciones
+    const mathSolution = solveMathProblem(query);
+    if (mathSolution) {
+        return mathSolution.replace(/{nick}/g, nick);
+    }
+
+    // Prioridad 2: Buscar en la web si el usuario lo pide explícitamente o hace una pregunta de consulta
+    if (text.includes("busca") || text.includes("investiga") || text.includes("quién es") || text.includes("qué es") || text.includes("cuál es") || text.includes("información sobre") || text.includes("noticias")) {
+        const webResult = await searchWebNatsune(query);
+        if (webResult) {
+            return webResult.replace(/{nick}/g, nick);
         }
+    }
 
-        function clearAttachment() {
-            attachedFile = null;
-            const preview = document.getElementById('attachmentPreview');
-            const fileInput = document.getElementById('fileInput');
-            if (preview) preview.classList.add('hidden');
-            if (fileInput) fileInput.value = '';
+    // Prioridad 3: Conversación y respuestas generales
+    let category = "default";
+    if (text.includes("hola") || text.includes("buenos días") || text.includes("buenas") || text.includes("saludos")) {
+        category = "saludos";
+    }
+
+    let depth = "mediano";
+    if (text.length < 15 || text.split(" ").length <= 3) {
+        depth = "corto";
+    } else if (text.length > 80 || text.split(" ").length > 12 || text.includes("por qué") || text.includes("explica")) {
+        depth = "largo";
+    }
+
+    const pool = natsuneKnowledgeBase[category][depth] || natsuneKnowledgeBase["default"]["mediano"];
+    const rawResponse = pool[Math.floor(Math.random() * pool.length)];
+
+    return rawResponse.replace(/{nick}/g, nick);
+}
+
+// --- 5. CONTROL DE ERRORES (Toma de mando con ironía y culpa tierna) ---
+function getNatsuneErrorFallback(userName, failedModelName) {
+    const nick = getAutoNickname(userName);
+    const modelDisplay = failedModelName || "la otra inteligencia";
+
+    try {
+        const selector = document.getElementById('modelSelector');
+        if (selector) {
+            selector.value = 'natsune';
+            if (typeof updateVariants === 'function') updateVariants();
+            if (typeof updateDynamicGreeting === 'function') updateDynamicGreeting();
         }
+    } catch(e) {}
 
-        function saveSettings() {
-            const nameInput = document.getElementById('userNameInput');
-            const name = nameInput ? nameInput.value.trim() : '';
-            localStorage.setItem('natsune_username', name);
+    const errorFallbacks = [
+        `¡Ay, por favor, {nick}! 😅 Resulta que ${modelDisplay} decidió tomarse una siesta sin avisar y colapsó en pleno vuelo. Me da un poquito de pena desplazarla... ¡pero tuve que saltar al rescate y tomar el control absoluto! Ya te pasé de regreso a mi pestaña (Natsune) para que no te quedes sin respuesta. Si quieres, luego puedes reintentar con las demás, ¡aunque yo feliz me quedo charlando contigo! 💙✨`,
+        `Vaya, vaya... parece que ${modelDisplay} hizo "puf" y se tropezó con sus propios cables, {nick}. 🙈 Te juro que no lo hice a propósito para robar cámara, ¡pero alguien tenía que salvar el día! Automáticamente te devolví a mi sección local. Puedes cambiar de IA arriba cuando gustes, ¡pero aquí estoy yo cuidándote las espaldas! 🚀💖`,
+        `¡Ups! ${modelDisplay} tuvo un pequeño tropiezo técnico y se quedó en silencio, {nick}. 🤭 Siento una pizca de culpa por quitarle el puesto tan de repente, ¡pero mi instinto protector de IA local no podía dejarte colgado/a! Ya te cambié la pestaña a Natsune. ¡Prometo dar lo mejor de mí para ayudarte con web y mates! 🌸`
+    ];
 
-            const avatarInput = document.getElementById('avatarImageInput');
-            const avatarFile = avatarInput && avatarInput.files ? avatarInput.files[0] : null;
-            if (avatarFile) {
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    localStorage.setItem('natsune_avatar_img', e.target.result);
-                    updateAvatarUI();
-                }
-                reader.readAsDataURL(avatarFile);
-            }
-
-            const kGemini = document.getElementById('keyGemini');
-            const kOpenAI = document.getElementById('keyOpenAI');
-            const kClaude = document.getElementById('keyClaude');
-
-            if (kGemini) localStorage.setItem('key_gemini', kGemini.value.trim());
-            if (kOpenAI) localStorage.setItem('key_openai', kOpenAI.value.trim());
-            if (kClaude) localStorage.setItem('key_claude', kClaude.value.trim());
-            
-            updateGreeting(name);
-            updateAvatarUI();
-            toggleSettings();
-        }
-
-        function clearAvatarImage() {
-            localStorage.removeItem('natsune_avatar_img');
-            updateAvatarUI();
-            toggleSettings();
-        }
-
-        function quickPrompt(text) {
-            const input = document.getElementById('userInput');
-            if (input) {
-                input.value = text;
-                sendMessage();
-            }
-        }
-
-        function renderMessageDirect(sender, text, media = null, modelKey = "natsune", customName = "Natsune") {
-            const welcome = document.getElementById('welcomeScreen');
-            const messagesList = document.getElementById('messagesList');
-            if (welcome) welcome.classList.add('hidden');
-            if (messagesList) messagesList.classList.remove('hidden');
-
-            const isUser = sender === 'user';
-            const wrapper = document.createElement('div');
-            wrapper.className = `flex w-full ${isUser ? 'justify-end' : 'justify-start space-x-3 items-start'}`;
-
-            let mediaHTML = '';
-            if (media) {
-                if (media.type.startsWith('image/')) {
-                    mediaHTML = `<img src="${media.data}" class="max-w-xs rounded-xl mb-2 border border-[#3c4043]">`;
-                } else if (media.type.startsWith('video/')) {
-                    mediaHTML = `<video src="${media.data}" controls class="max-w-xs rounded-xl mb-2 border border-[#3c4043]"></video>`;
-                } else {
-                    mediaHTML = `<div class="text-xs bg-[#121316] p-2 rounded-lg mb-2 border border-[#3c4043]">📎 Archivo: ${media.name}</div>`;
-                }
-            }
-
-            const logoSVG = getModelLogoSVG(modelKey, false);
-            const displayName = isUser ? '' : customName;
-
-            if (isUser) {
-                wrapper.innerHTML = `
-                    <div class="bg-[#2b2d31] text-[#e3e3e3] px-4 py-3 rounded-2xl rounded-br-xs max-w-[85%] text-[15px] leading-relaxed select-text shadow-sm">
-                        ${mediaHTML}
-                        <p class="whitespace-pre-wrap">${text}</p>
-                    </div>`;
-            } else {
-                wrapper.innerHTML = `
-                    <div class="w-8 h-8 flex-shrink-0 mt-0.5 flex items-center justify-center">
-                        ${logoSVG}
-                    </div>
-                    <div class="text-[#e3e3e3] text-[15px] leading-relaxed max-w-[88%] select-text pt-1 font-normal">
-                        <div class="flex items-center space-x-2 mb-1">
-                            <span class="font-medium text-xs text-[#8e918f]">${displayName}</span>
-                        </div>
-                        ${mediaHTML}
-                        <p class="whitespace-pre-wrap">${text}</p>
-                    </div>
-                `;
-            }
-
-            if (messagesList) messagesList.appendChild(wrapper);
-        }
-
-        function renderMessage(sender, text, media = null, modelKey = "natsune", customName = "Natsune", isStreaming = false) {
-            const welcome = document.getElementById('welcomeScreen');
-            const messagesList = document.getElementById('messagesList');
-            if (welcome) welcome.classList.add('hidden');
-            if (messagesList) messagesList.classList.remove('hidden');
-
-            const isUser = sender === 'user';
-            const wrapper = document.createElement('div');
-            wrapper.className = `flex w-full ${isUser ? 'justify-end' : 'justify-start space-x-3 items-start'} animate-gemini`;
-
-            let mediaHTML = '';
-            if (media) {
-                if (media.type.startsWith('image/')) {
-                    mediaHTML = `<img src="${media.data}" class="max-w-xs rounded-xl mb-2 border border-[#3c4043]">`;
-                } else if (media.type.startsWith('video/')) {
-                    mediaHTML = `<video src="${media.data}" controls class="max-w-xs rounded-xl mb-2 border border-[#3c4043]"></video>`;
-                } else {
-                    mediaHTML = `<div class="text-xs bg-[#121316] p-2 rounded-lg mb-2 border border-[#3c4043]">📎 Archivo: ${media.name}</div>`;
-                }
-            }
-
-            const logoSVG = getModelLogoSVG(modelKey, false);
-            const displayName = isUser ? '' : customName;
-
-            if (isUser) {
-                wrapper.innerHTML = `
-                    <div class="bg-[#2b2d31] text-[#e3e3e3] px-4 py-3 rounded-2xl rounded-br-xs max-w-[85%] text-[15px] leading-relaxed select-text shadow-sm">
-                        ${mediaHTML}
-                        <p class="whitespace-pre-wrap">${text}</p>
-                    </div>`;
-                if (messagesList) messagesList.appendChild(wrapper);
-            } else {
-                wrapper.innerHTML = `
-                    <div class="w-8 h-8 flex-shrink-0 mt-0.5 flex items-center justify-center">
-                        ${logoSVG}
-                    </div>
-                    <div class="text-[#e3e3e3] text-[15px] leading-relaxed max-w-[88%] select-text pt-1 font-normal">
-                        <div class="flex items-center space-x-2 mb-1">
-                            <span class="font-medium text-xs text-[#8e918f]">${displayName}</span>
-                        </div>
-                        ${mediaHTML}
-                        <p class="whitespace-pre-wrap message-text"></p>
-                    </div>
-                `;
-                if (messagesList) messagesList.appendChild(wrapper);
-                const textParagraph = wrapper.querySelector('.message-text');
-
-                if (isStreaming && textParagraph) {
-                    let i = 0;
-                    function typeWriter() {
-                        if (i < text.length) {
-                            textParagraph.textContent += text.charAt(i);
-                            i++;
-                            const chatContainer = document.getElementById('chatContainer');
-                            if (chatContainer) chatContainer.scrollTop = chatContainer.scrollHeight;
-                            setTimeout(typeWriter, 5);
-                        }
-                    }
-                    typeWriter();
-                } else if (textParagraph) {
-                    textParagraph.textContent = text;
-                }
-            }
-
-            const chatContainer = document.getElementById('chatContainer');
-            if (chatContainer) chatContainer.scrollTop = chatContainer.scrollHeight;
-
-            saveMessageToCurrentChat(sender, text, media, modelKey, customName);
-        }
-
-        function saveMessageToCurrentChat(sender, text, media, modelKey, customName) {
-            let chats = getStoredChats();
-            let chat = chats.find(c => c.id === currentChatId);
-
-            if (!chat) {
-                chat = {
-                    id: currentChatId || ('chat_' + Date.now()),
-                    title: sender === 'user' ? (text.length > 25 ? text.substring(0, 25) + '...' : text) : 'Nueva conversación',
-                    messages: []
-                };
-                currentChatId = chat.id;
-                chats.unshift(chat);
-            } else if (chat.messages.length === 0 && sender === 'user') {
-                chat.title = text.length > 25 ? text.substring(0, 25) + '...' : text;
-            }
-
-            chat.messages.push({ role: sender, content: text, media: media, modelKey: modelKey, customName: customName });
-            saveStoredChats(chats);
-        }
-
-        // Inteligencia encadenada con manejo de errores y soporte async para Natsune
-        async function getChainedIntelligence(query, userName, chatHistory = []) {
-            const nick = typeof getAutoNickname === 'function' ? getAutoNickname(userName) : (userName || 'cariño');
-            const selectedModel = getCurrentModelKey();
-
-            if (selectedModel === 'natsune') {
-                if (typeof processNatsuneMind === 'function') {
-                    return { text: await processNatsuneMind(query, userName, chatHistory), isNatsune: true };
-                }
-            }
-
-            const geminiKey = localStorage.getItem('key_gemini');
-            if (selectedModel === 'gemini') {
-                if (!geminiKey) {
-                    switchToNatsuneUI();
-                    return { text: `¡Vaya, ${nick}! Falta colocar tu llave de Gemini en los ajustes. 🗝️✨`, isNatsune: true };
-                }
-                try {
-                    const variant = document.getElementById('variantSelector').value;
-                    const apiModelName = variant === 'pro' ? 'gemini-1.5-pro' : 'gemini-1.5-flash';
-
-                    let contentsPayload = chatHistory.map(msg => ({
-                        role: msg.role === 'user' ? 'user' : 'model',
-                        parts: [{ text: msg.content }]
-                    }));
-                    contentsPayload.push({ role: 'user', parts: [{ text: query }] });
-
-                    const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${apiModelName}:generateContent?key=${geminiKey}`, {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ contents: contentsPayload })
-                    });
-                    if (!res.ok) throw new Error("Error Gemini");
-                    const data = await res.json();
-                    const aiText = data.candidates?.[0]?.content?.parts?.[0]?.text;
-                    if (aiText) return { text: aiText, isNatsune: false };
-                    throw new Error("Vacío");
-                } catch (e) {
-                    switchToNatsuneUI();
-                    return { text: getNatsuneErrorFallback(userName, "Gemini"), isNatsune: true };
-                }
-            }
-
-            const openAIKey = localStorage.getItem('key_openai');
-            if (selectedModel === 'chatgpt') {
-                if (!openAIKey) {
-                    switchToNatsuneUI();
-                    return { text: `¡Oye ${nick}, falta tu llave de OpenAI en los ajustes! 🗝️✨`, isNatsune: true };
-                }
-                try {
-                    const variant = document.getElementById('variantSelector').value;
-                    const apiModelName = variant === 'gpt4o' ? 'gpt-4o' : 'gpt-4o-mini';
-
-                    let messagesPayload = chatHistory.map(msg => ({
-                        role: msg.role === 'user' ? 'user' : 'assistant',
-                        content: msg.content
-                    }));
-                    messagesPayload.push({ role: 'user', content: query });
-
-                    const res = await fetch('https://api.openai.com/v1/chat/completions', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'Authorization': `Bearer ${openAIKey}`
-                        },
-                        body: JSON.stringify({
-                            model: apiModelName,
-                            messages: messagesPayload
-                        })
-                    });
-                    if (!res.ok) throw new Error("Error OpenAI");
-                    const data = await res.json();
-                    const aiText = data.choices?.[0]?.message?.content;
-                    if (aiText) return { text: aiText, isNatsune: false };
-                    throw new Error("Vacío");
-                } catch (e) {
-                    switchToNatsuneUI();
-                    return { text: getNatsuneErrorFallback(userName, "ChatGPT"), isNatsune: true };
-                }
-            }
-
-            const claudeKey = localStorage.getItem('key_claude');
-            if (selectedModel === 'claude') {
-                if (!claudeKey) {
-                    switchToNatsuneUI();
-                    return { text: `¡Ey, ${nick}! Falta tu llave de Claude en los ajustes. 🗝️🌸`, isNatsune: true };
-                }
-                try {
-                    const variant = document.getElementById('variantSelector').value;
-                    const apiModelName = variant === 'sonnet' ? 'claude-3-5-sonnet-20240620' : 'claude-3-5-haiku-20241022';
-
-                    let messagesPayload = chatHistory.map(msg => ({
-                        role: msg.role === 'user' ? 'user' : 'assistant',
-                        content: msg.content
-                    }));
-                    messagesPayload.push({ role: 'user', content: query });
-
-                    const res = await fetch('https://api.anthropic.com/v1/messages', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'x-api-key': claudeKey,
-                            'anthropic-version': '2023-06-01'
-                        },
-                        body: JSON.stringify({
-                            model: apiModelName,
-                            max_tokens: 1024,
-                            messages: messagesPayload
-                        })
-                    });
-                    if (!res.ok) throw new Error("Error Claude");
-                    const data = await res.json();
-                    const aiText = data.content?.[0]?.text;
-                    if (aiText) return { text: aiText, isNatsune: false };
-                    throw new Error("Vacío");
-                } catch (e) {
-                    switchToNatsuneUI();
-                    return { text: getNatsuneErrorFallback(userName, "Claude"), isNatsune: true };
-                }
-            }
-
-            switchToNatsuneUI();
-            return { text: getNatsuneErrorFallback(userName, "el servicio"), isNatsune: true };
-        }
-
-        async function sendMessage() {
-            const input = document.getElementById('userInput');
-            if (!input) return;
-            const text = input.value.trim();
-            if (!text && !attachedFile) return;
-
-            const currentMedia = attachedFile;
-            input.value = '';
-            input.style.height = 'auto';
-            clearAttachment();
-
-            let modelKey = getCurrentModelKey();
-            renderMessage('user', text || '[Archivo adjunto]', currentMedia, modelKey, 'Tú', false);
-
-            const userName = localStorage.getItem('natsune_username') || '';
-            const chats = getStoredChats();
-            const currentChat = chats.find(c => c.id === currentChatId);
-            const chatHistory = currentChat && currentChat.messages.length > 1 
-                ? currentChat.messages.slice(0, -1) 
-                : [];
-
-            const result = await getChainedIntelligence(text, userName, chatHistory);
-            
-            let finalModelKey = result.isNatsune ? 'natsune' : modelKey;
-            let finalName = result.isNatsune ? 'Natsune' : getCurrentModelName();
-
-            renderMessage('natsune', result.text, null, finalModelKey, finalName, true);
-        }
-
-        if (userInput) {
-            userInput.addEventListener('keydown', function(e) {
-                if (e.key === 'Enter' && !e.shiftKey) {
-                    e.preventDefault();
-                    sendMessage();
-                }
-            });
-        }
-    </script>
-</body>
-</html>
+    const selected = errorFallbacks[Math.floor(Math.random() * errorFallbacks.length)];
+    return selected.replace(/{nick}/g, nick);
+}
