@@ -1,7 +1,6 @@
 /**
  * =========================================================================
  * NATSUNE IA - SERVIDOR BACKEND PROXY (server.js)
- * Protege tu API Key y resuelve los problemas de CORS del navegador.
  * =========================================================================
  */
 
@@ -12,8 +11,8 @@ const fetch = require('node-fetch');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// API Key dividida para evitar que el escáner automático de GitHub la bloquee
-const GROQ_API_KEY = ['gsk', 'snnKlHUt1jDqnmcQHefsWGdyb3FYoo1KCDKhq0bsD7gj4NKT1ReO'].join('_');
+// Lee la API Key de forma segura desde las variables de entorno de Render
+const GROQ_API_KEY = process.env.GROQ_API_KEY;
 
 app.use(cors());
 app.use(express.json({ limit: '10mb' }));
@@ -52,5 +51,5 @@ app.post('/api/chat', async (req, res) => {
 });
 
 app.listen(PORT, () => {
-  console.log(`Servidor de Natsune IA corriendo en http://localhost:${PORT}`);
+  console.log(`Servidor de Natsune IA corriendo en el puerto ${PORT}`);
 });
