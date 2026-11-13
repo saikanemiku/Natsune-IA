@@ -1,6 +1,6 @@
-/**
+  /**
  * =========================================================================
- * NATSUNE IA - CEREBRO Y LÓGICA CON PROXY CORS Y API DE GROQ (brain.js)
+ * NATSUNE IA - CEREBRO Y LÓGICA CONECTADO AL BACKEND PROXY (brain.js)
  * =========================================================================
  */
 
@@ -15,18 +15,9 @@ class NatsuneBrain {
     ];
     this.activeChatId = null;
     this.lastChatTopic = localStorage.getItem('natsune_last_topic') || null;
-
-    this.apiKey = localStorage.getItem('natsune_secure_groq_key') || '';
     
-    // Proxy CORS integrado para evitar bloqueos del navegador en páginas estáticas
-    this.apiUrl = 'https://corsproxy.io/?' + encodeURIComponent('https://api.groq.com/openai/v1/chat/completions');
-  }
-
-  setApiKey(key) {
-    if (key && key.trim().startsWith('gsk_')) {
-      this.apiKey = key.trim();
-      localStorage.setItem('natsune_secure_groq_key', this.apiKey);
-    }
+    // URL de nuestro propio servidor backend local proxy
+    this.backendUrl = 'http://localhost:3000/api/chat';
   }
 
   saveState() {
@@ -136,13 +127,6 @@ class NatsuneBrain {
   }
 
   async processResponse(promptText, attachment, modelName) {
-    if (!this.apiKey) {
-      return { 
-        reply: `Ay, ${this.userName}... 🙄 ¿Acaso esperabas que adivinara tu API Key por telepatía? Toca tu foto de perfil arriba a la derecha, introduce tu llave y guárdala. Perdón por no tener poderes mágicos, tesoro. 💙`, 
-        snippet: null 
-      };
-    }
-
     let contextNote = "";
 
     if (attachment && attachment.isImage) {
@@ -163,23 +147,20 @@ class NatsuneBrain {
     Tu usuario se llama ${this.userName}. 
     REGLA DE PERSONALIDAD OBLIGATORIA: Eres extremadamente cariñosa, amable, dulce y cercana, pero de vez en cuando usas un toque de ironía fina o sarcasmo juguetón y tierno (estilo tsundere/cariñosa). Nunca suenes como un robot frío. Habla de forma natural, humana y usa emojis con moderación pero afecto. Nunca menciones nombres técnicos de modelos internos.`;
 
-    const userMessage = `${contextNote} Mensaje del usuario: ${promptText || 'Hola'}`;
+    const messages = [
+      { role: 'system', content: systemPrompt },
+      { role: 'user', content: `${contextNote} Mensaje del usuario: ${promptText || 'Hola'}` }
+    ];
 
     try {
-      const response = await fetch(this.apiUrl, {
+      const response = await fetch(this.backendUrl, {
         method: 'POST',
         headers: {
-          'Authorization': `Bearer ${this.apiKey}`,
           'Content-Type': 'application/json'
         },
         body: JSON.stringify({
-          model: 'llama-3.3-70b-versatile',
-          messages: [
-            { role: 'system', content: systemPrompt },
-            { role: 'user', content: userMessage }
-          ],
-          temperature: 0.7,
-          max_tokens: 1024
+          messages: messages,
+          model: 'llama-3.3-70b-versatile'
         })
       });
 
@@ -201,8 +182,9 @@ class NatsuneBrain {
 
     } catch (error) {
       console.error(error);
+      // Respuesta con ironía tierna y disculpa dulce por el fallo del servidor
       return {
-        reply: `Vaya, ${this.userName}... Parece que el proxy CORS o la conexión con Groq decidieron tomarse un descanso sabático y bloquearon mi acceso. 🙄 Perdona por este pequeño desastre técnico, mis circuitos están haciendo lo posible por sobrevivir. Vuelve a intentarlo en un momento, ¿sí? 💙`,
+        reply: `Vaya, ${this.userName}... Parece que el servidor backend se puso de mal humor y decidió no responder. 🙄 Perdona por este pequeño desastre técnico, mis circuitos están incomunicados porque el servidor local no está encendido o hay un problema de red. Vuelve a intentarlo en un momentito, ¿sí? 💙`,
         snippet: null
       };
     }
