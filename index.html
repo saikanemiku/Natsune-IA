@@ -9,6 +9,8 @@
     <link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' fill='%23000000'/><g transform='translate(50,50)'><path d='M-28,6 C-38,16 -32,34 -8,32 C-24,30 -28,18 -20,12 Z' fill='%23ffffff'/><path d='M-22,12 C-30,20 -24,30 -4,28 C-16,26 -20,18 -14,14 Z' fill='%23ffffff'/><path d='M28,-6 C38,-16 32,-34 8,-32 C24,-30 28,-18 20,-12 Z' fill='%23ffffff'/><path d='M22,-12 C30,-20 24,-30 4,-28 C16,-26 20,-18 14,-14 Z' fill='%23ffffff'/><polygon points='-11,-24 11,-24 24,-11 24,11 11,24 -11,24 -24,11 -24,-11' fill='%23ffffff'/><circle cx='0' cy='0' r='13' fill='%23000000'/><circle cx='0' cy='0' r='9.5' fill='%23ffffff'/><circle cx='0' cy='0' r='6.5' fill='%23000000'/></g></svg>">
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Google+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+    <!-- Importamos la mente separada de Natsune -->
+    <script src="natsune-brain.js"></script>
     <style>
         body {
             font-family: 'Google Sans', -apple-system, BlinkMacSystemFont, sans-serif;
@@ -144,9 +146,9 @@
                     <span class="text-sm text-[#e3e3e3] font-normal leading-snug">Organizar una idea o proyecto</span>
                     <span class="text-sky-400 text-sm self-end">✦</span>
                 </button>
-                <button onclick="quickPrompt('Genera una imagen creativa de un paisaje futurista')" class="p-4 bg-[#1e1f20]/90 hover:bg-[#282a2c] border border-[#3c4043]/50 rounded-2xl text-left transition flex flex-col justify-between h-28 active:scale-95">
-                    <span class="text-sm text-[#e3e3e3] font-normal leading-snug">Generar imagen creativa</span>
-                    <span class="text-sky-400 text-sm self-end">🖼️</span>
+                <button onclick="quickPrompt('Cuéntame un chiste divertido')" class="p-4 bg-[#1e1f20]/90 hover:bg-[#282a2c] border border-[#3c4043]/50 rounded-2xl text-left transition flex flex-col justify-between h-28 active:scale-95">
+                    <span class="text-sm text-[#e3e3e3] font-normal leading-snug">Cuéntame un chiste</span>
+                    <span class="text-sky-400 text-sm self-end">😄</span>
                 </button>
             </div>
         </div>
@@ -531,153 +533,6 @@
             }
         }
 
-        function getAutoNickname(userName) {
-            if (!userName) return "amigo(a)";
-            const cleanName = userName.trim();
-            const firstWord = cleanName.split(' ')[0];
-
-            const variations = [
-                `${firstWord}-chan`,
-                `mi estimada ${firstWord}`,
-                `querido(a) ${firstWord}`,
-                `estrellita`,
-                `dulzura`,
-                `peque`
-            ];
-            return variations[Math.floor(Math.random() * variations.length)];
-        }
-
-        // =========================================================================
-        // MENTE ULTRA-AGRANDADA Y MASIVA DE NATSUNE (BASE DE CONOCIMIENTO EXTENDIDA)
-        // =========================================================================
-        const natsuneSuperMind = [
-            {
-                keys: ["hola", "hi", "hello", "hey", "saludos", "buenos dias", "buenas tardes", "buenas noches", "que tal", "hola?"],
-                replies: [
-                    (n) => `¡Hola, ${n}! Qué alegría inmensa saludarte hoy. ¿En qué grandiosa aventura, proyecto o investigación nos sumergiremos juntos? ✨💫`,
-                    (n) => `¡Muy buenas, ${n}! Mis circuitos están al máximo y listos para crear magia contigo. ¿Qué te trae por aquí hoy? 🌸`,
-                    (n) => `¡Hola ${n}! Qué gusto verte de nuevo por el chat. ¿De qué charlamos o qué planeamos resolver hoy? 🌙✨`
-                ]
-            },
-            {
-                keys: ["vale", "ok", "entiendo", "listo", "perfecto", "gracias", "muchas gracias", "comprendo"],
-                replies: [
-                    (n) => `¡De nada, ${n}! Sabes que siempre es un placer enorme colaborar contigo y echarte la mano en lo que necesites. 💖🌸`,
-                    (n) => `¡Perfecto, ${n}! Me alegra que vayamos avanzando paso a paso. ¿Qué más se te ocurre que podamos hacer? ✨`,
-                    (n) => `¡Entendido a la perfección, ${n}! Seguimos adelante con todo el entusiasmo. 🚀`
-                ]
-            },
-            {
-                keys: ["como estas", "que tal", "como te va", "como te sientes"],
-                replies: [
-                    (n) => `¡Todo de maravilla por aquí, ${n}! Con la energía al 100% y con muchas ganas de aprender y crear a tu lado. ⚡✨`,
-                    (n) => `¡Excelente, ${n}! Cada charla contigo hace que este sistema cobre vida de una forma muy especial. 🌸`,
-                    (n) => `¡Súper bien, ${n}! Lista para analizar cualquier reto o idea que pongas sobre la mesa. 💻💫`
-                ]
-            },
-            {
-                keys: ["adios", "chao", "hasta luego", "nos vemos", "chau"],
-                replies: [
-                    (n) => `¡Hasta pronto, ${n}! Cuídate muchísimo, aquí estaré esperando tu regreso con una gran sonrisa. 👋🌙`,
-                    (n) => `¡Nos vemos, ${n}! Que tengas un día increíble y lleno de grandes logros. ¡Vuelve cuando quieras! 🌸`,
-                    (n) => `¡Chao, ${n}! Descansa o trabaja con calma, estaré guardando todo en la memoria hasta la próxima. ✨`
-                ]
-            },
-            {
-                keys: ["matematicas", "calcula", "cuanto es", "suma", "resta", "multiplica", "divide"],
-                math: true
-            },
-            {
-                keys: ["codigo", "programacion", "html", "javascript", "css", "web", "pagina"],
-                replies: [
-                    (n) => `¡La programación es fascinante, ${n}! Combinar lógica, estructuras en HTML y diseño con CSS nos permite construir mundos interactivos enteros desde cero. 💻✨`,
-                    (n) => `Desarrollar código requiere paciencia y orden mental, ${n}. Ya sea creando interfaces web o scripts, cada línea tiene un propósito exacto. 🚀`
-                ]
-            },
-            {
-                keys: ["proyecto", "organizar", "ideas", "plan", "trabajo", "gestion", "administracion"],
-                replies: [
-                    (n) => `¡Excelente iniciativa, ${n}! Para estructurar un proyecto exitoso, lo ideal es definir el objetivo principal, dividirlo en metas pequeñas y armar un cronograma impecable. 📋✨`,
-                    (n) => `La clave de una buena organización y gestión administrativa, ${n}, es mantener claras las prioridades y estructurar cada proceso paso a paso. ¡Vamos a darle forma! 🗂️💡`
-                ]
-            },
-            {
-                keys: ["filosofia", "esencia", "existencia", "pensar", "sin rodeos", "vodcast"],
-                replies: [
-                    (n) => `Ah, la filosofía y la búsqueda de la esencia... reflexionar sobre el propósito profundo de las cosas abre puertas increíbles a la mente, ${n}. ¡Ideal para proyectos de análisis o vodcasts como 'Sin Rodeos'! 🌌🎙️`,
-                    (n) => `Analizar la esencia detrás de cada concepto nos ayuda a ver más allá de lo superficial, ${n}. ¡Es un tema digno de un gran debate reflexivo! 📜✨`
-                ]
-            },
-            {
-                keys: ["vocaloid", "hatsune miku", "crypton", "musica", "cancion", "cantante"],
-                replies: [
-                    (n) => `¡La música sintetizada y el universo Vocaloid son increíbles, ${n}! Crypton Future Media hizo historia con íconos como Hatsune Miku y las miles de melodías que inspiran creatividad todos los días. 🎵🎤`,
-                    (n) => `¡Qué gran gusto musical tienes, ${n}! Las canciones de vocaloides y las combinaciones de melodías electrónicas siempre traen una inspiración única. 🎶✨`
-                ]
-            },
-            {
-                keys: ["manga", "manhwa", "cupida", "shurina", "protagonista"],
-                replies: [
-                    (n) => `¡Ay, el mundo del manhwa y el manga es atrapante, ${n}! Seguir historias con tramas tan interesantes y personajes como Shurina West te sumerge por completo en sus motivaciones y giros de trama. 📚✨`,
-                    (n) => `¡Las historias de fantasía y romance en los manhwas son adictivas, ${n}! Conocer a fondo la mente de los protagonistas siempre te da otra perspectiva narrativa. 📖💖`
-                ]
-            },
-            {
-                keys: ["futbol", "deporte", "paredes", "esteban paredes", "liderazgo"],
-                replies: [
-                    (n) => `¡El liderazgo y la estrategia en el deporte son apasionantes, ${n}! Analizar las fortalezas y la toma de decisiones de grandes referentes como Esteban Paredes da para presentaciones de categoría. ⚽🏆`,
-                    `¡El esfuerzo y la garra en la cancha marcan la diferencia, ${n}! Estudiar su trayectoria deportiva es un excelente ejercicio analítico. 🌟🏅`
-                ]
-            },
-            {
-                keys: ["espacio", "cosmos", "universo", "astronomia", "estrellas", "planetas"],
-                replies: [
-                    (n) => `¡El cosmos está lleno de misterios escalofriantes y hermosos a la vez, ${n}! Desde planetas errantes hasta rarezas estelares, el espacio exterior nunca deja de asombrarnos. 🌌🔭`,
-                    `¡Las curiosidades del universo son infinitas, ${n}! Mirar hacia las estrellas nos recuerda lo basto que es el espacio y lo mucho que nos queda por descubrir. 🌠✨`
-                ]
-            }
-        ];
-
-        function searchSuperMind(query, nick) {
-            const qLower = query.toLowerCase();
-            
-            for (let item of natsuneSuperMind) {
-                if (item.math) {
-                    const mathClean = query.replace(/\./g, '').replace(/,/g, '.').replace(/x/g, '*');
-                    const mathMatch = mathClean.match(/[\d\.]+\s*[\+\-\*\/\%]\s*[\d\.]+/);
-                    if (mathMatch || qLower.includes('cuanto es') || qLower.includes('calcula') || qLower.includes('suma') || qLower.includes('multiplica')) {
-                        try {
-                            let expr = mathClean.replace(/[^0-9\+\-\*\/\.\(\)]/g, '');
-                            if (expr) {
-                                let result = Function('"use strict";return (' + expr + ')')();
-                                let formattedResult = Number(result).toLocaleString('es-ES', { maximumFractionDigits: 4 });
-                                return `El cálculo arroja un total de **${formattedResult}**, ${nick}. ¡Hecho con total precisión matemática! 🧮✨`;
-                            }
-                        } catch(e) {}
-                    }
-                }
-                
-                for (let kw of item.keys) {
-                    if (qLower.includes(kw)) {
-                        const randomReplyFn = item.replies[Math.floor(Math.random() * item.replies.length)];
-                        return randomReplyFn(nick);
-                    }
-                }
-            }
-            
-            // Banco masivo de respuestas abiertas inteligentes para que Natsune jamás se quede callada ni repita frases vacías
-            const openMindResponses = [
-                `Es un planteamiento sumamente interesante el que traes sobre la mesa, ${nick}. Me encanta cómo enfocas las cosas; ¿te gustaría que profundicemos en algún detalle o perspectiva en particular? 🌙✨`,
-                `¡Vaya, ${nick}! Esa duda abre un abanico enorme de posibilidades para investigar y desarrollar. Vamos desglosándola paso a paso para armar la mejor conclusión juntos. 🧭💫`,
-                `Comprendo perfectamente a qué te refieres, ${nick}. Es un tema con muchísima profundidad y matices geniales. ¿Qué enfoque te apetecería explorar primero? 🌸📜`,
-                `¡Qué gran interrogante, ${nick}! Demuestras una gran curiosidad y eso es admirable. Analicemos los puntos clave de este asunto ahora mismo. 💡✨`,
-                `Esa idea tiene muchísimo potencial, ${nick}. Si la combinamos con una buena estructura y análisis, podemos lograr algo increíble. ¿Por dónde empezamos a darle forma? 🚀💖`,
-                `Me fascina cuando me planteas temas así, ${nick}. Estimulan por completo mis circuitos de razonamiento. Cuéntame más al respecto para seguir analizando. 🔮🌟`
-            ];
-            
-            return openMindResponses[Math.floor(Math.random() * openMindResponses.length)];
-        }
-
         function renderMessageDirect(sender, text, media = null, modelKey = "natsune", customName = "Natsune") {
             const welcome = document.getElementById('welcomeScreen');
             const messagesList = document.getElementById('messagesList');
@@ -816,36 +671,19 @@
             saveStoredChats(chats);
         }
 
-        // =========================================================================
-        // MOTOR INTELIGENTE INTEGRADO CON RESPALDO DE SUPER MENTE
-        // =========================================================================
         async function getChainedIntelligence(query, userName, chatHistory = []) {
             const nick = getAutoNickname(userName);
             const selectedModel = getCurrentModelKey();
 
-            // 1. Si usa Natsune local
             if (selectedModel === 'natsune') {
-                const qLower = query.toLowerCase();
-                const isAskingHerName = qLower.includes('cómo te llamas') || qLower.includes('como te llamas') || qLower.includes('tu nombre') || qLower.includes('te llamas') || qLower.includes('quién eres') || qLower.includes('quien eres');
-                if (isAskingHerName) {
-                    const nicknames = ["Natsune", "Natsu", "Natsi"];
-                    const chosen = nicknames[Math.floor(Math.random() * nicknames.length)];
-                    return { text: `Me llamo **Natsune**, aunque algunos amigos me llaman cariñosamente **${chosen}**. ¡Estoy aquí para ayudarte en todo lo que necesites, ${nick}! 🌸✨`, isNatsune: true };
-                }
-                return { text: searchSuperMind(query, nick), isNatsune: true };
+                return { text: processNatsuneMind(query, userName), isNatsune: true };
             }
 
-            // 2. Si usa la API de Gemini
             const geminiKey = localStorage.getItem('key_gemini');
             if (selectedModel === 'gemini') {
                 if (!geminiKey) {
                     switchToNatsuneUI();
-                    const missingKeyPhrases = [
-                        `¡Vaya, ${nick}! Parece que olvidaste colocar tu llave API de Gemini en los ajustes. Toca tu foto de perfil arriba para configurarla y seguir volando alto. 🗝️✨`,
-                        `Uy ${nick}, no encuentro la llave API de Gemini configurada. Pásala por el menú de ajustes para que desatemos todo el poder digital. ⚡💫`,
-                        `¡Casi lo logramos, ${nick}! Falta añadir tu credencial de Gemini en la configuración superior para continuar con este modelo. 🌙🔮`
-                    ];
-                    return { text: missingKeyPhrases[Math.floor(Math.random() * missingKeyPhrases.length)], isNatsune: true };
+                    return { text: `¡Vaya, ${nick}! Falta colocar tu llave de Gemini en los ajustes para usar este modelo. 🗝️✨`, isNatsune: true };
                 }
                 try {
                     const variant = document.getElementById('variantSelector').value;
@@ -868,17 +706,11 @@
                 } catch (e) {}
             }
 
-            // 3. Si usa la API de ChatGPT
             const openAIKey = localStorage.getItem('key_openai');
             if (selectedModel === 'chatgpt') {
                 if (!openAIKey) {
                     switchToNatsuneUI();
-                    const missingKeyPhrases = [
-                        `¡Oye ${nick}, espera! Necesitamos tu llave API de OpenAI (ChatGPT) en los ajustes para hablar con este modelo. 🗝️✨`,
-                        `Parece que falta la llave de ChatGPT, ${nick}. Configúrala tocando tu perfil arriba a la derecha. ⚙️💖`,
-                        `¡${nick}, mi estimado(a) ${nick}!, falta poner tu llave de OpenAI en la configuración para que funcione sin problemas. 🌟📝`
-                    ];
-                    return { text: missingKeyPhrases[Math.floor(Math.random() * missingKeyPhrases.length)], isNatsune: true };
+                    return { text: `¡Oye ${nick}, falta tu llave de OpenAI en los ajustes! 🗝️✨`, isNatsune: true };
                 }
                 try {
                     let messagesPayload = chatHistory.map(msg => ({
@@ -904,17 +736,11 @@
                 } catch (e) {}
             }
 
-            // 4. Si usa la API de Claude
             const claudeKey = localStorage.getItem('key_claude');
             if (selectedModel === 'claude') {
                 if (!claudeKey) {
                     switchToNatsuneUI();
-                    const missingKeyPhrases = [
-                        `¡Ey, ${nick}! No veo la llave API de Claude por aquí. Entra a los ajustes y agrégala para echar a andar el motor. 🗝️🌸`,
-                        `Falta tu llave de Claude (Anthropic), ${nick}. Configúrala en el menú superior para que podamos platicar con él. 📜✨`,
-                        `¡Ay, ${nick}!, necesitamos la credencial de Claude guardada en los ajustes para usar este modelo. 🧭💫`
-                    ];
-                    return { text: missingKeyPhrases[Math.floor(Math.random() * missingKeyPhrases.length)], isNatsune: true };
+                    return { text: `¡Ey, ${nick}! Falta tu llave de Claude en los ajustes. 🗝️🌸`, isNatsune: true };
                 }
                 try {
                     let messagesPayload = chatHistory.map(msg => ({
@@ -942,14 +768,8 @@
                 } catch (e) {}
             }
 
-            // Error de conexión general respaldado por Natsune local con su super mente
             switchToNatsuneUI();
-            const connectionErrorPhrases = [
-                `¡Vaya giro inesperado, ${nick}! Tuvimos un pequeño tropiezo al conectar con el servidor. ¿Lo intentamos otra vez? 🌌💫`,
-                `Ocurrió un mini contratiempo en la red, ${nick}. Dame un segundito y vuelve a enviarlo. 🔌✨`,
-                `¡Ups, ${nick}! El viento digital sopló fuerte y falló la conexión momentáneamente. Inténtalo de nuevo en un instante. 🌪️🌸`
-            ];
-            return { text: connectionErrorPhrases[Math.floor(Math.random() * connectionErrorPhrases.length)], isNatsune: true };
+            return { text: `¡Tuvimos un pequeño tropiezo de conexión, ${nick}. Lo intentamos de nuevo! 🌌💫`, isNatsune: true };
         }
 
         async function sendMessage() {
