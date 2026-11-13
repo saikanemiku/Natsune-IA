@@ -9,11 +9,12 @@ const cors = require('cors');
 const fetch = require('node-fetch');
 
 const app = express();
-const PORT = process.env.PORT || 3000;
+
+// Render asigna su propio puerto dinámicamente, debemos usar process.env.PORT obligatoriamente
+const PORT = process.env.PORT || 10000;
 
 const GROQ_API_KEY = process.env.GROQ_API_KEY;
 
-// CORS abierto para permitir peticiones desde tu GitHub Pages
 app.use(cors({
   origin: '*',
   methods: ['GET', 'POST', 'OPTIONS'],
@@ -54,6 +55,6 @@ app.post('/api/chat', async (req, res) => {
   }
 });
 
-app.listen(PORT, () => {
+app.listen(PORT, '0.0.0.0', () => {
   console.log(`Servidor de Natsune IA corriendo en el puerto ${PORT}`);
 });
