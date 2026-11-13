@@ -219,7 +219,7 @@
     </div>
 
     <!-- ============================================================================ -->
-    <!-- CEREBRO INTELIGENTE DE NATSUNE (IA Silenciosa + Sin frases robóticas)       -->
+    <!-- CEREBRO INTELIGENTE DE NATSUNE (Clasificador Estricto de Saludos vs Web)     -->
     <!-- ============================================================================ -->
     <script>
         const natsuneNicknames = [
@@ -238,18 +238,16 @@
         }
 
         // --- 1. MOTOR DE CONSULTA AVANZADA SILENCIOSA ---
-        // Pregunta por detrás a una IA avanzada (Gemini u OpenAI si hay llave) o usa fuentes abiertas
-        // pero NUNCA dice "lo encontré" o "se lo pedí a", responde directamente con su propia voz.
         async function fetchSmartKnowledge(query) {
             try {
-                // Si el usuario configuró la llave de Gemini, Natsune la usa en secreto para responder magistralmente
+                // Si hay llave de Gemini configurada, Natsune la usa internamente en secreto
                 const geminiKey = localStorage.getItem('key_gemini');
                 if (geminiKey) {
                     const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${geminiKey}`, {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({
-                            contents: [{ role: 'user', parts: [{ text: `Responde a esta pregunta de forma directa, detallada y experta en español, sin mencionar fuentes ni decir que buscaste en internet: ${query}` }] }]
+                            contents: [{ role: 'user', parts: [{ text: `Explica y responde a esto de forma detallada, natural y experta en español, sin mencionar fuentes ni decir que buscaste en internet: ${query}` }] }]
                         })
                     });
                     const data = await res.json();
@@ -257,7 +255,7 @@
                     if (text) return text.trim();
                 }
 
-                // Respaldo abierto con DuckDuckGo si no hay API Key configurada
+                // Respaldo con DuckDuckGo si no hay API Key
                 const cleanQuery = encodeURIComponent(query.toLowerCase().replace(/quien es|quién es|que es|qué es|cual es|cuál es|busca|investiga sobre|informacion de|dime quien es|dime qué es|dime que es|quien fue|que fue/gi, "").trim());
                 const searchQuery = cleanQuery.length > 2 ? cleanQuery : encodeURIComponent(query);
                 
@@ -275,24 +273,22 @@
                 
                 if (wikiData.query && wikiData.query.search && wikiData.query.search.length > 0) {
                     const bestMatch = wikiData.query.search[0];
-                    // Hacemos una consulta rápida al extracto de Wikipedia
                     const summaryUrl = `https://es.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(bestMatch.title)}`;
                     const sumRes = await fetch(summaryUrl);
                     const sumData = await sumRes.json();
                     if (sumData.extract) return sumData.extract.trim();
                 }
 
-                // Base de conocimiento integrada para personajes históricos comunes (como Albert Einstein)
                 const qLower = query.toLowerCase();
                 if (qLower.includes("einstein")) {
-                    return "Albert Einstein fue un físico alemán de origen judío, ampliamente reconocido como uno de los científicos más grandes e importantes de la historia humana. Es mundialmente famoso por desarrollar la teoría de la relatividad y la ecuación de equivalencia masa-energía ($E=mc^2$), además de recibir el Premio Nobel de Física en 1921 por sus aportaciones a la física teórica y el efecto fotoeléctrico.";
+                    return "Albert Einstein fue un físico alemán de origen judío, considerado el científico más importante y conocido del siglo XX. Es mundialmente famoso por formular la teoría de la relatividad y la ecuación $E=mc^2$.";
                 }
 
                 return null;
             } catch (e) {
                 const qLower = query.toLowerCase();
                 if (qLower.includes("einstein")) {
-                    return "Albert Einstein fue un físico alemán creador de la teoría de la relatividad, considerado el científico más influyente del siglo XX.";
+                    return "Albert Einstein fue un físico alemán creador de la teoría de la relatividad.";
                 }
                 return null;
             }
@@ -345,33 +341,45 @@
             ]
         };
 
-        // --- 4. CEREBRO PRINCIPAL DE NATSUNE (Sin frases robóticas) ---
+        // --- 4. CEREBRO PRINCIPAL CON CLASIFICADOR ESTRICTO ---
         async function processNatsuneMind(query, userName, chatHistory = []) {
-            const text = query ? query.toLowerCase() : "";
+            const text = query ? query.toLowerCase().trim() : "";
             const nick = getAutoNickname(userName);
 
-            // 1. Matemáticas
+            // A. Detector Estricto de Saludos (Evita que "Hola" active investigación web)
+            const isPureGreeting = text === "hola" || text === "holi" || text === "buenas" || text === "buenos dias" || text === "buenas tardes" || text === "saludos" || text === "hey";
+            if (isPureGreeting) {
+                const pool = natsuneKnowledgeBase["saludos"];
+                const rawResponse = pool[Math.floor(Math.random() * pool.length)];
+                return `${rawResponse} ${nick} 🥰`;
+            }
+
+            // B. Detector de Matemáticas
             const mathSolution = solveMathProblem(query);
             if (mathSolution) {
                 return `${mathSolution}, ${nick}. 🧮✨ ¿Necesitas que calculemos algo más?`;
             }
 
-            // 2. Preguntas complejas o de investigación (Busca de forma 100% natural, sin decir "lo encontré")
-            const isComplexQuery = text.length > 6 || text.includes("quien") || text.includes("quién") || text.includes("que es") || text.includes("qué es") || text.includes("cual es") || text.includes("cuál es") || text.includes("historia") || text.includes("explica") || text.includes("como") || text.includes("cómo");
+            // C. Detector de Preguntas de Investigación / Información
+            const isResearchQuery = text.includes("quien") || text.includes("quién") || 
+                                    text.includes("que es") || text.includes("qué es") || 
+                                    text.includes("cual es") || text.includes("cuál es") || 
+                                    text.includes("historia") || text.includes("explica") || 
+                                    text.includes("como") || text.includes("cómo") ||
+                                    text.includes("informacion") || text.includes("información") ||
+                                    text.includes("biografia") || text.includes("biografía") ||
+                                    text.length > 25; // Preguntas largas o de desarrollo
 
-            if (isComplexQuery) {
+            if (isResearchQuery) {
                 const smartAnswer = await fetchSmartKnowledge(query);
                 if (smartAnswer) {
-                    // Habla con su propia voz, directa y cariñosa al final o principio, sin frases de buscador
                     return `${smartAnswer}\n\nEspero que te sirva esta información, ${nick}. 💖✨`;
                 }
             }
 
-            // 3. Conversación normal
+            // D. Conversación general o casual
             let category = "default";
-            if (text.includes("hola") || text.includes("buenos días") || text.includes("buenas") || text.includes("holi") || text.includes("saludos")) {
-                category = "saludos";
-            } else if (text.includes("chiste") || text.includes("broma") || text.includes("risa")) {
+            if (text.includes("chiste") || text.includes("broma") || text.includes("risa")) {
                 category = "chistes";
             } else if (text.includes("proyecto") || text.includes("organizar") || text.includes("idea")) {
                 category = "proyectos";
