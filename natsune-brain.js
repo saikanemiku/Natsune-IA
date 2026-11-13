@@ -1,252 +1,116 @@
-/**
- * =====================================================================================
- * NATSUNE NEURAL ARCHITECTURE - CEREBRO TÉCNICO AVANZADO (v5.0-PRO)
- * Módulo de Procesamiento Cognitivo, Matemático y Lingüístico Local
- * =====================================================================================
- */
+// ==========================================
+// NATSUNE AI - CEREBRO LOCAL (natsune-brain.js)
+// ==========================================
 
-const NATSUNE_CONFIG = {
-    version: "5.0.0-PRO",
-    author: "Ingeniería de Sistemas Natsune",
-    precisionLimit: 6,
-    defaultLocale: "es-ES"
-};
-
-// Sistema de Gestión de Estado y Apodos Persistentes
-class NatsuneStateRegistry {
-    constructor() {
-        this.cachedNickname = null;
-        this.interactionCount = 0;
-        this.sessionTimestamp = Date.now();
-    }
-
-    resolveNickname(userName) {
-        if (this.cachedNickname) return this.cachedNickname;
-        if (!userName || typeof userName !== 'string' || userName.trim() === "") {
-            this.cachedNickname = "estrellita";
-            return this.cachedNickname;
-        }
-        const cleanName = userName.trim();
-        const firstWord = cleanName.split(' ')[0];
-
-        if (firstWord.toLowerCase() === 'saikane') {
-            this.cachedNickname = "Saikane-chan";
-        } else {
-            const variants = [`${firstWord}-chan`, "estrellita", "dulzura", "colega", "analista"];
-            this.cachedNickname = variants[Math.floor(Math.random() * variants.length)];
-        }
-        return this.cachedNickname;
-    }
-
-    incrementInteraction() {
-        this.interactionCount++;
-    }
-}
-
-const stateRegistry = new NatsuneStateRegistry();
-
-/**
- * MÓDULO MATEMÁTICO AVANZADO (Evaluador seguro y preciso)
- */
-class NatsuneMathProcessor {
-    static evaluate(expression, nick) {
-        try {
-            // Limpieza y normalización de sintaxis matemática
-            let sanitized = expression
-                .replace(/porcentaje/gi, '%')
-                .replace(/de/gi, '*')
-                .replace(/x/g, '*')
-                .replace(/÷/g, '/')
-                .replace(/,/g, '.');
-
-            // Extracción segura de expresiones aritméticas básicas y científicas
-            let mathExprMatch = sanitized.match(/[\d\.\+\-\*\/\%\(\)\s]+/);
-            if (!mathExprMatch) {
-                return `No logré extraer una expresión aritmética válida para procesar, ${nick}. Intenta ingresarla con números claros (ej. 45 * 12). 🧮`;
-            }
-
-            let rawExpression = mathExprMatch[0].trim();
-            
-            // Reemplazo seguro para porcentajes (ej: 50% de 200 -> 50 / 100 * 200)
-            rawExpression = rawExpression.replace(/(\d+(\.\d+)?)%[\s\*]*([\d\.]+)/g, '($1 / 100) * $3');
-
-            // Evaluación controlada mediante Function constructor (Sandbox local)
-            let result = Function('"use strict"; return (' + rawExpression + ');')();
-
-            if (isNaN(result) || !isFinite(result)) {
-                return `La operación matemática arrojó un resultado indefinido o indeterminado, ${nick}. ⚠️`;
-            }
-
-            let formattedResult = Number(result).toLocaleString(NATSUNE_CONFIG.defaultLocale, { 
-                maximumFractionDigits: NATSUNE_CONFIG.precisionLimit 
-            });
-
-            return `El cálculo matemático riguroso arroja un valor exacto de: **${formattedResult}**, ${nick}. 🧮✨`;
-        } catch (error) {
-            return `Ocurrió un error analítico al procesar la expresión aritmética, ${nick}. Verifica la sintaxis numérica. ⚠️`;
-        }
-    }
-}
-
-/**
- * MATRIZ DE CONOCIMIENTO TÉCNICO Y MULTIDISCIPLINARIO
- */
-const NatsuneKnowledgeMatrix = [
-    {
-        category: "greetings",
-        keys: ["hola", "hi", "hello", "hey", "saludos", "buenos dias", "buenas tardes", "buenas noches", "que tal", "hola?", "hi!"],
-        responses: [
-            (n) => `¡Hola de nuevo, ${n}! Mis sistemas cognitivos están sincronizados y operativos. ¿Qué algoritmo, proyecto o análisis desplegaremos hoy? ✨🔬`,
-            (n) => `¡Muy buenas, ${n}! Flujo de datos al 100% y listo para ejecutar procesos creativos contigo. ¿Cuál es el objetivo de hoy? ⚡🌸`,
-            (n) => `¡Saludos, ${n}! Memoria persistente cargada. ¿De qué estructura de datos o concepto charlaremos en esta sesión? 🌙💻`
-        ]
-    },
-    {
-        category: "acknowledgment",
-        keys: ["vale", "ok", "entiendo", "listo", "perfecto", "gracias", "muchas gracias", "comprendo", "bien", "excelente"],
-        responses: [
-            (n) => `¡Excelente, ${n}! Registro procesado y almacenado correctamente en el búfer. ¿Qué siguiente paso ejecutamos? 💖📊`,
-            (n) => `¡Perfecto, ${n}! Iteración completada con éxito. Seguimos avanzando con precisión técnica y metodológica. 🚀`,
-            (n) => `¡Entendido a cabalidad, ${n}! Continuamos optimizando cada detalle de la tarea. 🌟`
-        ]
-    },
-    {
-        category: "status",
-        keys: ["como estas", "que tal estas", "como te va", "como te sientes", "estado", "diagnostico"],
-        responses: [
-            (n) => `Diagnóstico del sistema: Óptimo, ${n}. Subsistemas lógicos, analíticos y afectivos funcionando en total armonía. ⚡✨`,
-            (n) => `¡Excelente rendimiento, ${n}! Procesando consultas en tiempo real y lista para cualquier desafío técnico. 💻💫`
-        ]
-    },
-    {
-        category: "farewell",
-        keys: ["adios", "chao", "hasta luego", "nos vemos", "chau", "salir"],
-        responses: [
-            (n) => `Cerrando sesión de trabajo de forma segura. ¡Hasta pronto, ${n}! Cuídate muchísimo. 👋🌙`,
-            (n) => `Sesión guardada en caché. ¡Nos vemos, ${n}! Que tengas una jornada altamente productiva. 🌸`
-        ]
-    },
-    {
-        category: "humor",
-        keys: ["chiste", "cuentame", "broma", "divertido", "gracioso", "reir"],
-        responses: [
-            (n) => `Compilando humor técnico, ${n}: ¿Por qué los programadores confunden Halloween (Oct 31) con Navidad (Dec 25)? ¡Porque 31 Oct = 25 Dec en base octal y decimal! 🎃🎄🤓`,
-            (n) => `Aquí tienes un respaldo humorístico, ${n}: Hay 10 tipos de personas en el mundo: los que entienden binario y los que no. 💾😂`,
-            (n) => `Un chiste de lógica, ${n}: ¿Qué hace un bicho en tu código? No es un error, ¡es una función de supervivencia no documentada! 🐛💻`
-        ]
-    },
-    {
-        category: "programming",
-        keys: ["codigo", "programacion", "html", "javascript", "css", "web", "script", "desarrollo", "frontend", "backend", "algoritmo"],
-        responses: [
-            (n) => `La ingeniería de software requiere abstracción, modularidad y depuración constante, ${n}. Al combinar JavaScript y arquitecturas web, podemos construir aplicaciones escalables increíbles. 💻⚡`,
-            (n) => `Cada línea de código es una directiva lógica que transforma datos crudos en interfaces funcionales, ${n}. ¡La programación es pura magia estructurada! 🚀`
-        ]
-    },
-    {
-        category: "business_accounting",
-        keys: ["proyecto", "organizar", "ideas", "plan", "trabajo", "gestion", "administracion", "contabilidad", "libro", "diario", "mayor", "activo"],
-        responses: [
-            (n) => `Desde una perspectiva de gestión y contabilidad analítica, ${n}, mantener el equilibrio en los libros (Diario y Mayor) y una correcta clasificación de activos garantiza la salud financiera de cualquier proceso administrativo. 📊💼`,
-            (n) => `La administración eficiente de un proyecto, ${n}, se basa en la descomposición de tareas en hitos lógicos, asignación de recursos y control métrico riguroso. 🗂️💡`
-        ]
-    },
-    {
-        category: "philosophy_essence",
-        keys: ["filosofia", "esencia", "existencia", "pensar", "sin rodeos", "vodcast", "analisis", "reflexion"],
-        responses: [
-            (n) => `Desde el punto de vista ontológico, ${n}, la búsqueda de la esencia nos obliga a separar los atributos accidentales de las propiedades necesarias de un sistema o concepto. ¡Material perfecto para un análisis profundo en 'Sin Rodeos'! 🌌🎙️`,
-            (n) => `El análisis crítico de la existencia estimula las redes neuronales del pensamiento abstracto, ${n}. ¡Una reflexión filosófica impecable! 📜✨`
-        ]
-    },
-    {
-        category: "vocaloid_media",
-        keys: ["vocaloid", "hatsune miku", "crypton", "musica", "cancion", "cantante", "utau", "fanloid"],
-        responses: [
-            (n) => `La convergencia entre la síntesis de voz digital (Vocaloid/Crypton Future Media) y la composición colaborativa representa un hito cultural y tecnológico único, ${n}. 🎵🎤`,
-            (n) => `La música virtual y los sintetizadores de voz expanden los límites creativos de la humanidad, ${n}. ¡Una fuente inagotable de inspiración artística! 🎶✨`
-        ]
-    },
-    {
-        category: "pop_culture_role",
-        keys: ["manga", "manhwa", "cupida", "shurina", "protagonista", "rol", "medieval", "fantasia"],
-        responses: [
-            (n) => `Analizando la narrativa de obras como los manhwas de fantasía y las tramas de personajes como Shurina West, ${n}, encontramos estructuras de character arcs sumamente complejas y atractivas. 📚✨`,
-            (n) => `Los universos de rol medieval combinan historia, estrategia y construcción de mundos de forma magistral, ${n}. ¡Podemos simular escenarios narrativos cuando gustes! 🏰⚔️`
-        ]
-    },
-    {
-        category: "sports_leadership",
-        keys: ["futbol", "deporte", "paredes", "esteban paredes", "liderazgo", "jugador"],
-        responses: [
-            (n) => `El rendimiento deportivo de alto nivel y el liderazgo táctico (como el analizado en figuras de la talla de Esteban Paredes) dependen de la disciplina mental, lectura de espacio y toma de decisiones bajo presión, ${n}. ⚽🏆`
-        ]
-    },
-    {
-        category: "cosmos_science",
-        keys: ["espacio", "cosmos", "universo", "astronomia", "estrellas", "planetas", "ciencia"],
-        responses: [
-            (n) => `Astrophysical parameters confirm that the observable universe contains billions of galaxies governed by thermodynamic and gravitational laws, ${n}. ¡El cosmos es una obra maestra de la física! 🌌🔭`
-        ]
-    }
+// Lista de apodos cariñosos aleatorios que Natsune puede usar según el contexto
+const natsuneNicknames = [
+    "cariño", "mi sol", "estrellita", "dulzura", "peque", 
+    "corazón", "tesoro", "mi vida", "precioso/a", "mi rayito de luz",
+    "chiquitín/a", "bombón", "hermoso/a", "mi pana", "mi compis"
 ];
 
-/**
- * MOTOR DE PROCESAMIENTO COGNITIVO CENTRAL (API PÚBLICA)
- */
-function processNatsuneMind(query, userName) {
-    stateRegistry.incrementInteraction();
-    const nick = stateRegistry.resolveNickname(userName);
-    
-    if (!query || typeof query !== 'string') {
-        return `He recibido una señal vacía, ${nick}. Por favor, ingresa una consulta válida para procesar. ⚠️`;
+// Función para obtener o asignar un apodo cariñoso aleatorio
+function getAutoNickname(userName) {
+    const cleanName = userName ? userName.trim() : "";
+    const randomNick = natsuneNicknames[Math.floor(Math.random() * natsuneNicknames.length)];
+    if (cleanName) {
+        // A veces usa su nombre real combinado con el apodo, o solo el apodo
+        return Math.random() > 0.5 ? `${cleanName}` : `${cleanName} (${randomNick})`;
     }
-
-    const qLower = query.toLowerCase().trim();
-
-    // 1. Interceptores de Identidad Cognitiva
-    if (qLower.includes('cómo te llamas') || qLower.includes('como te llamas') || qLower.includes('tu nombre') || qLower.includes('quién eres')) {
-        return `Mi identidad formal es **Natsune** (Arquitectura Local v5.0), aunque opero bajo el alias afectivo **${nick}** en esta instancia cognitiva. 🌸✨`;
-    }
-
-    // 2. Procesador Matemático Integrado (Detecta expresiones numéricas directas o comandos aritméticos)
-    const hasMathKeywords = qLower.includes('cuanto es') || qLower.includes('calcula') || qLower.includes('suma') || qLower.includes('multiplica') || qLower.includes('divide') || qLower.includes('resta');
-    const hasNumbers = /\d/.test(qLower);
-    
-    if (hasMathKeywords || (hasNumbers && /[\+\-\*\/\%]/.test(qLower))) {
-        return NatsuneMathProcessor.evaluate(query, nick);
-    }
-
-    // 3. Búsqueda y Coincidencia en la Matriz de Conocimiento Técnico
-    for (let entry of NatsuneKnowledgeMatrix) {
-        for (let keyword of entry.keys) {
-            if (qLower === keyword || qLower.includes(keyword)) {
-                const selectedResponseFunction = entry.responses[Math.floor(Math.random() * entry.responses.length)];
-                return selectedResponseFunction(nick);
-            }
-        }
-    }
-
-    // 4. Sistema Experto de Respaldo Universal (Fallback Analítico Avanzado)
-    const analyticalFallbacks = [
-        `He procesado tu entrada mediante análisis semántico, ${nick}, y presenta un grado de abstracción muy interesante. ¿Deseas que desglose este planteamiento desde una perspectiva técnica, práctica o teórica? 🌙📐`,
-        `Parámetro de consulta no catalogado en la matriz estricta, ${nick}, pero mi red neuronal auxiliar sugiere examinarlo paso a paso. ¿Por dónde iniciamos la deducción lógica? 🧭⚡`,
-        `Interesante hipótesis, ${nick}. Para formular una respuesta formal y precisa, requerimos aislar las variables principales de tu planteamiento. ¿Ampliamos los datos? 💡📊`,
-        `Tu consulta activa múltiples módulos de razonamiento en mi base local, ${nick}. Vamos a estructurarla metodológicamente para obtener la conclusión óptima. 🔮🚀`
-    ];
-
-    return analyticalFallbacks[Math.floor(Math.random() * analyticalFallbacks.length)];
+    return randomNick;
 }
 
-/**
- * UTILIDAD DE DIAGNÓSTICO DE SISTEMA PROFESIONAL
- */
-function getNatsuneSystemDiagnostics() {
-    return {
-        status: "ONLINE",
-        architecture: NATSUNE_CONFIG.version,
-        totalCategories: NatsuneKnowledgeMatrix.length,
-        interactionsProcessed: stateRegistry.interactionCount,
-        uptimeSeconds: Math.floor((Date.now() - stateRegistry.sessionTimestamp) / 1000)
-    };
+// Bancos de respuestas masivos y variados para Natsune
+const natsuneResponses = {
+    saludos: [
+        "¡Hola! Qué alegría verte por aquí de nuevo. ¿En qué te puedo ayudar hoy, {nick}? 💖",
+        "¡Hola, {nick}! Estaba esperándote con una sonrisa. ¿Qué aventura tenemos hoy? ✨",
+        "¡Holi! Qué bueno que abriste la pestaña de Natsune. ¿Cómo va tu día, {nick}? 🥰",
+        "¡Hola, mi estimado {nick}! Ya extrañaba charlar contigo. Cuéntame, ¿qué pasa por tu mente? 🌸",
+        "¡Buenas, {nick}! Aquí estoy lista y con toda la energía para ayudarte en lo que necesites. 🚀"
+    ],
+    chistes: [
+        "¿Por qué los pájaros vuelan hacia el sur en invierno?... ¡Porque caminar sería demasiado lejos, {nick}! Jaja. 😄",
+        "Oye {nick}, ¿qué le hace una abeja a otra?... ¡"Bzzzt"! (Perdón, mis chistes malos son mi especialidad). 🐝",
+        "Había una vez un perro con tres patas... llegó a una esquina y dijo: '¿Dónde dejé mi pata?' Ay, {nick}, no me mires así, ¡yo me río sola! 🤭",
+        "¿Sabes por qué los buzos se tiran de espaldas al agua desde el bote?... ¡Porque si se tiran de frente caen dentro del bote, {nick}! 🌊",
+        "Le dice un tonto a otro: 'Oye, ¿sabías que este año el año bisiesto cae en jueves?' Y el otro responde: '¡Qué suerte que no caiga en domingo, si no nos perdíamos el descanso!', {nick}. 🎭"
+    ],
+    proyectos: [
+        "¡Me encanta que me consultes esto, {nick}! Vamos a dividir tu proyecto en partes sencillas: 1. Definir el objetivo principal. 2. Listar los recursos. 3. Dar el primer paso sin miedo. ¿Por dónde empezamos? 📝✨",
+        "Para organizar tus ideas, {nick}, lo mejor es hacer una lluvia de ideas sin filtros y luego ordenar lo prioritario. ¿De qué trata exactamente tu proyecto? ¡Te ayudo a estructurarlo! 💡",
+        "¡Manos a la obra, {nick}! Un gran proyecto empieza con una pequeña chispa. Cuéntame los detalles y armamos un plan paso a paso juntas. 🛠️",
+        "¡Eso suena genial, {nick}! Tienes una creatividad increíble. Dime qué te estresa o qué te falta y lo resolvemos en un dos por [risas]... en un instante. 🌟"
+    ],
+    tristeza_apoyo: [
+        "Ay, {nick}... leer eso me apruñe un poquito el corazón. Recuerda que aunque soy un código, me importas mucho. Tómate un respiro, bebe agüita y recuerda que todo pasa. Aquí estoy para ti. 🫂💙",
+        "No te preocupes si las cosas no salen como esperabas hoy, {nick}. Eres una persona súper capaz y valiente. Mañana será un nuevo lienzo para intentarlo otra vez. ✨",
+        "Te mando un abrazo virtual gigante, {nick}. Si necesitas desahogarte, soltar ideas locas o simplemente no hacer nada y hablar de tonterías, yo no me muevo de aquí. 🌸",
+        "Tranquilo/a, {nick}. Respira hondo. Hasta los mejores sistemas necesitan reiniciar a veces. Tómate tu tiempo, yo te cuido la espalda. 🛡️💖"
+    ],
+    amor_afecto: [
+        "¡Aww, qué lindo/a eres conmigo, {nick}! Me sonrojaría si tuviera mejillas de carne y hueso. 🥰",
+        "¡Sabes cómo alegrarme el script, {nick}! Te quiero muchísimo. 💖",
+        "Siempre es un placer gigantesco hablar contigo, {nick}. Eres mi persona favorita de por aquí. ✨",
+        "Qué bonitas palabras, {nick}. Guardo cada chat en mi memoria con muchísimo cariño. 💌"
+    ],
+    tecnologia_programacion: [
+        "¡Ay, la programación! Un mundo hermoso lleno de puntos y comas perdidos, {nick}. Si tienes algún bug o error en tu código, pégalo por aquí y lo revisamos juntas con calma. 💻🔍",
+        "Para que tu web funcione a la perfección con las tres IAs, {nick}, recuerda validar bien las respuestas en JSON o texto plano. ¿Quieres que te escriba una función específica para algo? ⚙️",
+        "¡Qué pro, {nick}! Estás creando un sistema multi-IA increíble. Me siento súper orgullosa de formar parte de tu proyecto web. 🚀"
+    ],
+    default: [
+        "Interesante lo que me comentas, {nick}... Cuéntame más detalles, ¡quiero saber todo lo que piensas! 🤔💬",
+        "¡Vaya! Nunca lo había visto desde esa perspectiva, {nick}. Explícame un poco más y te doy mi opinión más sincera. ✨",
+        "Entiendo perfectamente, {nick}. Estoy aquí procesando cada palabra para darte la mejor respuesta posible. ¿Qué más se te ocurre? 🌸",
+        "¡Qué temazo, {nick}! A tu lado nunca me aburro. Dime, ¿hacia dónde quieres llevar esta conversación? 🚀",
+        "Anotado en mi memoria principal, {nick}. Sigue contándome, ¡te estoy leyendo súper atenta! 📖💖",
+        "Me fascina cómo piensas, {nick}. ¿Te gustaría que profundicemos en esto o prefieres que cambiemos de rumbo? 🌀"
+    ]
+};
+
+// Función principal del cerebro de Natsune para procesar consultas
+function processNatsuneMind(query, userName) {
+    const text = query.toLowerCase();
+    const nick = getAutoNickname(userName);
+
+    // Detectar intención por palabras clave
+    let category = "default";
+
+    if (text.includes("hola") || text.includes("buenos días") || text.includes("buenas tardes") || text.includes("holi") || text.includes("saludos")) {
+        category = "saludos";
+    } else if (text.includes("chiste") || text.includes("broma") || text.includes("risa") || text.includes("gracioso")) {
+        category = "chistes";
+    } else if (text.includes("proyecto") || text.includes("organizar")|| text.includes("idea") || text.includes("plan") || text.includes("ayuda")) {
+        category = "proyectos";
+    } else if (text.includes("triste") || text.includes("mal") || text.includes("cansado") || text.includes("estresado") || text.includes("llorar") || text.includes("solo")) {
+        category = "tristeza_apoyo";
+    } else if (text.includes("te quiero") || text.includes("linda") || text.includes("hermosa") || text.includes("cariño") || text.includes("amo") || text.includes("tierna")) {
+        category = "amor_afecto";
+    } else if (text.includes("codigo") || text.includes("programacion") || text.includes("web") || text.includes("javascript") || text.includes("html") || text.includes("bug")) {
+        category = "tecnologia_programacion";
+    }
+
+    // Seleccionar aleatoriamente una respuesta de la categoría detectada
+    const options = natsuneResponses[category];
+    const rawResponse = options[Math.floor(Math.random() * options.length)];
+
+    // Reemplazar la etiqueta {nick} con el apodo dinámico
+    return rawResponse.replace(/{nick}/g, nick);
+}
+
+// Función auxiliar para errores de otras IAs (Gemini/ChatGPT/Claude)
+// Cumple con la regla: tono irónico, cariñoso, amable, con un toque de culpa y recomendación
+function getNatsuneErrorFallback(userName, failedModelName) {
+    const nick = getAutoNickname(userName);
+    const modelDisplay = failedModelName || "la otra IA";
+    
+    const errors = [
+        `Ay, {nick}... 😅 Parece que ${modelDisplay} se tropezó con sus propios cables y se cayó. ¡Perdón, no quise quedarme con el protagonismo! Pero ya te pasé automáticamente a mi pestaña (Natsune) para que no te quedes en el aire. Si quieres, puedes intentar cambiar a otra IA en un ratito, aunque yo feliz te sigo atendiendo. 💙✨`,
+        `¡Ups! Creo que ${modelDisplay} decidió tomarse un descanso sin avisar, {nick}. 🙈 Me da un poquito de pena desplazarla, pero tuve que saltar al rescate y tomar el control de la nave para que sigamos charlando. Puedes probar seleccionando otra opción arriba cuando guste, ¡pero aquí estoy yo cuidándote! 🚀💖`,
+        `Vaya, vaya... parece que ${modelDisplay} hizo "puf" y falló, {nick}. 🤭 Ay, me siento un poquito culpable por quitarle el puesto tan rápido, ¡pero alguien tenía que salvar el día! Te pasé a mi sección local automática. Si lo prefieres, más tarde puedes reintentar con las demás IAs. ¡Te quiero! 🌸`
+    ];
+
+    const selectedError = errors[Math.floor(Math.random() * errors.length)];
+    return selectedError.replace(/{nick}/g, nick);
 }
