@@ -2,37 +2,45 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, interactive-widget=resizes-content" />
   <title>Natsune IA</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Outfit:wght@400;500;600&display=swap" rel="stylesheet">
   <style>
     :root {
-      --bg-main: #0b0f19;
-      --bg-sidebar: #1e1f20;
-      --bg-card: #1e1f20;
-      --bg-input: #1a1c23;
-      --text-primary: #e3e3e3;
-      --text-secondary: #9aa0a6;
-      --accent-blue: #a8c7fa;
+      --bg-main: #030508;
+      --bg-sidebar: #0b0e14;
+      --bg-surface: #121620;
+      --bg-surface-hover: #1a202e;
+      --text-primary: #f0f4f8;
+      --text-secondary: #8b9bb4;
+      --cyan-neon: #00f2fe;
+      --cyan-glow: rgba(0, 242, 254, 0.55);
+      --blue-deep: rgba(6, 78, 115, 0.24);
     }
 
     * {
       box-sizing: border-box;
       margin: 0;
       padding: 0;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    html, body {
+      height: 100%;
+      height: 100dvh;
+      overflow: hidden;
     }
 
     body {
       font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
       background-color: var(--bg-main);
-      background-image: radial-gradient(circle at bottom, rgba(30, 58, 138, 0.25) 0%, transparent 60%);
+      background-image: 
+        radial-gradient(ellipse 85% 45% at 50% 100%, var(--blue-deep) 0%, rgba(0, 180, 216, 0.08) 45%, transparent 75%);
       color: var(--text-primary);
       display: flex;
       flex-direction: column;
-      height: 100vh;
-      overflow: hidden;
       -webkit-font-smoothing: antialiased;
     }
 
@@ -41,72 +49,56 @@
       display: flex;
       align-items: center;
       justify-content: space-between;
-      padding: 16px 20px;
+      padding: 14px 18px;
       height: 64px;
       flex-shrink: 0;
-      gap: 12px;
+      z-index: 20;
     }
 
     .top-left, .top-right {
       display: flex;
       align-items: center;
       gap: 10px;
+      position: relative;
     }
 
     .icon-btn {
       width: 40px;
       height: 40px;
       border-radius: 50%;
-      border: none;
-      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      background: rgba(255, 255, 255, 0.05);
       color: var(--text-primary);
       display: flex;
       align-items: center;
       justify-content: center;
       cursor: pointer;
-      transition: background-color 0.2s;
+      transition: background-color 0.2s, border-color 0.2s, transform 0.1s;
     }
 
-    .icon-btn:hover {
+    .icon-btn:hover, .icon-btn:active {
       background: rgba(255, 255, 255, 0.12);
+      border-color: rgba(0, 242, 254, 0.3);
     }
 
     .pill-dropdown {
       display: flex;
       align-items: center;
       gap: 6px;
-      background: rgba(255, 255, 255, 0.06);
-      border: none;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.06);
       color: var(--text-primary);
       padding: 8px 14px;
       border-radius: 20px;
       font-size: 14px;
       font-weight: 500;
       cursor: pointer;
-      transition: background-color 0.2s;
+      transition: background-color 0.2s, border-color 0.2s;
     }
 
     .pill-dropdown:hover {
-      background: rgba(255, 255, 255, 0.12);
-    }
-
-    .action-pill {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      background: rgba(255, 255, 255, 0.06);
-      border: none;
-      color: var(--text-primary);
-      padding: 8px 14px;
-      border-radius: 20px;
-      font-size: 14px;
-      font-weight: 500;
-      cursor: pointer;
-      transition: background-color 0.2s;
-    }
-
-    .action-pill:hover {
-      background: rgba(255, 255, 255, 0.12);
+      background: rgba(255, 255, 255, 0.1);
+      border-color: rgba(0, 242, 254, 0.3);
     }
 
     .user-avatar {
@@ -114,23 +106,143 @@
       height: 38px;
       border-radius: 50%;
       background: linear-gradient(135deg, #ff416c, #ff4b2b);
+      border: 2px solid rgba(255, 255, 255, 0.15);
       display: flex;
       align-items: center;
       justify-content: center;
       font-weight: 600;
-      font-size: 14px;
+      font-size: 15px;
       color: #fff;
       cursor: pointer;
-      overflow: hidden;
+      transition: transform 0.15s, box-shadow 0.2s;
     }
 
-    .user-avatar img {
+    .user-avatar:hover {
+      transform: scale(1.05);
+      box-shadow: 0 0 14px rgba(0, 242, 254, 0.4);
+    }
+
+    /* Dropdowns & Popovers */
+    .dropdown-menu {
+      position: absolute;
+      top: 48px;
+      background: #0f131c;
+      border: 1px solid rgba(0, 242, 254, 0.25);
+      border-radius: 16px;
+      padding: 8px;
+      min-width: 210px;
+      display: none;
+      flex-direction: column;
+      gap: 4px;
+      box-shadow: 0 12px 32px rgba(0, 0, 0, 0.85);
+      z-index: 60;
+    }
+
+    .dropdown-menu.open {
+      display: flex;
+      animation: popIn 0.16s ease-out;
+    }
+
+    .dropdown-menu.left { left: 48px; }
+    .dropdown-menu.right { right: 0; min-width: 240px; padding: 14px; }
+
+    @keyframes popIn {
+      from { opacity: 0; transform: translateY(-6px) scale(0.97); }
+      to { opacity: 1; transform: translateY(0) scale(1); }
+    }
+
+    .dropdown-item {
+      padding: 10px 12px;
+      border-radius: 10px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 14px;
+      color: var(--text-primary);
+      transition: background-color 0.15s;
+    }
+
+    .dropdown-item:hover {
+      background: rgba(0, 242, 254, 0.12);
+    }
+
+    .dropdown-item small {
+      display: block;
+      font-size: 11.5px;
+      color: var(--text-secondary);
+      margin-top: 2px;
+    }
+
+    /* Profile Card Inside Dropdown */
+    .profile-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      margin-bottom: 10px;
+    }
+
+    .profile-input-group {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      margin-bottom: 10px;
+    }
+
+    .profile-input-group label {
+      font-size: 12px;
+      color: var(--text-secondary);
+    }
+
+    .profile-input {
+      background: #171c28;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 10px;
+      padding: 8px 10px;
+      color: var(--text-primary);
+      font-size: 14px;
+      outline: none;
+    }
+
+    .profile-input:focus {
+      border-color: var(--cyan-neon);
+      box-shadow: 0 0 10px rgba(0, 242, 254, 0.3);
+    }
+
+    .save-profile-btn {
+      background: linear-gradient(135deg, #00c6ff, #0072ff);
+      color: #fff;
+      border: none;
+      border-radius: 10px;
+      padding: 8px 12px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
       width: 100%;
-      height: 100%;
-      object-fit: cover;
     }
 
-    /* Center Main Area */
+    /* Main Viewport */
+    .chat-viewport {
+      flex: 1;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      padding: 0 18px;
+      scroll-behavior: smooth;
+    }
+
+    .chat-viewport::-webkit-scrollbar {
+      width: 5px;
+    }
+
+    .chat-viewport::-webkit-scrollbar-thumb {
+      background: rgba(255, 255, 255, 0.12);
+      border-radius: 4px;
+    }
+
+    /* Center Welcome Screen */
     .main-center {
       flex: 1;
       display: flex;
@@ -138,8 +250,8 @@
       align-items: center;
       justify-content: center;
       text-align: center;
-      padding: 0 24px;
-      gap: 24px;
+      gap: 20px;
+      padding-bottom: 24px;
     }
 
     .center-logo-glow {
@@ -150,54 +262,130 @@
       align-items: center;
       justify-content: center;
       color: #ffffff;
-      filter: drop-shadow(0 0 16px rgba(168, 199, 250, 0.4));
-      animation: pulseGlow 3s ease-in-out infinite;
+      filter: drop-shadow(0 0 16px rgba(0, 242, 254, 0.45));
+      animation: pulseGlow 3.2s ease-in-out infinite;
     }
 
     @keyframes pulseGlow {
-      0%, 100% { transform: scale(1); filter: drop-shadow(0 0 12px rgba(168, 199, 250, 0.3)); }
-      50% { transform: scale(1.05); filter: drop-shadow(0 0 22px rgba(168, 199, 250, 0.6)); }
+      0%, 100% { transform: scale(1); filter: drop-shadow(0 0 12px rgba(0, 242, 254, 0.35)); }
+      50% { transform: scale(1.06); filter: drop-shadow(0 0 24px rgba(0, 242, 254, 0.7)); }
     }
 
     .center-greeting {
       font-family: 'Outfit', sans-serif;
-      font-size: 38px;
+      font-size: 32px;
       font-weight: 500;
       line-height: 1.25;
-      letter-spacing: -0.5px;
+      letter-spacing: -0.4px;
       color: var(--text-primary);
-      max-width: 500px;
+      max-width: 440px;
     }
 
-    /* Bottom Floating Input Bar */
+    /* Messages Stream */
+    .messages-container {
+      width: 100%;
+      max-width: 720px;
+      margin: 0 auto;
+      display: none;
+      flex-direction: column;
+      gap: 20px;
+      padding: 12px 0 20px;
+    }
+
+    .message-row {
+      display: flex;
+      gap: 12px;
+      width: 100%;
+      animation: fadeUp 0.22s ease-out;
+    }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .message-row.user {
+      justify-content: flex-end;
+    }
+
+    .user-bubble {
+      background: #151c28;
+      border: 1px solid rgba(0, 242, 254, 0.22);
+      color: var(--text-primary);
+      padding: 12px 16px;
+      border-radius: 20px 20px 4px 20px;
+      max-width: 80%;
+      font-size: 15px;
+      line-height: 1.5;
+      word-break: break-word;
+    }
+
+    .ai-avatar {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: #080c12;
+      border: 1px solid rgba(0, 242, 254, 0.35);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      margin-top: 2px;
+      box-shadow: 0 0 10px rgba(0, 242, 254, 0.2);
+    }
+
+    .ai-avatar.spinning svg {
+      animation: spin 1.8s linear infinite;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    .ai-bubble {
+      flex: 1;
+      font-size: 15px;
+      line-height: 1.6;
+      color: var(--text-primary);
+      padding-top: 4px;
+    }
+
+    /* Bottom Floating Input Bar with Strong Cyan Glow on Focus */
     .bottom-input-container {
       width: 100%;
-      max-width: 680px;
-      margin: 0 auto 24px;
-      padding: 0 20px;
+      max-width: 720px;
+      margin: 0 auto;
+      padding: 8px 16px 18px;
       flex-shrink: 0;
+      position: relative;
+      z-index: 20;
     }
 
     .floating-prompt-box {
-      background-color: #1c1f26;
-      border: 1px solid rgba(255, 255, 255, 0.08);
+      background-color: #11151f;
+      border: 1.5px solid rgba(255, 255, 255, 0.09);
       border-radius: 32px;
-      padding: 8px 12px 8px 16px;
+      padding: 6px 10px 6px 12px;
       display: flex;
       align-items: center;
-      gap: 12px;
-      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
-      transition: border-color 0.2s, background-color 0.2s;
+      gap: 8px;
+      box-shadow: 0 8px 28px rgba(0, 0, 0, 0.7);
+      transition: border-color 0.25s ease, box-shadow 0.25s ease, background-color 0.25s ease;
     }
 
+    /* Potente iluminación cian alrededor al tocar / escribir */
     .floating-prompt-box:focus-within {
-      background-color: #232630;
-      border-color: rgba(168, 199, 250, 0.3);
+      background-color: #0d131d;
+      border-color: var(--cyan-neon);
+      box-shadow: 
+        0 0 0 2px rgba(0, 242, 254, 0.28),
+        0 0 22px rgba(0, 242, 254, 0.65),
+        0 0 42px rgba(0, 180, 216, 0.35);
     }
 
     .tool-icon-btn {
-      width: 36px;
-      height: 36px;
+      width: 38px;
+      height: 38px;
       border-radius: 50%;
       border: none;
       background: transparent;
@@ -210,9 +398,9 @@
       flex-shrink: 0;
     }
 
-    .tool-icon-btn:hover {
-      background: rgba(255, 255, 255, 0.08);
-      color: var(--text-primary);
+    .tool-icon-btn:hover, .tool-icon-btn:active {
+      background: rgba(0, 242, 254, 0.12);
+      color: var(--cyan-neon);
     }
 
     .prompt-input {
@@ -220,33 +408,63 @@
       background: transparent;
       border: none;
       outline: none;
-      color: var(--text-primary);
+      color: #ffffff;
       font-family: inherit;
       font-size: 16px;
-      padding: 4px 0;
+      line-height: 1.4;
+      padding: 8px 4px;
+      min-width: 0;
     }
 
     .prompt-input::placeholder {
       color: var(--text-secondary);
     }
 
-    .audio-btn {
-      background: #2b3142;
-      color: var(--accent-blue);
+    .action-right-btn {
+      background: #1b2436;
+      color: #7dd3fc;
       border-radius: 50%;
-      width: 38px;
-      height: 38px;
+      width: 40px;
+      height: 40px;
       display: flex;
       align-items: center;
       justify-content: center;
-      border: none;
+      border: 1px solid rgba(0, 242, 254, 0.2);
       cursor: pointer;
-      transition: background-color 0.2s;
+      transition: all 0.2s ease;
       flex-shrink: 0;
     }
 
-    .audio-btn:hover {
-      background: #353c52;
+    .action-right-btn.send-ready {
+      background: var(--cyan-neon);
+      color: #020813;
+      border-color: var(--cyan-neon);
+      box-shadow: 0 0 16px rgba(0, 242, 254, 0.65);
+    }
+
+    .action-right-btn:active {
+      transform: scale(0.93);
+    }
+
+    /* Attach Menu */
+    .attach-popover {
+      position: absolute;
+      bottom: 74px;
+      left: 18px;
+      background: #0f141f;
+      border: 1px solid rgba(0, 242, 254, 0.3);
+      border-radius: 16px;
+      padding: 8px;
+      display: none;
+      flex-direction: column;
+      gap: 4px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.85);
+      z-index: 50;
+    }
+
+    .attach-popover.open {
+      display: flex;
+      animation: popIn 0.15s ease-out;
     }
 
     /* Sidebar Drawer */
@@ -257,13 +475,15 @@
       width: 280px;
       height: 100%;
       background-color: var(--bg-sidebar);
+      border-right: 1px solid rgba(0, 242, 254, 0.15);
       z-index: 100;
       transform: translateX(-100%);
-      transition: transform 0.3s cubic-bezier(0.2, 0, 0, 1);
+      transition: transform 0.28s cubic-bezier(0.2, 0, 0, 1);
       display: flex;
       flex-direction: column;
-      padding: 20px;
-      box-shadow: 4px 0 24px rgba(0,0,0,0.5);
+      justify-content: space-between;
+      padding: 18px;
+      box-shadow: 6px 0 32px rgba(0, 0, 0, 0.85);
     }
 
     .sidebar.open {
@@ -274,38 +494,88 @@
       display: flex;
       align-items: center;
       justify-content: space-between;
-      margin-bottom: 24px;
+      margin-bottom: 20px;
     }
 
-    .sidebar-title {
+    .sidebar-brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
       font-family: 'Outfit', sans-serif;
-      font-size: 18px;
-      font-weight: 650;
+      font-size: 19px;
+      font-weight: 600;
+      color: #fff;
+    }
+
+    .new-chat-sidebar-btn {
+      width: 100%;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 12px 14px;
+      border-radius: 14px;
+      background: rgba(0, 242, 254, 0.1);
+      border: 1px solid rgba(0, 242, 254, 0.3);
+      color: var(--cyan-neon);
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      margin-bottom: 18px;
+      transition: background 0.2s;
+    }
+
+    .new-chat-sidebar-btn:hover {
+      background: rgba(0, 242, 254, 0.18);
+    }
+
+    .history-label {
+      font-size: 12px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.6px;
+      color: var(--text-secondary);
+      margin-bottom: 8px;
+      padding-left: 6px;
+    }
+
+    .history-list {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      overflow-y: auto;
+      flex: 1;
+    }
+
+    .history-item {
+      padding: 10px 12px;
+      border-radius: 12px;
+      font-size: 14px;
       color: var(--text-primary);
+      cursor: pointer;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      transition: background 0.15s;
+    }
+
+    .history-item:hover {
+      background: rgba(255, 255, 255, 0.07);
     }
 
     .overlay {
       position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: rgba(0,0,0,0.6);
+      inset: 0;
+      background: rgba(0, 0, 0, 0.72);
+      backdrop-filter: blur(2px);
       z-index: 90;
       opacity: 0;
       pointer-events: none;
-      transition: opacity 0.3s;
+      transition: opacity 0.25s;
     }
 
     .overlay.open {
       opacity: 1;
       pointer-events: auto;
-    }
-
-    @media (max-width: 600px) {
-      .center-greeting {
-        font-size: 30px;
-      }
     }
   </style>
 </head>
@@ -315,15 +585,11 @@
   <svg width="0" height="0" style="position:absolute;">
     <defs>
       <g id="natsune-logo-shape">
-        <!-- Outer Octagonal Nut -->
         <path fill="currentColor" fill-rule="evenodd" d="M35.5 22 L64.5 22 L82 40.5 L82 59.5 L64.5 78 L35.5 78 L18 59.5 L18 40.5 Z M50 32 A18 18 0 1 0 50 68 A18 18 0 1 0 50 32 Z" />
-        <!-- Inner Ring -->
         <path fill="currentColor" fill-rule="evenodd" d="M50 35.5 A14.5 14.5 0 1 0 50 64.5 A14.5 14.5 0 1 0 50 35.5 Z M50 39 A11 11 0 1 0 50 61 A11 11 0 1 0 50 39 Z" />
-        <!-- Top-Right Orbital Swirl Blades -->
         <path fill="currentColor" d="M43 22 C58 14, 77 16, 86 24 C73 19, 57 19, 46 22 Z" />
         <path fill="currentColor" d="M55 22 C70 18, 86 23, 91 34 C83 27, 70 23, 58 24 Z" />
         <path fill="currentColor" d="M66 25 C79 25, 90 33, 90 45 C86 36, 78 30, 68 29 Z" />
-        <!-- Bottom-Left Orbital Swirl Blades -->
         <path fill="currentColor" d="M57 78 C42 86, 23 84, 14 76 C27 81, 43 81, 54 78 Z" />
         <path fill="currentColor" d="M45 78 C30 82, 14 77, 9 66 C17 73, 30 77, 42 76 Z" />
         <path fill="currentColor" d="M34 75 C21 75, 10 67, 10 55 C14 64, 22 70, 32 71 Z" />
@@ -336,22 +602,42 @@
 
   <!-- Sidebar Drawer -->
   <aside class="sidebar" id="sidebar">
-    <div class="sidebar-header">
-      <span class="sidebar-title">Natsune IA</span>
-      <button class="icon-btn" id="closeSidebar">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <line x1="18" y1="6" x2="6" y2="18"></line>
-          <line x1="6" y1="6" x2="18" y2="18"></line>
+    <div style="display:flex; flex-direction:column; height:100%;">
+      <div class="sidebar-header">
+        <div class="sidebar-brand">
+          <svg width="24" height="24" viewBox="0 0 100 100" style="color: var(--cyan-neon);">
+            <use href="#natsune-logo-shape"></use>
+          </svg>
+          <span>Natsune IA</span>
+        </div>
+        <button class="icon-btn" id="closeSidebar" aria-label="Cerrar menú">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
+        </button>
+      </div>
+
+      <button class="new-chat-sidebar-btn" id="newChatBtn">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+          <line x1="12" y1="5" x2="12" y2="19"></line>
+          <line x1="5" y1="12" x2="19" y2="12"></line>
         </svg>
+        <span>Nuevo chat</span>
       </button>
+
+      <div class="history-label">Recientes</div>
+      <div class="history-list" id="historyList">
+        <div class="history-item" onclick="loadHistoryChat('Diseño de interfaz futurista')">Diseño de interfaz futurista</div>
+        <div class="history-item" onclick="loadHistoryChat('Ideas de programación web')">Ideas de programación web</div>
+      </div>
     </div>
-    <div style="color: var(--text-secondary); font-size: 14px;">Historial y ajustes próximamente.</div>
   </aside>
 
-  <!-- Top Header -->
+  <!-- Top Header (Sin botón Actualizar) -->
   <header class="top-bar">
     <div class="top-left">
-      <button class="icon-btn" id="menuBtn" title="Menú">
+      <button class="icon-btn" id="menuBtn" title="Menú" aria-label="Abrir menú">
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
           <line x1="3" y1="6" x2="21" y2="6"></line>
           <line x1="3" y1="12" x2="21" y2="12"></line>
@@ -360,45 +646,95 @@
       </button>
 
       <button class="pill-dropdown" id="modelSelectBtn">
-        <span>Automático</span>
+        <span id="currentModelName">Automático</span>
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
           <polyline points="6 9 12 15 18 9"></polyline>
         </svg>
       </button>
+
+      <!-- Model Dropdown Menu -->
+      <div class="dropdown-menu left" id="modelDropdown">
+        <div class="dropdown-item" onclick="setModel('Automático')">
+          <div>
+            <strong>Automático</strong>
+            <small>Equilibrio óptimo velocidad/potencia</small>
+          </div>
+        </div>
+        <div class="dropdown-item" onclick="setModel('Natsune Pro')">
+          <div>
+            <strong>Natsune Pro</strong>
+            <small>Razonamiento profundo y código</small>
+          </div>
+        </div>
+        <div class="dropdown-item" onclick="setModel('Natsune Flash')">
+          <div>
+            <strong>Natsune Flash</strong>
+            <small>Respuestas instantáneas</small>
+          </div>
+        </div>
+      </div>
     </div>
 
     <div class="top-right">
-      <button class="icon-btn" title="Logotipo Natsune">
+      <button class="icon-btn" id="logoBtn" title="Natsune IA">
         <svg width="22" height="22" viewBox="0 0 100 100">
           <use href="#natsune-logo-shape"></use>
         </svg>
       </button>
 
-      <button class="action-pill" id="updateBtn">
-        <span>Actualizar</span>
-      </button>
+      <div class="user-avatar" id="profileBtn" title="Perfil de usuario">
+        <span id="avatarInitial">S</span>
+      </div>
 
-      <div class="user-avatar" title="Perfil">
-        <span>S</span>
+      <!-- Functional Profile Popover -->
+      <div class="dropdown-menu right" id="profileDropdown">
+        <div class="profile-header">
+          <div class="user-avatar" style="width:36px; height:36px; cursor:default;" id="popoverAvatar">S</div>
+          <div>
+            <div style="font-weight:600; font-size:14px;" id="profileDisplayName">Sally</div>
+            <div style="font-size:12px; color:var(--cyan-neon);">Cuenta Natsune Plus</div>
+          </div>
+        </div>
+        <div class="profile-input-group">
+          <label for="userNameInput">Tu nombre</label>
+          <input type="text" id="userNameInput" class="profile-input" value="Sally" maxlength="24" />
+        </div>
+        <button class="save-profile-btn" id="saveProfileBtn">Guardar cambios</button>
       </div>
     </div>
   </header>
 
-  <!-- Center Assistant Screen -->
-  <main class="main-center">
-    <div class="center-logo-glow">
-      <svg width="52" height="52" viewBox="0 0 100 100">
-        <use href="#natsune-logo-shape"></use>
-      </svg>
-    </div>
+  <!-- Scrollable Chat / Welcome Viewport -->
+  <div class="chat-viewport" id="chatViewport">
+    <!-- Center Assistant Screen -->
+    <main class="main-center" id="welcomeScreen">
+      <div class="center-logo-glow">
+        <svg width="54" height="54" viewBox="0 0 100 100">
+          <use href="#natsune-logo-shape"></use>
+        </svg>
+      </div>
 
-    <h1 class="center-greeting" id="greetingText">¿Cómo puedo ayudarte, Sally?</h1>
-  </main>
+      <h1 class="center-greeting" id="greetingText">¿Cómo puedo ayudarte, Sally?</h1>
+    </main>
+
+    <!-- Conversation Stream -->
+    <div class="messages-container" id="messagesContainer"></div>
+  </div>
 
   <!-- Bottom Input Bar -->
   <div class="bottom-input-container">
-    <div class="floating-prompt-box">
-      <button class="tool-icon-btn" title="Adjuntar elemento">
+    <!-- Attach Menu -->
+    <div class="attach-popover" id="attachPopover">
+      <div class="dropdown-item" onclick="triggerAttachment('Imagen')">
+        <span>Subir imagen</span>
+      </div>
+      <div class="dropdown-item" onclick="triggerAttachment('Archivo')">
+        <span>Adjuntar archivo</span>
+      </div>
+    </div>
+
+    <div class="floating-prompt-box" id="promptBox">
+      <button type="button" class="tool-icon-btn" id="attachBtn" title="Adjuntar elemento">
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
           <line x1="12" y1="5" x2="12" y2="19"></line>
           <line x1="5" y1="12" x2="19" y2="12"></line>
@@ -410,9 +746,11 @@
         class="prompt-input" 
         id="promptInput" 
         placeholder="Pedir a Natsune IA"
+        autocomplete="off"
+        enterkeyhint="send"
       />
 
-      <button class="tool-icon-btn" title="Micrófono">
+      <button type="button" class="tool-icon-btn" id="micBtn" title="Dictado por voz">
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
           <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path>
           <path d="M19 10v2a7 7 0 0 1-14 0v-2"></path>
@@ -421,41 +759,287 @@
         </svg>
       </button>
 
-      <button class="audio-btn" title="Entrada de voz avanzada">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-          <line x1="18" y1="20" x2="18" y2="4"></line>
+      <button type="button" class="action-right-btn" id="sendOrWaveBtn" title="Enviar o Modo Voz">
+        <!-- Wave Icon (Default when empty) -->
+        <svg id="waveIcon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
+          <line x1="18" y1="19" x2="18" y2="5"></line>
           <line x1="12" y1="16" x2="12" y2="8"></line>
-          <line x1="6" y1="13" x2="6" y2="11"></line>
+          <line x1="6" y1="14" x2="6" y2="10"></line>
+        </svg>
+        <!-- Send Arrow Icon (When typing) -->
+        <svg id="sendIcon" style="display:none;" width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"></path>
         </svg>
       </button>
     </div>
   </div>
 
   <script>
+    // DOM References
     const menuBtn = document.getElementById('menuBtn');
     const closeSidebar = document.getElementById('closeSidebar');
     const sidebar = document.getElementById('sidebar');
     const overlay = document.getElementById('overlay');
-    const updateBtn = document.getElementById('updateBtn');
+    const newChatBtn = document.getElementById('newChatBtn');
+    const historyList = document.getElementById('historyList');
 
-    menuBtn.addEventListener('click', () => {
+    const modelSelectBtn = document.getElementById('modelSelectBtn');
+    const modelDropdown = document.getElementById('modelDropdown');
+    const currentModelName = document.getElementById('currentModelName');
+
+    const profileBtn = document.getElementById('profileBtn');
+    const profileDropdown = document.getElementById('profileDropdown');
+    const userNameInput = document.getElementById('userNameInput');
+    const saveProfileBtn = document.getElementById('saveProfileBtn');
+    const greetingText = document.getElementById('greetingText');
+    const avatarInitial = document.getElementById('avatarInitial');
+    const popoverAvatar = document.getElementById('popoverAvatar');
+    const profileDisplayName = document.getElementById('profileDisplayName');
+
+    const promptBox = document.getElementById('promptBox');
+    const promptInput = document.getElementById('promptInput');
+    const sendOrWaveBtn = document.getElementById('sendOrWaveBtn');
+    const waveIcon = document.getElementById('waveIcon');
+    const sendIcon = document.getElementById('sendIcon');
+    const attachBtn = document.getElementById('attachBtn');
+    const attachPopover = document.getElementById('attachPopover');
+    const micBtn = document.getElementById('micBtn');
+
+    const welcomeScreen = document.getElementById('welcomeScreen');
+    const messagesContainer = document.getElementById('messagesContainer');
+    const chatViewport = document.getElementById('chatViewport');
+
+    let userName = 'Sally';
+
+    // 1. Sidebar / Hamburger Logic
+    function openSidebar() {
+      closeAllPopovers();
       sidebar.classList.add('open');
       overlay.classList.add('open');
-    });
+    }
 
-    closeSidebar.addEventListener('click', () => {
+    function hideSidebar() {
       sidebar.classList.remove('open');
       overlay.classList.remove('open');
+    }
+
+    menuBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      openSidebar();
     });
 
-    overlay.addEventListener('click', () => {
-      sidebar.classList.remove('open');
-      overlay.classList.remove('open');
+    closeSidebar.addEventListener('click', hideSidebar);
+    overlay.addEventListener('click', hideSidebar);
+
+    newChatBtn.addEventListener('click', () => {
+      messagesContainer.innerHTML = '';
+      messagesContainer.style.display = 'none';
+      welcomeScreen.style.display = 'flex';
+      promptInput.value = '';
+      updateInputButtonState();
+      hideSidebar();
     });
 
-    updateBtn.addEventListener('click', () => {
-      location.reload();
+    // 2. Popovers (Model Selector, Profile, Attach)
+    function closeAllPopovers() {
+      modelDropdown.classList.remove('open');
+      profileDropdown.classList.remove('open');
+      attachPopover.classList.remove('open');
+    }
+
+    document.addEventListener('click', (e) => {
+      if (!e.target.closest('.top-left') && !e.target.closest('.top-right') && !e.target.closest('.bottom-input-container')) {
+        closeAllPopovers();
+      }
     });
+
+    modelSelectBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const isOpen = modelDropdown.classList.contains('open');
+      closeAllPopovers();
+      if (!isOpen) modelDropdown.classList.add('open');
+    });
+
+    function setModel(name) {
+      currentModelName.textContent = name;
+      closeAllPopovers();
+    }
+
+    profileBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const isOpen = profileDropdown.classList.contains('open');
+      closeAllPopovers();
+      if (!isOpen) profileDropdown.classList.add('open');
+    });
+
+    profileDropdown.addEventListener('click', (e) => e.stopPropagation());
+
+    saveProfileBtn.addEventListener('click', () => {
+      const cleanName = userNameInput.value.trim();
+      if (cleanName) {
+        userName = cleanName;
+        const initial = userName.charAt(0).toUpperCase();
+        avatarInitial.textContent = initial;
+        popoverAvatar.textContent = initial;
+        profileDisplayName.textContent = userName;
+        greetingText.textContent = `¿Cómo puedo ayudarte, ${userName}?`;
+      }
+      closeAllPopovers();
+    });
+
+    attachBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const isOpen = attachPopover.classList.contains('open');
+      closeAllPopovers();
+      if (!isOpen) attachPopover.classList.add('open');
+    });
+
+    function triggerAttachment(type) {
+      closeAllPopovers();
+      promptInput.value = `[${type} adjuntado] `;
+      promptInput.focus();
+      updateInputButtonState();
+    }
+
+    // 3. Keyboard, Input & Send Logic
+    promptBox.addEventListener('click', (e) => {
+      if (e.target === promptBox) {
+        promptInput.focus();
+      }
+    });
+
+    function updateInputButtonState() {
+      const hasText = promptInput.value.trim().length > 0;
+      if (hasText) {
+        waveIcon.style.display = 'none';
+        sendIcon.style.display = 'block';
+        sendOrWaveBtn.classList.add('send-ready');
+      } else {
+        waveIcon.style.display = 'block';
+        sendIcon.style.display = 'none';
+        sendOrWaveBtn.classList.remove('send-ready');
+      }
+    }
+
+    promptInput.addEventListener('input', updateInputButtonState);
+
+    promptInput.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        sendMessage();
+      }
+    });
+
+    sendOrWaveBtn.addEventListener('click', () => {
+      if (promptInput.value.trim().length > 0) {
+        sendMessage();
+      } else {
+        promptInput.placeholder = 'Escuchando tu voz...';
+        promptInput.focus();
+        setTimeout(() => {
+          promptInput.placeholder = 'Pedir a Natsune IA';
+        }, 2000);
+      }
+    });
+
+    micBtn.addEventListener('click', () => {
+      promptInput.placeholder = 'Habla ahora...';
+      promptInput.focus();
+      setTimeout(() => {
+        promptInput.placeholder = 'Pedir a Natsune IA';
+      }, 2000);
+    });
+
+    function sendMessage() {
+      const text = promptInput.value.trim();
+      if (!text) return;
+
+      if (welcomeScreen.style.display !== 'none') {
+        welcomeScreen.style.display = 'none';
+        messagesContainer.style.display = 'flex';
+        addHistoryItem(text);
+      }
+
+      appendUserMessage(text);
+      promptInput.value = '';
+      updateInputButtonState();
+
+      const loaderId = appendLoading();
+      setTimeout(() => {
+        const loaderEl = document.getElementById(loaderId);
+        if (loaderEl) loaderEl.remove();
+        appendAIMessage(`¡Hola ${userName}! Soy **Natsune IA** (${currentModelName.textContent}). He recibido tu mensaje: "${text}". ¿En qué más puedo asistirte hoy?`);
+      }, 750);
+    }
+
+    function appendUserMessage(text) {
+      const row = document.createElement('div');
+      row.className = 'message-row user';
+      row.innerHTML = `<div class="user-bubble">${escapeHTML(text)}</div>`;
+      messagesContainer.appendChild(row);
+      chatViewport.scrollTop = chatViewport.scrollHeight;
+    }
+
+    function appendLoading() {
+      const id = 'loading-' + Date.now();
+      const row = document.createElement('div');
+      row.className = 'message-row';
+      row.id = id;
+      row.innerHTML = `
+        <div class="ai-avatar spinning">
+          <svg width="18" height="18" viewBox="0 0 100 100" style="color: var(--cyan-neon);">
+            <use href="#natsune-logo-shape"></use>
+          </svg>
+        </div>
+        <div class="ai-bubble" style="color: var(--text-secondary);">Pensando...</div>
+      `;
+      messagesContainer.appendChild(row);
+      chatViewport.scrollTop = chatViewport.scrollHeight;
+      return id;
+    }
+
+    function appendAIMessage(text) {
+      const row = document.createElement('div');
+      row.className = 'message-row';
+      const formatted = escapeHTML(text).replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+      row.innerHTML = `
+        <div class="ai-avatar">
+          <svg width="18" height="18" viewBox="0 0 100 100" style="color: #fff;">
+            <use href="#natsune-logo-shape"></use>
+          </svg>
+        </div>
+        <div class="ai-bubble">${formatted}</div>
+      `;
+      messagesContainer.appendChild(row);
+      chatViewport.scrollTop = chatViewport.scrollHeight;
+    }
+
+    function addHistoryItem(title) {
+      const item = document.createElement('div');
+      item.className = 'history-item';
+      item.textContent = title;
+      item.onclick = () => loadHistoryChat(title);
+      historyList.prepend(item);
+    }
+
+    function loadHistoryChat(title) {
+      hideSidebar();
+      welcomeScreen.style.display = 'none';
+      messagesContainer.style.display = 'flex';
+      messagesContainer.innerHTML = '';
+      appendUserMessage(title);
+      appendAIMessage(`Retomando nuestra conversación sobre **${title}**, ${userName}. ¿Qué te gustaría explorar a continuación?`);
+    }
+
+    function escapeHTML(str) {
+      return str.replace(/[&<>'"]/g, tag => ({
+        '&': '&amp;',
+        '<': '&lt;',
+        '>': '&gt;',
+        "'": '&#39;',
+        '"': '&quot;'
+      }[tag]));
+    }
   </script>
 </body>
 </html>
