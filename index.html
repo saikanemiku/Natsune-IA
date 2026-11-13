@@ -671,19 +671,26 @@
             saveStoredChats(chats);
         }
 
+        // INTELIGENCIA ENCADENADA ACTUALIZADA CON CONTROL DE ERRORES Y MEMORIA COMPARTIDA
         async function getChainedIntelligence(query, userName, chatHistory = []) {
-            const nick = getAutoNickname(userName);
+            const nick = typeof getAutoNickname === 'function' ? getAutoNickname(userName) : (userName || 'cariño');
             const selectedModel = getCurrentModelKey();
 
+            // 1. Si el usuario eligió a Natsune directamente
             if (selectedModel === 'natsune') {
-                return { text: processNatsuneMind(query, userName), isNatsune: true };
+                if (typeof processNatsuneMind === 'function') {
+                    return { text: processNatsuneMind(query, userName, chatHistory), isNatsune: true };
+                } else {
+                    return { text: `¡Hola ${nick}! Asegúrate de que el archivo natsune-brain.js esté en la misma carpeta para poder pensar al máximo. 💖`, isNatsune: true };
+                }
             }
 
+            // 2. Modelo Gemini
             const geminiKey = localStorage.getItem('key_gemini');
             if (selectedModel === 'gemini') {
                 if (!geminiKey) {
                     switchToNatsuneUI();
-                    return { text: `¡Vaya, ${nick}! Falta colocar tu llave de Gemini en los ajustes para usar este modelo. 🗝️✨`, isNatsune: true };
+                    return { text: `¡Vaya, ${nick}! Falta colocar tu llave de Gemini en los ajustes para usar este modelo. 🗝️✨ Mientras tanto, me quedo yo contigo para que no te quedes sin respuesta.`, isNatsune: true };
                 }
                 try {
                     const variant = document.getElementById('variantSelector').value;
@@ -700,19 +707,31 @@
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({ contents: contentsPayload })
                     });
+                    if (!res.ok) throw new Error("Error en API Gemini");
                     const data = await res.json();
                     const aiText = data.candidates?.[0]?.content?.parts?.[0]?.text;
                     if (aiText) return { text: aiText, isNatsune: false };
-                } catch (e) {}
+                    throw new Error("Respuesta vacía de Gemini");
+                } catch (e) {
+                    switchToNatsuneUI();
+                    const fallbackMsg = typeof getNatsuneErrorFallback === 'function' 
+                        ? getNatsuneErrorFallback(userName, "Gemini") 
+                        : `¡Ups, ${nick}! Gemini tuvo un problema y tomé el control. 🌸`;
+                    return { text: fallbackMsg, isNatsune: true };
+                }
             }
 
+            // 3. Modelo ChatGPT (OpenAI)
             const openAIKey = localStorage.getItem('key_openai');
             if (selectedModel === 'chatgpt') {
                 if (!openAIKey) {
                     switchToNatsuneUI();
-                    return { text: `¡Oye ${nick}, falta tu llave de OpenAI en los ajustes! 🗝️✨`, isNatsune: true };
+                    return { text: `¡Oye ${nick}, falta tu llave de OpenAI en los ajustes! 🗝️✨ Ya me encargué yo de tomar el relevo.`, isNatsune: true };
                 }
                 try {
+                    const variant = document.getElementById('variantSelector').value;
+                    const apiModelName = variant === 'gpt4o' ? 'gpt-4o' : 'gpt-4o-mini';
+
                     let messagesPayload = chatHistory.map(msg => ({
                         role: msg.role === 'user' ? 'user' : 'assistant',
                         content: msg.content
@@ -726,23 +745,35 @@
                             'Authorization': `Bearer ${openAIKey}`
                         },
                         body: JSON.stringify({
-                            model: 'gpt-4o-mini',
+                            model: apiModelName,
                             messages: messagesPayload
                         })
                     });
+                    if (!res.ok) throw new Error("Error en API OpenAI");
                     const data = await res.json();
                     const aiText = data.choices?.[0]?.message?.content;
                     if (aiText) return { text: aiText, isNatsune: false };
-                } catch (e) {}
+                    throw new Error("Respuesta vacía de OpenAI");
+                } catch (e) {
+                    switchToNatsuneUI();
+                    const fallbackMsg = typeof getNatsuneErrorFallback === 'function' 
+                        ? getNatsuneErrorFallback(userName, "ChatGPT") 
+                        : `¡Ups, ${nick}! ChatGPT falló y tuve que rescatar la conversación. 💖`;
+                    return { text: fallbackMsg, isNatsune: true };
+                }
             }
 
+            // 4. Modelo Claude (Anthropic)
             const claudeKey = localStorage.getItem('key_claude');
             if (selectedModel === 'claude') {
                 if (!claudeKey) {
                     switchToNatsuneUI();
-                    return { text: `¡Ey, ${nick}! Falta tu llave de Claude en los ajustes. 🗝️🌸`, isNatsune: true };
+                    return { text: `¡Ey, ${nick}! Falta tu llave de Claude en los ajustes. 🗝️🌸 Pero no te preocupes, yo tomo el mando.`, isNatsune: true };
                 }
                 try {
+                    const variant = document.getElementById('variantSelector').value;
+                    const apiModelName = variant === 'sonnet' ? 'claude-3-5-sonnet-20240620' : 'claude-3-5-haiku-20241022';
+
                     let messagesPayload = chatHistory.map(msg => ({
                         role: msg.role === 'user' ? 'user' : 'assistant',
                         content: msg.content
@@ -757,19 +788,31 @@
                             'anthropic-version': '2023-06-01'
                         },
                         body: JSON.stringify({
-                            model: 'claude-3-5-haiku-20241022',
+                            model: apiModelName,
                             max_tokens: 1024,
                             messages: messagesPayload
                         })
                     });
+                    if (!res.ok) throw new Error("Error en API Claude");
                     const data = await res.json();
                     const aiText = data.content?.[0]?.text;
                     if (aiText) return { text: aiText, isNatsune: false };
-                } catch (e) {}
+                    throw new Error("Respuesta vacía de Claude");
+                } catch (e) {
+                    switchToNatsuneUI();
+                    const fallbackMsg = typeof getNatsuneErrorFallback === 'function' 
+                        ? getNatsuneErrorFallback(userName, "Claude") 
+                        : `¡Vaya, ${nick}! Claude se quedó sin señal y tomé su lugar. ✨`;
+                    return { text: fallbackMsg, isNatsune: true };
+                }
             }
 
+            // Fallback general
             switchToNatsuneUI();
-            return { text: `¡Tuvimos un pequeño tropiezo de conexión, ${nick}. Lo intentamos de nuevo! 🌌💫`, isNatsune: true };
+            const generalFallback = typeof getNatsuneErrorFallback === 'function' 
+                ? getNatsuneErrorFallback(userName, "la conexión externa") 
+                : `¡Tuvimos un pequeño tropiezo de conexión, ${nick}. Aquí estoy yo para ayudarte! 🌌💫`;
+            return { text: generalFallback, isNatsune: true };
         }
 
         async function sendMessage() {
@@ -789,7 +832,10 @@
             const userName = localStorage.getItem('natsune_username') || '';
             const chats = getStoredChats();
             const currentChat = chats.find(c => c.id === currentChatId);
-            const chatHistory = currentChat ? currentChat.messages : [];
+            // Enviamos todo el historial previo excepto el último mensaje recién añadido para evitar duplicarlo en el payload
+            const chatHistory = currentChat && currentChat.messages.length > 1 
+                ? currentChat.messages.slice(0, -1) 
+                : [];
 
             const result = await getChainedIntelligence(text, userName, chatHistory);
             
