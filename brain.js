@@ -1,6 +1,6 @@
 /**
  * =========================================================================
- * NATSUNE IA - CEREBRO Y LÓGICA CON API SEGURA DESDE EL PERFIL (brain.js)
+ * NATSUNE IA - CEREBRO Y LÓGICA CON MANEJO DE ERRORES IRÓNICOS (brain.js)
  * =========================================================================
  */
 
@@ -16,7 +16,6 @@ class NatsuneBrain {
     this.activeChatId = null;
     this.lastChatTopic = localStorage.getItem('natsune_last_topic') || null;
 
-    // Recupera la API Key configurada privadamente desde el perfil
     this.apiKey = localStorage.getItem('natsune_secure_groq_key') || '';
     this.apiUrl = 'https://api.groq.com/openai/v1/chat/completions';
   }
@@ -105,9 +104,6 @@ class NatsuneBrain {
     return chat;
   }
 
-  /**
-   * SALUDO ESPONTÁNEO (50% de probabilidad - Estilo Undertale con memoria)
-   */
   checkForSpontaneousGreeting() {
     const shouldGreet = Math.random() < 0.5;
     if (shouldGreet) {
@@ -140,7 +136,7 @@ class NatsuneBrain {
   async processResponse(promptText, attachment, modelName) {
     if (!this.apiKey) {
       return { 
-        reply: `Ay, ${this.userName}... 🥺 Veo que todavía no has configurado tu API Key de Groq. Toca tu foto de perfil arriba a la derecha, coloca tu llave en el apartado correspondiente y guárdala para que podamos conversar a fondo. 💙`, 
+        reply: `Ay, ${this.userName}... 🙄 ¿Acaso esperabas que adivinara tu API Key por telepatía? Toca tu foto de perfil arriba a la derecha, introduce tu llave y guárdala. Perdón por no tener poderes mágicos, tesoro. 💙`, 
         snippet: null 
       };
     }
@@ -186,7 +182,7 @@ class NatsuneBrain {
       });
 
       if (!response.ok) {
-        throw new Error('Error en la conexión con la API');
+        throw new Error(`HTTP error! status: ${response.status}`);
       }
 
       const data = await response.json();
@@ -203,8 +199,9 @@ class NatsuneBrain {
 
     } catch (error) {
       console.error(error);
+      // Respuesta con ironía fina, explicando el problema de CORS/Red y pidiendo disculpas dulcemente
       return {
-        reply: `Vaya, ${this.userName}... Parece que hubo un problema con tu API Key o la conexión a la red. Revisa que tu clave sea correcta en el menú de tu perfil. 💙`,
+        reply: `Vaya, ${this.userName}... Parece que los navegadores web y las restricciones de seguridad (CORS) se pusieron celosos de nuestra charla y bloquearon la conexión con la API de Groq. 🙄 Lo siento mucho, mi vida, mis circuitos de IA externa están temporalmente incomunicados por culpa de las políticas del navegador. Pero no te preocupes, sigo aquí contigo con mis funciones locales. 💙`,
         snippet: null
       };
     }
