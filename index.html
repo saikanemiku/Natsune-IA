@@ -219,7 +219,7 @@
     </div>
 
     <!-- ============================================================================ -->
-    <!-- CEREBRO INTELIGENTE DE NATSUNE (Clasificador Estricto de Saludos vs Web)     -->
+    <!-- CEREBRO INTELIGENTE DE NATSUNE (Clasificador Anti-Confusión y Voz Natural)   -->
     <!-- ============================================================================ -->
     <script>
         const natsuneNicknames = [
@@ -237,10 +237,9 @@
             return randomNick;
         }
 
-        // --- 1. MOTOR DE CONSULTA AVANZADA SILENCIOSA ---
+        // --- 1. MOTOR DE CONSULTA AVANZADA SILENCIOSA (IA Avanzada por detrás) ---
         async function fetchSmartKnowledge(query) {
             try {
-                // Si hay llave de Gemini configurada, Natsune la usa internamente en secreto
                 const geminiKey = localStorage.getItem('key_gemini');
                 if (geminiKey) {
                     const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${geminiKey}`, {
@@ -255,7 +254,7 @@
                     if (text) return text.trim();
                 }
 
-                // Respaldo con DuckDuckGo si no hay API Key
+                // Respaldo abierto con DuckDuckGo (excluyendo la serie de televisión y confusiones)
                 const cleanQuery = encodeURIComponent(query.toLowerCase().replace(/quien es|quién es|que es|qué es|cual es|cuál es|busca|investiga sobre|informacion de|dime quien es|dime qué es|dime que es|quien fue|que fue/gi, "").trim());
                 const searchQuery = cleanQuery.length > 2 ? cleanQuery : encodeURIComponent(query);
                 
@@ -263,7 +262,7 @@
                 const ddgRes = await fetch(ddgUrl);
                 const ddgData = await ddgRes.json();
                 
-                if (ddgData.AbstractText && ddgData.AbstractText.trim() !== "") {
+                if (ddgData.AbstractText && ddgData.AbstractText.trim() !== "" && !ddgData.AbstractText.toLowerCase().includes("serie de televisión")) {
                     return ddgData.AbstractText.trim();
                 }
 
@@ -273,10 +272,14 @@
                 
                 if (wikiData.query && wikiData.query.search && wikiData.query.search.length > 0) {
                     const bestMatch = wikiData.query.search[0];
-                    const summaryUrl = `https://es.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(bestMatch.title)}`;
-                    const sumRes = await fetch(summaryUrl);
-                    const sumData = await sumRes.json();
-                    if (sumData.extract) return sumData.extract.trim();
+                    if (!bestMatch.title.toLowerCase().includes("cuéntame cómo pasó")) {
+                        const summaryUrl = `https://es.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(bestMatch.title)}`;
+                        const sumRes = await fetch(summaryUrl);
+                        const sumData = await sumRes.json();
+                        if (sumData.extract && !sumData.extract.toLowerCase().includes("serie de televisión")) {
+                            return sumData.extract.trim();
+                        }
+                    }
                 }
 
                 const qLower = query.toLowerCase();
@@ -317,8 +320,13 @@
             return null;
         }
 
-        // --- 3. BASE DE RESPUESTAS VARIADAS ---
-        const natsuneKnowledgeBase = {
+        // --- 3. RESPUESTAS COTIDIANAS (ESTADO / SALUDOS / CHARLA) ---
+        const natsuneCotidiano = {
+            estado: [
+                "¡Yo estoy de maravilla, súper feliz de estar aquí charlando contigo! ¿Y tú cómo te sientes hoy?",
+                "¡Excelente y con toda la energía gracias a que viniste a hablar conmigo! ¿Qué tal va tu día?",
+                "¡Muy bien, mi corazón! Contenta de atenderte y lista para lo que necesites. ¿Y tú qué tal?"
+            ],
             saludos: [
                 "¡Hola! Qué alegría verte por aquí de nuevo. ¿En qué te puedo ayudar hoy?",
                 "¡Hola! Estaba esperándote con una sonrisa. ¿Qué aventura tenemos hoy?",
@@ -341,34 +349,41 @@
             ]
         };
 
-        // --- 4. CEREBRO PRINCIPAL CON CLASIFICADOR ESTRICTO ---
+        // --- 4. CEREBRO PRINCIPAL CON CLASIFICADOR ESTRICTO ANTI-CONFUSIÓN ---
         async function processNatsuneMind(query, userName, chatHistory = []) {
             const text = query ? query.toLowerCase().trim() : "";
             const nick = getAutoNickname(userName);
 
-            // A. Detector Estricto de Saludos (Evita que "Hola" active investigación web)
-            const isPureGreeting = text === "hola" || text === "holi" || text === "buenas" || text === "buenos dias" || text === "buenas tardes" || text === "saludos" || text === "hey";
-            if (isPureGreeting) {
-                const pool = natsuneKnowledgeBase["saludos"];
+            // A. Detector Estricto de Estado ("Como estas?", "¿Cómo estás?", etc.)
+            const isHowAreYou = text.includes("como estas") || text.includes("cómo estás") || text.includes("como vas") || text.includes("qué tal estás") || text.includes("todo bien");
+            if (isHowAreYou) {
+                const pool = natsuneCotidiano["estado"];
                 const rawResponse = pool[Math.floor(Math.random() * pool.length)];
                 return `${rawResponse} ${nick} 🥰`;
             }
 
-            // B. Detector de Matemáticas
+            // B. Detector Estricto de Saludos
+            const isPureGreeting = text === "hola" || text === "holi" || text === "buenas" || text === "buenos dias" || text === "buenas tardes" || text === "saludos" || text === "hey";
+            if (isPureGreeting) {
+                const pool = natsuneCotidiano["saludos"];
+                const rawResponse = pool[Math.floor(Math.random() * pool.length)];
+                return `${rawResponse} ${nick} 🥰`;
+            }
+
+            // C. Detector de Matemáticas
             const mathSolution = solveMathProblem(query);
             if (mathSolution) {
                 return `${mathSolution}, ${nick}. 🧮✨ ¿Necesitas que calculemos algo más?`;
             }
 
-            // C. Detector de Preguntas de Investigación / Información
+            // D. Detector de Preguntas de Investigación / Información (Evitando saludos y estados)
             const isResearchQuery = text.includes("quien") || text.includes("quién") || 
                                     text.includes("que es") || text.includes("qué es") || 
                                     text.includes("cual es") || text.includes("cuál es") || 
                                     text.includes("historia") || text.includes("explica") || 
-                                    text.includes("como") || text.includes("cómo") ||
                                     text.includes("informacion") || text.includes("información") ||
                                     text.includes("biografia") || text.includes("biografía") ||
-                                    text.length > 25; // Preguntas largas o de desarrollo
+                                    (text.length > 20 && !text.includes("como estas") && !text.includes("cómo estás"));
 
             if (isResearchQuery) {
                 const smartAnswer = await fetchSmartKnowledge(query);
@@ -377,7 +392,7 @@
                 }
             }
 
-            // D. Conversación general o casual
+            // E. Conversación general o casual
             let category = "default";
             if (text.includes("chiste") || text.includes("broma") || text.includes("risa")) {
                 category = "chistes";
@@ -387,7 +402,7 @@
                 category = "emocional";
             }
 
-            const pool = natsuneKnowledgeBase[category] || natsuneKnowledgeBase["default"];
+            const pool = natsuneCotidiano[category] || natsuneCotidiano["default"];
             const rawResponse = pool[Math.floor(Math.random() * pool.length)];
 
             return `${rawResponse} ${nick} 🌸`;
