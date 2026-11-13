@@ -11,13 +11,17 @@ const fetch = require('node-fetch');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// Lee la API Key de forma segura desde las variables de entorno de Render
 const GROQ_API_KEY = process.env.GROQ_API_KEY;
 
-app.use(cors());
+// CORS abierto para permitir peticiones desde tu GitHub Pages
+app.use(cors({
+  origin: '*',
+  methods: ['GET', 'POST', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization']
+}));
+
 app.use(express.json({ limit: '10mb' }));
 
-// Ruta proxy segura para procesar los mensajes de Natsune
 app.post('/api/chat', async (req, res) => {
   try {
     const { messages, model } = req.body;
