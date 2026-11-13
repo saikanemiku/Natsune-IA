@@ -1,8 +1,6 @@
 /**
  * =========================================================================
- * NATSUNE IA - CEREBRO Y LÓGICA CON API SEGURA (brain.js)
- * La API Key ya no está en el código plano, por lo que GitHub no la bloqueará.
- * Se solicita de forma privada y se guarda solo en tu navegador.
+ * NATSUNE IA - CEREBRO Y LÓGICA CON API SEGURA DESDE EL PERFIL (brain.js)
  * =========================================================================
  */
 
@@ -18,25 +16,15 @@ class NatsuneBrain {
     this.activeChatId = null;
     this.lastChatTopic = localStorage.getItem('natsune_last_topic') || null;
 
-    // Obtenemos la clave de forma segura del almacenamiento privado de tu navegador
+    // Recupera la API Key configurada privadamente desde el perfil
     this.apiKey = localStorage.getItem('natsune_secure_groq_key') || '';
     this.apiUrl = 'https://api.groq.com/openai/v1/chat/completions';
-
-    // Si no hay clave configurada, la pedimos discretamente la primera vez
-    if (!this.apiKey) {
-      this.promptForApiKey();
-    }
   }
 
-  // Método para configurar tu llave de forma privada en tu navegador
-  promptForApiKey() {
-    const keyInput = prompt('🔒 Natsune IA Seguridad:\nPor favor, introduce tu API Key de Groq para habilitar el cerebro inteligente (solo se guardará en este navegador de forma privada):');
-    if (keyInput && keyInput.trim().startsWith('gsk_')) {
-      this.apiKey = keyInput.trim();
+  setApiKey(key) {
+    if (key && key.trim().startsWith('gsk_')) {
+      this.apiKey = key.trim();
       localStorage.setItem('natsune_secure_groq_key', this.apiKey);
-      alert('¡Llave guardada de forma segura en tu navegador, Sally! ✨');
-    } else if (keyInput !== null) {
-      alert('La llave no parece válida, asegúrate de que empiece por "gsk_".');
     }
   }
 
@@ -117,6 +105,9 @@ class NatsuneBrain {
     return chat;
   }
 
+  /**
+   * SALUDO ESPONTÁNEO (50% de probabilidad - Estilo Undertale con memoria)
+   */
   checkForSpontaneousGreeting() {
     const shouldGreet = Math.random() < 0.5;
     if (shouldGreet) {
@@ -148,10 +139,10 @@ class NatsuneBrain {
 
   async processResponse(promptText, attachment, modelName) {
     if (!this.apiKey) {
-      this.promptForApiKey();
-      if (!this.apiKey) {
-        return { reply: `Por favor, ingresa tu API Key para que pueda pensar y responderte, ${this.userName}. 🥺`, snippet: null };
-      }
+      return { 
+        reply: `Ay, ${this.userName}... 🥺 Veo que todavía no has configurado tu API Key de Groq. Toca tu foto de perfil arriba a la derecha, coloca tu llave en el apartado correspondiente y guárdala para que podamos conversar a fondo. 💙`, 
+        snippet: null 
+      };
     }
 
     let contextNote = "";
@@ -213,7 +204,7 @@ class NatsuneBrain {
     } catch (error) {
       console.error(error);
       return {
-        reply: `Vaya, ${this.userName}... Parece que hubo un problema con tu API Key o la conexión a la red. Revisa que tu clave sea correcta. 💙`,
+        reply: `Vaya, ${this.userName}... Parece que hubo un problema con tu API Key o la conexión a la red. Revisa que tu clave sea correcta en el menú de tu perfil. 💙`,
         snippet: null
       };
     }
