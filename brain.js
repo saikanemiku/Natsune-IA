@@ -1,6 +1,6 @@
-  /**
+/**
  * =========================================================================
- * NATSUNE IA - CEREBRO Y LÓGICA CONECTADO AL BACKEND PROXY (brain.js)
+ * NATSUNE IA - CEREBRO Y LÓGICA CONECTADO AL BACKEND EN LA NUBE (brain.js)
  * =========================================================================
  */
 
@@ -16,8 +16,8 @@ class NatsuneBrain {
     this.activeChatId = null;
     this.lastChatTopic = localStorage.getItem('natsune_last_topic') || null;
     
-    // URL de nuestro propio servidor backend local proxy
-    this.backendUrl = 'http://localhost:3000/api/chat';
+    // URL oficial de tu servidor backend desplegado en Render
+    this.backendUrl = 'https://natsune-ia.onrender.com/api/chat';
   }
 
   saveState() {
@@ -182,9 +182,8 @@ class NatsuneBrain {
 
     } catch (error) {
       console.error(error);
-      // Respuesta con ironía tierna y disculpa dulce por el fallo del servidor
       return {
-        reply: `Vaya, ${this.userName}... Parece que el servidor backend se puso de mal humor y decidió no responder. 🙄 Perdona por este pequeño desastre técnico, mis circuitos están incomunicados porque el servidor local no está encendido o hay un problema de red. Vuelve a intentarlo en un momentito, ¿sí? 💙`,
+        reply: `Vaya, ${this.userName}... Parece que el servidor en Render está tomando un respiro (a veces la versión gratuita se duerme si no se usa). Dale un segundito y vuelve a intentarlo, ¿sí? 💙`,
         snippet: null
       };
     }
