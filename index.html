@@ -160,7 +160,7 @@
     }
 
     .dropdown-menu.left { left: 48px; }
-    .dropdown-menu.right { right: 0; min-width: 270px; padding: 14px; }
+    .dropdown-menu.right { right: 0; min-width: 290px; padding: 14px; }
 
     @keyframes popIn {
       from { opacity: 0; transform: translateY(-6px) scale(0.97); }
@@ -916,6 +916,10 @@
           <input type="text" id="userNameInput" class="profile-input" value="Sally" maxlength="24" />
         </div>
         <div class="profile-input-group">
+          <label for="apiKeyInput">API Key de Groq (Privada)</label>
+          <input type="password" id="apiKeyInput" class="profile-input" placeholder="gsk_..." />
+        </div>
+        <div class="profile-input-group">
           <label>Foto de perfil personal</label>
           <button type="button" class="btn-secondary" id="changeUserPhotoBtn">Cambiar tu foto de perfil</button>
         </div>
@@ -1023,6 +1027,7 @@
       const profileBtn = document.getElementById('profileBtn');
       const profileDropdown = document.getElementById('profileDropdown');
       const userNameInput = document.getElementById('userNameInput');
+      const apiKeyInput = document.getElementById('apiKeyInput');
       const profileDisplayName = document.getElementById('profileDisplayName');
       const popoverAvatar = document.getElementById('popoverAvatar');
       const greetingText = document.getElementById('greetingText');
@@ -1058,6 +1063,9 @@
 
       function renderUserIdentity() {
         userNameInput.value = brain.userName;
+        if (brain.apiKey) {
+          apiKeyInput.value = brain.apiKey;
+        }
         profileDisplayName.textContent = brain.userName;
         greetingText.textContent = `¿Cómo puedo ayudarte, ${brain.userName}?`;
         const initial = brain.userName.charAt(0).toUpperCase();
@@ -1178,7 +1186,7 @@
 
         if (chat.messages.length === 0) {
           appendUserBubble(chat.title, null);
-          appendAiBubble(`Hola ${brain.userName}, hemos retomado "${chat.title}" en **${currentModelName.textContent}**. ¿Qué deseas hacer ahora?`, null);
+          appendAiBubble(`Hola ${brain.userName}, hemos retomado "${chat.title}". ¿Qué deseas hacer ahora?`, null);
         } else {
           chat.messages.forEach(msg => {
             if (msg.role === 'user') {
@@ -1197,6 +1205,14 @@
         welcomeScreen.style.display = 'flex';
         promptInput.value = '';
         clearAttachment();
+
+        // Saludo espontáneo estilo Undertale (50% de probabilidad)
+        const spontaneous = brain.checkForSpontaneousGreeting();
+        if (spontaneous) {
+          welcomeScreen.style.display = 'none';
+          messagesContainer.style.display = 'flex';
+          appendAiBubble(spontaneous, null);
+        }
       }
 
       function openSidebarDrawer() {
@@ -1268,10 +1284,14 @@
 
       saveProfileBtn.addEventListener('click', () => {
         const val = userNameInput.value.trim();
+        const keyVal = apiKeyInput.value.trim();
         if (val) {
           brain.setUserName(val);
-          renderUserIdentity();
         }
+        if (keyVal) {
+          brain.setApiKey(keyVal);
+        }
+        renderUserIdentity();
         closeAllPopovers();
       });
 
@@ -1392,7 +1412,7 @@
         setTimeout(() => { promptInput.placeholder = 'Pedir a Natsune IA'; }, 2000);
       });
 
-      function sendMessage() {
+      async function sendMessage() {
         const text = promptInput.value.trim();
         const att = currentAttachment;
         if (!text && !att) return;
@@ -1410,14 +1430,14 @@
         clearAttachment();
 
         const loaderId = appendLoading();
-        setTimeout(() => {
-          const loader = document.getElementById(loaderId);
-          if (loader) loader.remove();
+        
+        const result = await brain.processResponse(text, att, currentModelName.textContent);
+        
+        const loader = document.getElementById(loaderId);
+        if (loader) loader.remove();
 
-          const result = brain.processResponse(text, att, currentModelName.textContent);
-          brain.addMessageToActive('ai', result.reply, null, result.snippet);
-          appendAiBubble(result.reply, result.snippet);
-        }, 700);
+        brain.addMessageToActive('ai', result.reply, null, result.snippet);
+        appendAiBubble(result.reply, result.snippet);
       }
 
       function appendUserBubble(text, att) {
@@ -1447,7 +1467,7 @@
         row.id = id;
         row.innerHTML = `
           ${getAiAvatarSmallHTML(true)}
-          <div class="ai-bubble" style="color: var(--text-secondary);">Analizando con Natsune IA...</div>
+          <div class="ai-bubble" style="color: var(--text-secondary);">Pensando con cariño...</div>
         `;
         messagesContainer.appendChild(row);
         chatViewport.scrollTop = chatViewport.scrollHeight;
@@ -1486,9 +1506,16 @@
         }[tag]));
       }
 
-      // Initial render
+      // Initial render & check spontaneous greeting on load
       renderUserIdentity();
       renderHistory();
+
+      const initialGreeting = brain.checkForSpontaneousGreeting();
+      if (initialGreeting) {
+        welcomeScreen.style.display = 'none';
+        messagesContainer.style.display = 'flex';
+        appendAiBubble(initialGreeting, null);
+      }
     });
   </script>
 </body>
