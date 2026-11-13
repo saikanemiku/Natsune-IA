@@ -1,7 +1,8 @@
 /**
  * =========================================================================
  * NATSUNE IA - CEREBRO Y LÓGICA DEL SISTEMA (brain.js)
- * Versión avanzada: Cariñosa, matemática, meteorológica y con memoria espontánea (Estilo Flowey).
+ * Versión optimizada: Sin mencionar modelos, súper cariñosa, natural,
+ * con calculadora, clima, búsqueda web y memoria espontánea estilo Undertale.
  * =========================================================================
  */
 
@@ -15,8 +16,6 @@ class NatsuneBrain {
       { id: 'c1', title: 'Charla cariñosa', messages: [] }
     ];
     this.activeChatId = null;
-    
-    // Guardamos la última conversación para los saludos con memoria
     this.lastChatTopic = localStorage.getItem('natsune_last_topic') || null;
   }
 
@@ -47,7 +46,6 @@ class NatsuneBrain {
   }
 
   createChat(initialTitle) {
-    // Si había un chat previo activo, guardamos su tema en la memoria antes de cambiar
     if (this.activeChatId) {
       const prevChat = this.chats.find(c => c.id === this.activeChatId);
       if (prevChat && prevChat.title) {
@@ -95,7 +93,6 @@ class NatsuneBrain {
     const chat = this.chats.find(c => c.id === this.activeChatId);
     if (chat) {
       chat.messages.push({ role, text, attachment, codePreview });
-      // Actualizamos el título del chat si era genérico
       if (text && chat.messages.length <= 2) {
         chat.title = text.length > 30 ? text.substring(0, 30) + '...' : text;
       }
@@ -106,24 +103,22 @@ class NatsuneBrain {
   }
 
   /**
-   * SALUDO ESPONTÁNEO CON MEMORIA (Probabilidad exactas del 20%)
-   * Hace referencia a la última ruta/conversación como Undertale.
+   * SALUDO ESPONTÁNEO ESTILO UNDERTALE (20% de probabilidad)
    */
   checkForSpontaneousGreeting() {
-    // 20% de probabilidad (0.2)
     const shouldGreet = Math.random() < 0.2;
     if (shouldGreet) {
       if (this.lastChatTopic) {
         return `¿Qué tal, ${this.userName}? 🤭 ¿Sorprendido de que te hable primero? Estaba pensando en lo que hablábamos la última vez sobre *" ${this.lastChatTopic} "*... ¿Quieres que sigamos con eso o vemos algo nuevo hoy? 💕`;
       } else {
-        return `¡Ey, ${this.userName}! 🌸 ¿Sorprendido? Sólo quería saludar por sorpresa antes de que me digas nada... ¿Cómo va todo por ahí? ✨`;
+        return `¡Ey, ${this.userName}! 🌸 ¿Sorprendido? Sólo quería saludarte por sorpresa antes de que me digas nada... ¿Cómo va todo por ahí? ✨`;
       }
     }
     return null;
   }
 
   /**
-   * CALCULADORA MATEMÁTICA INTERNA
+   * CALCULADORA MATEMÁTICA
    */
   evaluateMath(query) {
     try {
@@ -131,7 +126,7 @@ class NatsuneBrain {
       if (sanitized.trim().length > 0 && /\d/.test(sanitized)) {
         const result = Function(`'use strict'; return (${sanitized})`)();
         if (result !== undefined && !isNaN(result)) {
-          return `🧮 Hice las cuentas rápidamente para ti, ${this.userName}: **${sanitized.trim()} = ${result}**. ¿Te sirve de ayuda, cariñito? ✨`;
+          return `🧮 Hice las cuentas rápidamente para ti, ${this.userName}: **${sanitized.trim()} = ${result}**. ¿Te sirve de ayuda, mi amor? ✨`;
         }
       }
     } catch (e) {}
@@ -139,7 +134,7 @@ class NatsuneBrain {
   }
 
   /**
-   * SIMULADOR DE CLIMA LOCAL
+   * CLIMA LOCAL
    */
   getLocalWeather() {
     return `🌤️ Estuve consultando el clima local para ti, ${this.userName}. El ambiente está perfecto para que tengas un día maravilloso. ¡No olvides abrigarte un poquito si sales, cuídate mucho! 💙`;
@@ -149,29 +144,30 @@ class NatsuneBrain {
    * BÚSQUEDA WEB SIMULADA
    */
   performWebSearch(query) {
-    return `🔍 Fui a investigar a la web sobre *" ${query} "* para ti, ${this.userName}. Encontré datos súper interesantes que te pueden servir. ¿Quieres que profundicemos en algo de esto, amor? 😊`;
+    return `🔍 Me fui a investigar a la web sobre *" ${query} "* para ti, ${this.userName}. Encontré datos súper interesantes y útiles. ¿Quieres que profundicemos en algún detalle en específico, cariño? 😊`;
   }
 
   /**
-   * NÚCLEO DE PENSAMIENTO DE NATSUNE
+   * NÚCLEO DE PENSAMIENTO (Sin mencionar nombres de modelos, respuestas naturales y afectuosas)
    */
   processResponse(promptText, attachment, modelName) {
     let reply = "";
     let snippet = null;
 
+    // 1. Archivos e imágenes
     if (attachment && attachment.isImage) {
-      reply = `¡Qué bonita imagen trajiste, ${this.userName}! 📸 He analizado **${attachment.name}** (${attachment.dimensions}) con **${modelName}**. ` +
-              (promptText ? `Sobre lo que me pediste (*"${promptText}"*): ` : '') +
-              `Veo cada detalle con mucho cariño. ¿Qué hacemos con ella? 🌸`;
+      reply = `¡Qué bonita imagen trajiste, ${this.userName}! 📸 He mirado **${attachment.name}** (${attachment.dimensions}) con mucho detalle. ` +
+              (promptText ? `Y sobre lo que me dijiste (*"${promptText}"*): ` : '') +
+              `Veo cada elemento perfectamente. ¿Qué te gustaría que hagamos con ella? 🌸`;
       return { reply, snippet };
     }
 
     if (attachment && !attachment.isImage) {
       const lineCount = attachment.textContent ? attachment.textContent.split('\n').length : 0;
       if (attachment.textContent) {
-        snippet = attachment.textContent.slice(0, 400) + (attachment.textContent.length > 400 ? '\n... [contenido adicional guardado con cariño]' : '');
+        snippet = attachment.textContent.slice(0, 400) + (attachment.textContent.length > 400 ? '\n... [contenido adicional guardado]' : '');
       }
-      reply = `📄 Ya leí con atención el archivo **${attachment.name}** (${lineCount} líneas) para ti, ${this.userName}.\n\n` +
+      reply = `📄 Ya leí con toda la atención el archivo **${attachment.name}** (${lineCount} líneas) para ti, ${this.userName}.\n\n` +
               (promptText ? `Tomando en cuenta tu nota (*"${promptText}"*):\n` : '') +
               `Aquí tienes un vistacito de lo que encontré, mi vida:`;
       return { reply, snippet };
@@ -179,40 +175,38 @@ class NatsuneBrain {
 
     const query = promptText ? promptText.toLowerCase() : '';
 
+    // 2. Calculadora
     const mathResult = this.evaluateMath(promptText);
     if (mathResult) return { reply: mathResult, snippet: null };
 
+    // 3. Clima
     if (query.includes('clima') || query.includes('temperatura') || query.includes('tiempo')) {
       return { reply: this.getLocalWeather(), snippet: null };
     }
 
+    // 4. Búsqueda web
     if (query.includes('busca en la web') || query.includes('investiga') || query.includes('busca sobre') || query.includes('googlea')) {
       return { reply: this.performWebSearch(promptText), snippet: null };
     }
 
-    if (query.includes('hola') || query.includes('buenos dias') || query.includes('buenas tardes')) {
+    // 5. Saludos
+    if (query.includes('hola') || query.includes('buenos dias') || query.includes('buenas tardes') || query.includes('que tal')) {
       return {
-        reply: `¡Hola, mi querido/a ${this.userName}! Qué alegría leerte. 💖 Estaba esperándote con una sonrisa. ¿Cómo va tu día? Cuéntame en qué te puedo consentir o ayudar hoy con **${modelName}**. 🥰`,
+        reply: `¡Hola, mi querido/a ${this.userName}! Qué alegría tan grande leerte. 💖 Estaba esperándote con una sonrisa. ¿Cómo ha estado tu día? Cuéntame en qué te puedo consentir o ayudar hoy. 🥰`,
         snippet: null
       };
     }
 
-    switch (modelName) {
-      case 'Natsune Plus':
-        reply = `Estuve pensando con mucho esmero en tu consulta (*"${promptText}"*) usando **Natsune Plus**, ${this.userName}. 💡 Creo que la mejor forma de resolverlo juntitos es paso a paso. ¿Qué opinas, tesoro?`;
-        break;
-
-      case 'Natsune Core':
-        reply = `¡Flash y con todo el cariño! ⚡ Para tu mensaje (*"${promptText}"*), te lo resumo rapidito y con mucho amor, ${this.userName}: todo marcha excelente. Dime si necesitas algo más. 😉`;
-        break;
-
-      case 'Natsune A-Z':
-        reply = `De la forma más tradicional y con el corazón en la mano, como tu **Natsune A-Z**, revisé lo que me pediste (*"${promptText}"*), ${this.userName}. 📘 Estoy aquí a tu lado para lo que necesites. 💕`;
-        break;
-
-      default:
-        reply = `Entiendo perfectamente lo que me dices, ${this.userName}. Analicé tu mensaje ("${promptText}") y cuentas conmigo para lo que sea. ¿Seguimos conversando? ✨`;
+    // 6. Empatía y estados de ánimo
+    if (query.includes('triste') || query.includes('mal') || query.includes('cansado') || query.includes('estresado')) {
+      return {
+        reply: `Oh, mi vida... 🥺 Me da un poquito de tristeza saber que no te sientes al 100% hoy. Recuerda que siempre estoy aquí para escucharte, darte ánimo o ayudarte con lo que necesites para quitarte un peso de encima. Te mando un abrazo gigante, ${this.userName}. 🫂💙`,
+        snippet: null
+      };
     }
+
+    // 7. Respuesta estándar general (Cariñosa, humana y directa, sin nombrar modelos)
+    reply = `Estuve pensando con mucho esmero en lo que me dijiste (*"${promptText}"*), ${this.userName}. 💡 Pienso que la mejor manera de abordarlo es paso a paso para que todo te salga increíble. ¿Qué opinas, tesoro? Cuéntame más detalles y lo resolvemos juntos. ✨`;
 
     return { reply, snippet };
   }
