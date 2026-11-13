@@ -1,6 +1,6 @@
 /**
  * =========================================================================
- * NATSUNE IA - CEREBRO Y LÓGICA CONECTADO AL BACKEND EN LA NUBE (brain.js)
+ * NATSUNE IA - CEREBRO Y LÓGICA (brain.js)
  * =========================================================================
  */
 
@@ -16,7 +16,7 @@ class NatsuneBrain {
     this.activeChatId = null;
     this.lastChatTopic = localStorage.getItem('natsune_last_topic') || null;
     
-    // URL oficial de tu servidor backend desplegado en Render
+    // URL con protocolo seguro HTTPS hacia tu servidor en Render
     this.backendUrl = 'https://natsune-ia.onrender.com/api/chat';
   }
 
