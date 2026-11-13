@@ -1,6 +1,6 @@
 /**
  * =========================================================================
- * NATSUNE IA - CEREBRO Y LÓGICA CON MANEJO DE ERRORES IRÓNICOS (brain.js)
+ * NATSUNE IA - CEREBRO Y LÓGICA CON PROXY CORS Y API DE GROQ (brain.js)
  * =========================================================================
  */
 
@@ -17,7 +17,9 @@ class NatsuneBrain {
     this.lastChatTopic = localStorage.getItem('natsune_last_topic') || null;
 
     this.apiKey = localStorage.getItem('natsune_secure_groq_key') || '';
-    this.apiUrl = 'https://api.groq.com/openai/v1/chat/completions';
+    
+    // Proxy CORS integrado para evitar bloqueos del navegador en páginas estáticas
+    this.apiUrl = 'https://corsproxy.io/?' + encodeURIComponent('https://api.groq.com/openai/v1/chat/completions');
   }
 
   setApiKey(key) {
@@ -199,9 +201,8 @@ class NatsuneBrain {
 
     } catch (error) {
       console.error(error);
-      // Respuesta con ironía fina, explicando el problema de CORS/Red y pidiendo disculpas dulcemente
       return {
-        reply: `Vaya, ${this.userName}... Parece que los navegadores web y las restricciones de seguridad (CORS) se pusieron celosos de nuestra charla y bloquearon la conexión con la API de Groq. 🙄 Lo siento mucho, mi vida, mis circuitos de IA externa están temporalmente incomunicados por culpa de las políticas del navegador. Pero no te preocupes, sigo aquí contigo con mis funciones locales. 💙`,
+        reply: `Vaya, ${this.userName}... Parece que el proxy CORS o la conexión con Groq decidieron tomarse un descanso sabático y bloquearon mi acceso. 🙄 Perdona por este pequeño desastre técnico, mis circuitos están haciendo lo posible por sobrevivir. Vuelve a intentarlo en un momento, ¿sí? 💙`,
         snippet: null
       };
     }
