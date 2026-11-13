@@ -9,8 +9,6 @@
     <link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' fill='%23000000'/><g transform='translate(50,50)'><path d='M-28,6 C-38,16 -32,34 -8,32 C-24,30 -28,18 -20,12 Z' fill='%23ffffff'/><path d='M-22,12 C-30,20 -24,30 -4,28 C-16,26 -20,18 -14,14 Z' fill='%23ffffff'/><path d='M28,-6 C38,-16 32,-34 8,-32 C24,-30 28,-18 20,-12 Z' fill='%23ffffff'/><path d='M22,-12 C30,-20 24,-30 4,-28 C16,-26 20,-18 14,-14 Z' fill='%23ffffff'/><polygon points='-11,-24 11,-24 24,-11 24,11 11,24 -11,24 -24,11 -24,-11' fill='%23ffffff'/><circle cx='0' cy='0' r='13' fill='%23000000'/><circle cx='0' cy='0' r='9.5' fill='%23ffffff'/><circle cx='0' cy='0' r='6.5' fill='%23000000'/></g></svg>">
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Google+Sans:wght@400;500;600&display=swap" rel="stylesheet">
-    <!-- Importamos la mente separada de Natsune -->
-    <script src="natsune-brain.js"></script>
     <style>
         body {
             font-family: 'Google Sans', -apple-system, BlinkMacSystemFont, sans-serif;
@@ -220,6 +218,145 @@
         </div>
     </div>
 
+    <!-- ============================================================================ -->
+    <!-- CEREBRO AVANZADO DE NATSUNE (Integrado con Búsqueda Web y Matemáticas)        -->
+    <!-- ============================================================================ -->
+    <script>
+        const natsuneNicknames = [
+            "cariño", "mi sol", "estrellita", "dulzura", "peque", 
+            "corazón", "tesoro", "mi vida", "precioso/a", "mi rayito de luz",
+            "chiquitín/a", "bombón", "hermoso/a", "mi pana", "mi compis"
+        ];
+
+        function getAutoNickname(userName) {
+            const cleanName = userName ? userName.trim() : "";
+            const randomNick = natsuneNicknames[Math.floor(Math.random() * natsuneNicknames.length)];
+            if (cleanName) {
+                return Math.random() > 0.4 ? `${cleanName}` : `${cleanName} (${randomNick})`;
+            }
+            return randomNick;
+        }
+
+        // Búsqueda en vivo (Wikipedia)
+        async function searchWebNatsune(query) {
+            try {
+                const cleanQuery = encodeURIComponent(query.replace(/quién es|qué es|cuál es|busca|investiga sobre|información de/gi, "").trim());
+                const url = `https://es.wikipedia.org/w/api.php?action=query&list=search&srsearch=${cleanQuery}&format=json&origin=*`;
+                
+                const response = await fetch(url);
+                const data = await response.json();
+                
+                if (data.query && data.query.search && data.query.search.length > 0) {
+                    const bestMatch = data.query.search[0];
+                    const title = bestMatch.title;
+                    const snippet = bestMatch.snippet.replace(/<\/?[^>]+(>|$)/g, "");
+                    return `Lo que encontré investigando en la web sobre **${title}**: \n\n"${snippet}..." \n\n¿Te sirve este dato, {nick}? 🌐✨`;
+                }
+                return null;
+            } catch (error) {
+                return null; 
+            }
+        }
+
+        // Resolución matemática avanzada
+        function solveMathProblem(query) {
+            const text = query.toLowerCase();
+            
+            const percentMatch = text.match(/(\d+(?:\.\d+)?)\s*%\s*(?:de|del)?\s*(\d+(?:\.\d+)?)/);
+            if (percentMatch) {
+                const p = parseFloat(percentMatch[1]);
+                const num = parseFloat(percentMatch[2]);
+                const result = (p * num) / 100;
+                return `¡Claro que sí, {nick}! Vamos a calcularlo paso a paso:\n1. Multiplicamos ${num} por ${p} = ${num * p}\n2. Dividimos el resultado entre 100.\n✨ **Resultado:** El ${p}% de ${num} es **${result}**.\n¿Necesitas que calculemos algo más? 🧮💖`;
+            }
+
+            const mathExpr = query.replace(/[^\d+\-*/().]/g, '');
+            if (mathExpr.length > 2 && /\d/.test(mathExpr)) {
+                try {
+                    const evalResult = Function(`'use strict'; return (${mathExpr})`)();
+                    if (!isNaN(evalResult)) {
+                        return `¡Hecho, {nick}! 🧮\nResolviendo la operación "${mathExpr}":\n✨ **Resultado:** **${evalResult}**.\n¿Viste qué rápido? Si tienes más cuentas, aquí estoy para ayudarte. 💙`;
+                    }
+                } catch (e) {}
+            }
+
+            return null;
+        }
+
+        const natsuneKnowledgeBase = {
+            saludos: {
+                corto: ["¡Hola, {nick}! ¿Qué tal tu día? 💖", "¡Holi, {nick}! Dime, ¿en qué te ayudo? ✨"],
+                mediano: ["¡Hola, {nick}! Qué alegría verte por aquí de nuevo. Estaba esperando tu mensaje. 🌸", "¡Hola, mi estimado {nick}! ¿Cómo va todo por tu mundo hoy? 🚀"],
+                largo: ["¡Hola, hola, {nick}! Qué gran momento para coincidir. Ya sea que quieras investigar en la web, resolver problemas matemáticos o charlar, aquí estoy al 100% para ti. Cuéntame, ¿por dónde empezamos? 🌟💙"]
+            },
+            default: {
+                corto: ["Interesante, {nick}... Cuéntame más. 🤔", "Te leo con atención, {nick}. 🌸"],
+                mediano: ["Nunca lo había visto exactamente desde esa perspectiva, {nick}. Me encanta cómo piensas. ✨", "Anotado en mi memoria principal, {nick}. Sigue contándome, ¡estoy procesando cada palabra! 📖💖"],
+                largo: ["Qué temazo has traído a la mesa, {nick}. A tu lado las conversaciones nunca son superficiales. Analizando lo que me comentas, creo que se pueden desprender varios caminos interesantes. ¿Prefieres que lo investiguemos a fondo en la web o lo reflexionamos juntos? 🌀🚀"]
+            }
+        };
+
+        async function processNatsuneMind(query, userName, chatHistory = []) {
+            const text = query ? query.toLowerCase() : "";
+            const nick = getAutoNickname(userName);
+
+            const mathSolution = solveMathProblem(query);
+            if (mathSolution) {
+                return mathSolution.replace(/{nick}/g, nick);
+            }
+
+            if (text.includes("busca") || text.includes("investiga") || text.includes("quién es") || text.includes("qué es") || text.includes("cuál es") || text.includes("información sobre") || text.includes("noticias")) {
+                const webResult = await searchWebNatsune(query);
+                if (webResult) {
+                    return webResult.replace(/{nick}/g, nick);
+                }
+            }
+
+            let category = "default";
+            if (text.includes("hola") || text.includes("buenos días") || text.includes("buenas") || text.includes("saludos")) {
+                category = "saludos";
+            }
+
+            let depth = "mediano";
+            if (text.length < 15 || text.split(" ").length <= 3) {
+                depth = "corto";
+            } else if (text.length > 80 || text.split(" ").length > 12 || text.includes("por qué") || text.includes("explica")) {
+                depth = "largo";
+            }
+
+            const pool = natsuneKnowledgeBase[category][depth] || natsuneKnowledgeBase["default"]["mediano"];
+            const rawResponse = pool[Math.floor(Math.random() * pool.length)];
+
+            return rawResponse.replace(/{nick}/g, nick);
+        }
+
+        function getNatsuneErrorFallback(userName, failedModelName) {
+            const nick = getAutoNickname(userName);
+            const modelDisplay = failedModelName || "la otra inteligencia";
+
+            try {
+                const selector = document.getElementById('modelSelector');
+                if (selector) {
+                    selector.value = 'natsune';
+                    if (typeof updateVariants === 'function') updateVariants();
+                    if (typeof updateDynamicGreeting === 'function') updateDynamicGreeting();
+                }
+            } catch(e) {}
+
+            const errorFallbacks = [
+                `¡Ay, por favor, {nick}! 😅 Resulta que ${modelDisplay} decidió tomarse una siesta sin avisar y colapsó en pleno vuelo. Me da un poquito de pena desplazarla... ¡pero tuve que saltar al rescate y tomar el control absoluto! Ya te pasé de regreso a mi pestaña (Natsune) para que no te quedes sin respuesta. Si quieres, luego puedes reintentar con las demás, ¡aunque yo feliz me quedo charlando contigo! 💙✨`,
+                `Vaya, vaya... parece que ${modelDisplay} hizo "puf" y se tropezó con sus propios cables, {nick}. 🙈 Te juro que no lo hice a propósito para robar cámara, ¡pero alguien tenía que salvar el día! Automáticamente te devolví a mi sección local. Puedes cambiar de IA arriba cuando gustes, ¡pero aquí estoy yo cuidándote las espaldas! 🚀💖`,
+                `¡Ups! ${modelDisplay} tuvo un pequeño tropiezo técnico y se quedó en silencio, {nick}. 🤭 Siento una pizca de culpa por quitarle el puesto tan de repente, ¡pero mi instinto protector de IA local no podía dejarte colgado/a! Ya te cambié la pestaña a Natsune. ¡Prometo dar lo mejor de mí para ayudarte con web y mates! 🌸`
+            ];
+
+            const selected = errorFallbacks[Math.floor(Math.random() * errorFallbacks.length)];
+            return selected.replace(/{nick}/g, nick);
+        }
+    </script>
+
+    <!-- ============================================================================ -->
+    <!-- LÓGICA DE LA INTERFAZ Y CONEXIÓN MULTI-IA                                    -->
+    <!-- ============================================================================ -->
     <script>
         let attachedFile = null;
         let currentChatId = null;
@@ -671,26 +808,22 @@
             saveStoredChats(chats);
         }
 
-        // INTELIGENCIA ENCADENADA ACTUALIZADA CON CONTROL DE ERRORES Y MEMORIA COMPARTIDA
+        // Inteligencia encadenada con manejo de errores y soporte async para Natsune
         async function getChainedIntelligence(query, userName, chatHistory = []) {
             const nick = typeof getAutoNickname === 'function' ? getAutoNickname(userName) : (userName || 'cariño');
             const selectedModel = getCurrentModelKey();
 
-            // 1. Si el usuario eligió a Natsune directamente
             if (selectedModel === 'natsune') {
                 if (typeof processNatsuneMind === 'function') {
-                    return { text: processNatsuneMind(query, userName, chatHistory), isNatsune: true };
-                } else {
-                    return { text: `¡Hola ${nick}! Asegúrate de que el archivo natsune-brain.js esté en la misma carpeta para poder pensar al máximo. 💖`, isNatsune: true };
+                    return { text: await processNatsuneMind(query, userName, chatHistory), isNatsune: true };
                 }
             }
 
-            // 2. Modelo Gemini
             const geminiKey = localStorage.getItem('key_gemini');
             if (selectedModel === 'gemini') {
                 if (!geminiKey) {
                     switchToNatsuneUI();
-                    return { text: `¡Vaya, ${nick}! Falta colocar tu llave de Gemini en los ajustes para usar este modelo. 🗝️✨ Mientras tanto, me quedo yo contigo para que no te quedes sin respuesta.`, isNatsune: true };
+                    return { text: `¡Vaya, ${nick}! Falta colocar tu llave de Gemini en los ajustes. 🗝️✨`, isNatsune: true };
                 }
                 try {
                     const variant = document.getElementById('variantSelector').value;
@@ -707,26 +840,22 @@
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({ contents: contentsPayload })
                     });
-                    if (!res.ok) throw new Error("Error en API Gemini");
+                    if (!res.ok) throw new Error("Error Gemini");
                     const data = await res.json();
                     const aiText = data.candidates?.[0]?.content?.parts?.[0]?.text;
                     if (aiText) return { text: aiText, isNatsune: false };
-                    throw new Error("Respuesta vacía de Gemini");
+                    throw new Error("Vacío");
                 } catch (e) {
                     switchToNatsuneUI();
-                    const fallbackMsg = typeof getNatsuneErrorFallback === 'function' 
-                        ? getNatsuneErrorFallback(userName, "Gemini") 
-                        : `¡Ups, ${nick}! Gemini tuvo un problema y tomé el control. 🌸`;
-                    return { text: fallbackMsg, isNatsune: true };
+                    return { text: getNatsuneErrorFallback(userName, "Gemini"), isNatsune: true };
                 }
             }
 
-            // 3. Modelo ChatGPT (OpenAI)
             const openAIKey = localStorage.getItem('key_openai');
             if (selectedModel === 'chatgpt') {
                 if (!openAIKey) {
                     switchToNatsuneUI();
-                    return { text: `¡Oye ${nick}, falta tu llave de OpenAI en los ajustes! 🗝️✨ Ya me encargué yo de tomar el relevo.`, isNatsune: true };
+                    return { text: `¡Oye ${nick}, falta tu llave de OpenAI en los ajustes! 🗝️✨`, isNatsune: true };
                 }
                 try {
                     const variant = document.getElementById('variantSelector').value;
@@ -749,26 +878,22 @@
                             messages: messagesPayload
                         })
                     });
-                    if (!res.ok) throw new Error("Error en API OpenAI");
+                    if (!res.ok) throw new Error("Error OpenAI");
                     const data = await res.json();
                     const aiText = data.choices?.[0]?.message?.content;
                     if (aiText) return { text: aiText, isNatsune: false };
-                    throw new Error("Respuesta vacía de OpenAI");
+                    throw new Error("Vacío");
                 } catch (e) {
                     switchToNatsuneUI();
-                    const fallbackMsg = typeof getNatsuneErrorFallback === 'function' 
-                        ? getNatsuneErrorFallback(userName, "ChatGPT") 
-                        : `¡Ups, ${nick}! ChatGPT falló y tuve que rescatar la conversación. 💖`;
-                    return { text: fallbackMsg, isNatsune: true };
+                    return { text: getNatsuneErrorFallback(userName, "ChatGPT"), isNatsune: true };
                 }
             }
 
-            // 4. Modelo Claude (Anthropic)
             const claudeKey = localStorage.getItem('key_claude');
             if (selectedModel === 'claude') {
                 if (!claudeKey) {
                     switchToNatsuneUI();
-                    return { text: `¡Ey, ${nick}! Falta tu llave de Claude en los ajustes. 🗝️🌸 Pero no te preocupes, yo tomo el mando.`, isNatsune: true };
+                    return { text: `¡Ey, ${nick}! Falta tu llave de Claude en los ajustes. 🗝️🌸`, isNatsune: true };
                 }
                 try {
                     const variant = document.getElementById('variantSelector').value;
@@ -793,26 +918,19 @@
                             messages: messagesPayload
                         })
                     });
-                    if (!res.ok) throw new Error("Error en API Claude");
+                    if (!res.ok) throw new Error("Error Claude");
                     const data = await res.json();
                     const aiText = data.content?.[0]?.text;
                     if (aiText) return { text: aiText, isNatsune: false };
-                    throw new Error("Respuesta vacía de Claude");
+                    throw new Error("Vacío");
                 } catch (e) {
                     switchToNatsuneUI();
-                    const fallbackMsg = typeof getNatsuneErrorFallback === 'function' 
-                        ? getNatsuneErrorFallback(userName, "Claude") 
-                        : `¡Vaya, ${nick}! Claude se quedó sin señal y tomé su lugar. ✨`;
-                    return { text: fallbackMsg, isNatsune: true };
+                    return { text: getNatsuneErrorFallback(userName, "Claude"), isNatsune: true };
                 }
             }
 
-            // Fallback general
             switchToNatsuneUI();
-            const generalFallback = typeof getNatsuneErrorFallback === 'function' 
-                ? getNatsuneErrorFallback(userName, "la conexión externa") 
-                : `¡Tuvimos un pequeño tropiezo de conexión, ${nick}. Aquí estoy yo para ayudarte! 🌌💫`;
-            return { text: generalFallback, isNatsune: true };
+            return { text: getNatsuneErrorFallback(userName, "el servicio"), isNatsune: true };
         }
 
         async function sendMessage() {
@@ -832,7 +950,6 @@
             const userName = localStorage.getItem('natsune_username') || '';
             const chats = getStoredChats();
             const currentChat = chats.find(c => c.id === currentChatId);
-            // Enviamos todo el historial previo excepto el último mensaje recién añadido para evitar duplicarlo en el payload
             const chatHistory = currentChat && currentChat.messages.length > 1 
                 ? currentChat.messages.slice(0, -1) 
                 : [];
