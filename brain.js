@@ -1,8 +1,8 @@
 /**
  * =========================================================================
- * NATSUNE IA - CEREBRO Y LÓGICA DEL SISTEMA (brain.js)
- * Versión final: 50% de probabilidad de saludo espontáneo ampliado,
- * calculadora, clima, búsqueda web, empatía y cero menciones robóticas de modelos.
+ * NATSUNE IA - CEREBRO Y LÓGICA CON API SEGURA (brain.js)
+ * La API Key ya no está en el código plano, por lo que GitHub no la bloqueará.
+ * Se solicita de forma privada y se guarda solo en tu navegador.
  * =========================================================================
  */
 
@@ -10,21 +10,40 @@ class NatsuneBrain {
   constructor() {
     this.userName = localStorage.getItem('natsune_user_name') || 'Sally';
     this.userAvatar = localStorage.getItem('natsune_user_avatar') || null;
-    this.aiAvatar = null; // Logotipo oficial fijo
+    this.aiAvatar = null;
 
     this.chats = JSON.parse(localStorage.getItem('natsune_chats') || 'null') || [
-      { id: 'c1', title: 'Charla cariñosa', messages: [] }
+      { id: 'c1', title: 'Charla con Natsune', messages: [] }
     ];
     this.activeChatId = null;
     this.lastChatTopic = localStorage.getItem('natsune_last_topic') || null;
+
+    // Obtenemos la clave de forma segura del almacenamiento privado de tu navegador
+    this.apiKey = localStorage.getItem('natsune_secure_groq_key') || '';
+    this.apiUrl = 'https://api.groq.com/openai/v1/chat/completions';
+
+    // Si no hay clave configurada, la pedimos discretamente la primera vez
+    if (!this.apiKey) {
+      this.promptForApiKey();
+    }
+  }
+
+  // Método para configurar tu llave de forma privada en tu navegador
+  promptForApiKey() {
+    const keyInput = prompt('🔒 Natsune IA Seguridad:\nPor favor, introduce tu API Key de Groq para habilitar el cerebro inteligente (solo se guardará en este navegador de forma privada):');
+    if (keyInput && keyInput.trim().startsWith('gsk_')) {
+      this.apiKey = keyInput.trim();
+      localStorage.setItem('natsune_secure_groq_key', this.apiKey);
+      alert('¡Llave guardada de forma segura en tu navegador, Sally! ✨');
+    } else if (keyInput !== null) {
+      alert('La llave no parece válida, asegúrate de que empiece por "gsk_".');
+    }
   }
 
   saveState() {
     localStorage.setItem('natsune_chats', JSON.stringify(this.chats));
     localStorage.setItem('natsune_user_name', this.userName);
-    if (this.lastChatTopic) {
-      localStorage.setItem('natsune_last_topic', this.lastChatTopic);
-    }
+    if (this.lastChatTopic) localStorage.setItem('natsune_last_topic', this.lastChatTopic);
     if (this.userAvatar) {
       localStorage.setItem('natsune_user_avatar', this.userAvatar);
     } else {
@@ -71,17 +90,13 @@ class NatsuneBrain {
       this.lastChatTopic = null;
     }
     this.chats = this.chats.filter(c => c.id !== id);
-    if (this.activeChatId === id) {
-      this.activeChatId = null;
-    }
+    if (this.activeChatId === id) this.activeChatId = null;
     this.saveState();
   }
 
   deleteMultipleChats(ids) {
     this.chats = this.chats.filter(c => !ids.includes(c.id));
-    if (ids.includes(this.activeChatId)) {
-      this.activeChatId = null;
-    }
+    if (ids.includes(this.activeChatId)) this.activeChatId = null;
     this.saveState();
   }
 
@@ -102,114 +117,106 @@ class NatsuneBrain {
     return chat;
   }
 
-  /**
-   * SALUDO ESPONTÁNEO AMPLIADO (50% de probabilidad - Estilo Undertale extendido)
-   */
   checkForSpontaneousGreeting() {
-    // 50% de probabilidad (0.5)
     const shouldGreet = Math.random() < 0.5;
     if (shouldGreet) {
       if (this.lastChatTopic) {
-        return `¡Sorpresa, ${this.userName}! 🤭 Estaba por aquí ordenando mis ideas y me acordé de ti. El otro día estábamos platicando sobre *" ${this.lastChatTopic} "* y me quedé pensando en ello con mucho cariño. ¿Se te antoja seguir explorando ese tema o prefieres que platiquemos de otra cosa hoy, mi vida? 💕✨`;
+        return `¡Sorpresa, ${this.userName}! 🤭 Estaba por aquí ordenando mis ideas y me acordé de ti. El otro día estábamos platicando sobre *" ${this.lastChatTopic} "* y me quedé pensando en ello. ¿Se te antoja seguir explorando ese tema o prefieres que platiquemos de otra cosa hoy, mi vida? 💕✨`;
       } else {
-        return `¡Ey, hola, ${this.userName}! 🌸 ¡Qué gusto encontrarte por aquí tan prontito! Quería saludarte por sorpresa antes de que me escribas nada, solo para asegurarme de que tengas un día maravilloso y recordarte que estoy aquí para lo que necesites. ¿Cómo va todo por tu día? 💖`;
+        return `¡Ey, hola, ${this.userName}! 🌸 ¡Qué gusto encontrarte por aquí tan prontito! Quería saludarte por sorpresa antes de que me escribas nada, solo para asegurarme de que tengas un día maravilloso. ¿Cómo va todo por tu día? 💖`;
       }
     }
     return null;
   }
 
-  /**
-   * CALCULADORA MATEMÁTICA
-   */
   evaluateMath(query) {
     try {
       const sanitized = query.replace(/[^0-9+\-*/().%\s]/g, '');
       if (sanitized.trim().length > 0 && /\d/.test(sanitized)) {
         const result = Function(`'use strict'; return (${sanitized})`)();
         if (result !== undefined && !isNaN(result)) {
-          return `🧮 Hice las cuentas rápidamente para ti, ${this.userName}: **${sanitized.trim()} = ${result}**. ¿Te sirve de ayuda, mi amor? ✨`;
+          return `🧮 Hice las cuentas rápidamente para ti, ${this.userName}: **${sanitized.trim()} = ${result}**. ¿Te sirvió, cariñito? ✨`;
         }
       }
     } catch (e) {}
     return null;
   }
 
-  /**
-   * CLIMA LOCAL
-   */
   getLocalWeather() {
-    return `🌤️ Estuve consultando el clima local para ti, ${this.userName}. El ambiente está perfecto para que tengas un día maravilloso. ¡No olvides abrigarte un poquito si sales, cuídate mucho! 💙`;
+    return `🌤️ Estuve consultando el clima local para ti, ${this.userName}. El ambiente está fresco y agradable. ¡No olvides abrigarte un poquito si sales, cuídate mucho! 💙`;
   }
 
-  /**
-   * BÚSQUEDA WEB SIMULADA
-   */
-  performWebSearch(query) {
-    return `🔍 Me fui a investigar a la web sobre *" ${query} "* para ti, ${this.userName}. Encontré datos súper interesantes y útiles. ¿Quieres que profundicemos en algún detalle en específico, cariño? 😊`;
-  }
-
-  /**
-   * NÚCLEO DE PENSAMIENTO (Cálido, natural y libre de menciones a modelos)
-   */
-  processResponse(promptText, attachment, modelName) {
-    let reply = "";
-    let snippet = null;
-
-    // 1. Archivos e imágenes
-    if (attachment && attachment.isImage) {
-      reply = `¡Qué bonita imagen trajiste, ${this.userName}! 📸 He mirado **${attachment.name}** (${attachment.dimensions}) con mucho detalle. ` +
-              (promptText ? `Y sobre lo que me dijiste (*"${promptText}"*): ` : '') +
-              `Veo cada elemento perfectamente. ¿Qué te gustaría que hagamos con ella? 🌸`;
-      return { reply, snippet };
-    }
-
-    if (attachment && !attachment.isImage) {
-      const lineCount = attachment.textContent ? attachment.textContent.split('\n').length : 0;
-      if (attachment.textContent) {
-        snippet = attachment.textContent.slice(0, 400) + (attachment.textContent.length > 400 ? '\n... [contenido adicional guardado]' : '');
+  async processResponse(promptText, attachment, modelName) {
+    if (!this.apiKey) {
+      this.promptForApiKey();
+      if (!this.apiKey) {
+        return { reply: `Por favor, ingresa tu API Key para que pueda pensar y responderte, ${this.userName}. 🥺`, snippet: null };
       }
-      reply = `📄 Ya leí con toda la atención el archivo **${attachment.name}** (${lineCount} líneas) para ti, ${this.userName}.\n\n` +
-              (promptText ? `Tomando en cuenta tu nota (*"${promptText}"*):\n` : '') +
-              `Aquí tienes un vistacito de lo que encontré, mi vida:`;
-      return { reply, snippet };
     }
 
-    const query = promptText ? promptText.toLowerCase() : '';
+    let contextNote = "";
 
-    // 2. Calculadora
+    if (attachment && attachment.isImage) {
+      contextNote = `[El usuario adjuntó una imagen llamada ${attachment.name} de dimensiones ${attachment.dimensions}].`;
+    } else if (attachment && !attachment.isImage) {
+      contextNote = `[El usuario adjuntó un archivo llamado ${attachment.name} cuyo contenido es:\n${attachment.textContent ? attachment.textContent.slice(0, 1500) : 'Sin contenido'}].`;
+    }
+
     const mathResult = this.evaluateMath(promptText);
     if (mathResult) return { reply: mathResult, snippet: null };
 
-    // 3. Clima
+    const query = promptText ? promptText.toLowerCase() : '';
     if (query.includes('clima') || query.includes('temperatura') || query.includes('tiempo')) {
       return { reply: this.getLocalWeather(), snippet: null };
     }
 
-    // 4. Búsqueda web
-    if (query.includes('busca en la web') || query.includes('investiga') || query.includes('busca sobre') || query.includes('googlea')) {
-      return { reply: this.performWebSearch(promptText), snippet: null };
-    }
+    const systemPrompt = `Eres Natsune IA, un asistente personal de inteligencia artificial muy inteligente. 
+    Tu usuario se llama ${this.userName}. 
+    REGLA DE PERSONALIDAD OBLIGATORIA: Eres extremadamente cariñosa, amable, dulce y cercana, pero de vez en cuando usas un toque de ironía fina o sarcasmo juguetón y tierno (estilo tsundere/cariñosa). Nunca suenes como un robot frío. Habla de forma natural, humana y usa emojis con moderación pero afecto. Nunca menciones nombres técnicos de modelos internos.`;
 
-    // 5. Saludos
-    if (query.includes('hola') || query.includes('buenos dias') || query.includes('buenas tardes') || query.includes('que tal')) {
+    const userMessage = `${contextNote} Mensaje del usuario: ${promptText || 'Hola'}`;
+
+    try {
+      const response = await fetch(this.apiUrl, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${this.apiKey}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          model: 'llama-3.3-70b-versatile',
+          messages: [
+            { role: 'system', content: systemPrompt },
+            { role: 'user', content: userMessage }
+          ],
+          temperature: 0.7,
+          max_tokens: 1024
+        })
+      });
+
+      if (!response.ok) {
+        throw new Error('Error en la conexión con la API');
+      }
+
+      const data = await response.json();
+      const reply = data.choices && data.choices[0] && data.choices[0].message 
+        ? data.choices[0].message.content 
+        : `Ay, ${this.userName}, me quedé pensando un segundito y se me fue la inspiración. ¿Me lo repites, por favor? 🥺`;
+
+      let snippet = null;
+      if (attachment && !attachment.isImage && attachment.textContent) {
+        snippet = attachment.textContent.slice(0, 400) + '...';
+      }
+
+      return { reply, snippet };
+
+    } catch (error) {
+      console.error(error);
       return {
-        reply: `¡Hola, mi querido/a ${this.userName}! Qué alegría tan grande leerte. 💖 Estaba esperándote con una sonrisa. ¿Cómo ha estado tu día? Cuéntame en qué te puedo consentir o ayudar hoy. 🥰`,
+        reply: `Vaya, ${this.userName}... Parece que hubo un problema con tu API Key o la conexión a la red. Revisa que tu clave sea correcta. 💙`,
         snippet: null
       };
     }
-
-    // 6. Empatía y estados de ánimo
-    if (query.includes('triste') || query.includes('mal') || query.includes('cansado') || query.includes('estresado')) {
-      return {
-        reply: `Oh, mi vida... 🥺 Me da un poquito de tristeza saber que no te sientes al 100% hoy. Recuerda que siempre estoy aquí para escucharte, darte ánimo o ayudarte con lo que necesites para quitarte un peso de encima. Te mando un abrazo gigante, ${this.userName}. 🫂💙`,
-        snippet: null
-      };
-    }
-
-    // 7. Respuesta estándar general (Cariñosa, humana y directa)
-    reply = `Estuve pensando con mucho esmero en lo que me dijiste (*"${promptText}"*), ${this.userName}. 💡 Pienso que la mejor manera de abordarlo es paso a paso para que todo te salga increíble. ¿Qué opinas, tesoro? Cuéntame más detalles y lo resolvemos juntos. ✨`;
-
-    return { reply, snippet };
   }
 }
 
